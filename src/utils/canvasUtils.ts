@@ -151,16 +151,8 @@ export function drawText(
       const descHeight = descLines.length * lineHeight;
       ctx.font = descFont;
       
-      const totalNeededHeight = currentTextHeight + effectiveSpacing + descHeight;
-      
-      // Se lo spazio totale necessario supera quello disponibile, riduci lo spacing proporzionalmente
-      if (totalNeededHeight > availableHeight) {
-        const minSpacing = Math.min(effectiveSpacing, 40); // Mantiene lo spacing minimo
-        const maxReduction = effectiveSpacing - minSpacing;
-        const overflow = totalNeededHeight - availableHeight;
-        const reduction = Math.min(maxReduction, overflow);
-        effectiveSpacing = Math.max(minSpacing, effectiveSpacing - reduction);
-      }
+      // Mantiene lo spacing originale il più possibile
+      startY = contentStartY + (effectiveSpacing * 0.5);
     } else {
       const titleFont = ctx.font;
       ctx.font = getFontStyle('title', fontSize, template);
@@ -168,9 +160,10 @@ export function drawText(
       const titleHeight = titleLines.length * lineHeight;
       ctx.font = titleFont;
       
+      // Applica lo spacing originale per la descrizione
       startY = contentStartY + titleHeight + effectiveSpacing;
       
-      // Verifica che la descrizione non superi l'area disponibile
+      // Solo se il testo supera i limiti, adatta lo spacing
       const bottomLimit = height - (safeZoneMargin * 1.25);
       if (startY + currentTextHeight > bottomLimit) {
         const maxStartY = bottomLimit - currentTextHeight;
