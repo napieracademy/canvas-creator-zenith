@@ -14,6 +14,7 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
   const [scale, setScale] = useState(100);
   const ORIGINAL_WIDTH = 1080;
   const ORIGINAL_HEIGHT = 1350;
+  const MARGIN_X = 100; // Margine laterale fisso
 
   const updateScale = () => {
     const canvas = canvasRef.current;
@@ -71,7 +72,8 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
       const testLine = currentLine ? `${currentLine} ${word}` : word;
       const metrics = ctx.measureText(testLine);
       
-      if (metrics.width > canvas.width - 200) {
+      // Usa ORIGINAL_WIDTH - (2 * MARGIN_X) per il wrapping del testo
+      if (metrics.width > ORIGINAL_WIDTH - (2 * MARGIN_X)) {
         lines.push(currentLine);
         currentLine = word;
       } else {
@@ -84,10 +86,10 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
 
     const lineHeight = fontSize * 1.2;
     const totalHeight = lines.length * lineHeight;
-    const startY = (canvas.height - totalHeight) / 2;
-    const x = textAlign === 'left' ? 100 : 
-             textAlign === 'right' ? canvas.width - 100 : 
-             canvas.width / 2;
+    const startY = (ORIGINAL_HEIGHT - totalHeight) / 2;
+    const x = textAlign === 'left' ? MARGIN_X : 
+             textAlign === 'right' ? ORIGINAL_WIDTH - MARGIN_X : 
+             ORIGINAL_WIDTH / 2;
 
     lines.forEach((line, index) => {
       ctx.fillText(line, x, startY + index * lineHeight);
