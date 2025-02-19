@@ -136,24 +136,31 @@ export function drawText(
   if (template === 'lucky') {
     const imageHeight = height / 3; // Altezza dell'immagine
     const availableHeight = height - imageHeight - (safeZoneMargin * 3); // Spazio disponibile per il testo
-    const totalTextHeight = type === 'title' ? totalHeight : totalHeight * 2 + spacing; // Altezza totale necessaria
-    
-    // Calcola il punto di partenza del testo per centrarlo nello spazio disponibile
-    const textBlockStart = imageHeight + (safeZoneMargin * 2);
     
     if (type === 'title') {
-      startY = textBlockStart;
+      startY = imageHeight + (safeZoneMargin * 2);
     } else {
+      // Per la descrizione, calcoliamo la posizione basata sul titolo precedente
+      ctx.font = getFontStyle('title', fontSize, template);
       const titleLines = calculateLines(context, text, fontSize, 'title');
       const titleHeight = titleLines.length * lineHeight;
-      startY = textBlockStart + titleHeight + spacing;
+      
+      // La descrizione inizia dopo il titolo più lo spacing
+      startY = imageHeight + (safeZoneMargin * 2) + titleHeight + spacing;
     }
 
     // Verifica che il testo non esca dal canvas
     if (startY + totalHeight > height - safeZoneMargin) {
-      // Se il testo esce, riposizionalo più in alto
-      const overlap = (startY + totalHeight) - (height - safeZoneMargin);
-      startY -= overlap;
+      // Calcola quanto spazio abbiamo effettivamente disponibile
+      const availableSpace = height - safeZoneMargin - startY;
+      if (availableSpace < totalHeight) {
+        // Se non c'è abbastanza spazio, riduci lo spacing e sposta tutto più in alto
+        const reduction = totalHeight - availableSpace;
+        startY = Math.max(
+          imageHeight + safeZoneMargin,
+          startY - reduction
+        );
+      }
     }
   } else {
     // Layout originale per Klaus
