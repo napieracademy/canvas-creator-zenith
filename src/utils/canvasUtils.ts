@@ -133,12 +133,13 @@ export function drawText(
   const currentTextHeight = currentLines.length * lineHeight;
   
   let startY;
+  let effectiveSpacing = spacing;
 
   if (template === 'lucky') {
     // Calcola l'area disponibile dopo l'immagine con margini di sicurezza
     const imageHeight = height * 0.4;
-    const contentStartY = imageHeight + (safeZoneMargin * 0.75); // Margine ridotto dopo l'immagine
-    const availableHeight = height - contentStartY - (safeZoneMargin * 1.25); // Margine bottom aumentato
+    const contentStartY = imageHeight + (safeZoneMargin * 0.75);
+    const availableHeight = height - contentStartY - (safeZoneMargin * 1.25);
     
     if (type === 'title') {
       startY = contentStartY;
@@ -150,12 +151,15 @@ export function drawText(
       const descHeight = descLines.length * lineHeight;
       ctx.font = descFont;
       
-      const totalNeededHeight = currentTextHeight + spacing + descHeight;
+      const totalNeededHeight = currentTextHeight + effectiveSpacing + descHeight;
       
-      // Adatta lo spacing se necessario
+      // Se lo spazio totale necessario supera quello disponibile, riduci lo spacing proporzionalmente
       if (totalNeededHeight > availableHeight) {
-        const newSpacing = Math.max(30, availableHeight - currentTextHeight - descHeight);
-        spacing = Math.min(spacing, newSpacing);
+        const minSpacing = Math.min(effectiveSpacing, 40); // Mantiene lo spacing minimo
+        const maxReduction = effectiveSpacing - minSpacing;
+        const overflow = totalNeededHeight - availableHeight;
+        const reduction = Math.min(maxReduction, overflow);
+        effectiveSpacing = Math.max(minSpacing, effectiveSpacing - reduction);
       }
     } else {
       const titleFont = ctx.font;
@@ -164,14 +168,15 @@ export function drawText(
       const titleHeight = titleLines.length * lineHeight;
       ctx.font = titleFont;
       
-      startY = contentStartY + titleHeight + spacing;
+      startY = contentStartY + titleHeight + effectiveSpacing;
       
       // Verifica che la descrizione non superi l'area disponibile
       const bottomLimit = height - (safeZoneMargin * 1.25);
       if (startY + currentTextHeight > bottomLimit) {
         const maxStartY = bottomLimit - currentTextHeight;
-        spacing = Math.max(30, maxStartY - (contentStartY + titleHeight));
-        startY = contentStartY + titleHeight + spacing;
+        const minSpacing = Math.min(effectiveSpacing, 40);
+        effectiveSpacing = Math.max(minSpacing, maxStartY - (contentStartY + titleHeight));
+        startY = contentStartY + titleHeight + effectiveSpacing;
       }
     }
   } else {
@@ -184,7 +189,7 @@ export function drawText(
       const descLines = calculateLines(context, text, fontSize, 'description');
       const descHeight = descLines.length * lineHeight;
       ctx.font = descFont;
-      totalContentHeight += spacing + descHeight;
+      totalContentHeight += effectiveSpacing + descHeight;
     }
 
     const centerY = height / 2;
