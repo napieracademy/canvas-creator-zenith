@@ -84,11 +84,16 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
               <div className="relative w-12 h-12 mx-auto">
                 <Button
                   variant="outline"
-                  className={`absolute inset-0 p-0 overflow-hidden border-0 hover:opacity-90 transition-all duration-300 ${
+                  className={`absolute inset-0 rounded-full p-0 overflow-hidden border-0 hover:opacity-90 transition-all duration-300 ${
                     currentBackground === pair.background && currentText === pair.text
-                      ? 'ring-2 ring-primary' 
+                      ? 'ring-2 ring-primary ring-offset-2' 
                       : ''
                   }`}
+                  style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '50%'
+                  }}
                   onClick={() => onSelectColors(pair.background, pair.text)}
                 >
                   <div className="w-full h-full rounded-full overflow-hidden">
@@ -100,7 +105,8 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
                           ${pair.background} 50%, 
                           ${pair.text} 50%, 
                           ${pair.text} 100%
-                        )`
+                        )`,
+                        borderRadius: '50%'
                       }}
                     />
                   </div>
