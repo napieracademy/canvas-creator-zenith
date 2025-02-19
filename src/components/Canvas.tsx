@@ -9,6 +9,7 @@ interface CanvasProps {
   fontSize: number;
   onEffectiveFontSizeChange?: (size: number) => void;
   showSafeZone?: boolean;
+  format?: 'post' | 'story';
 }
 
 const Canvas: React.FC<CanvasProps> = ({ 
@@ -18,12 +19,13 @@ const Canvas: React.FC<CanvasProps> = ({
   textColor, 
   fontSize,
   onEffectiveFontSizeChange,
-  showSafeZone = false
+  showSafeZone = false,
+  format = 'post'
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [scale, setScale] = useState(100);
   const ORIGINAL_WIDTH = 1080;
-  const ORIGINAL_HEIGHT = 1350;
+  const ORIGINAL_HEIGHT = format === 'post' ? 1350 : 1920;
   const SAFE_ZONE_MARGIN = 120;
   const MAX_WIDTH = ORIGINAL_WIDTH - (2 * SAFE_ZONE_MARGIN);
   const MAX_HEIGHT = ORIGINAL_HEIGHT - (2 * SAFE_ZONE_MARGIN);
@@ -176,24 +178,22 @@ const Canvas: React.FC<CanvasProps> = ({
   }, [text, backgroundColor, textAlign, textColor, fontSize, onEffectiveFontSizeChange, showSafeZone]);
 
   return (
-    <div className="relative w-full h-full bg-white/50 rounded-xl overflow-hidden">
-      <canvas
-        ref={canvasRef}
-        style={{
-          width: '100%',
-          height: '100%',
-          maxWidth: `${ORIGINAL_WIDTH}px`,
-          maxHeight: `${ORIGINAL_HEIGHT}px`,
-          objectFit: 'contain',
-        }}
-      />
-      <div className="absolute bottom-4 right-4 flex gap-2">
-        <div className="bg-black/20 text-white px-3 py-1.5 rounded-full text-sm font-medium backdrop-blur-sm">
-          {scale}%
-        </div>
-        <div className="bg-black/20 text-white px-3 py-1.5 rounded-full text-sm font-medium backdrop-blur-sm">
-          1080 × 1350 px
-        </div>
+    <div className="space-y-2">
+      <div className="relative w-full h-full bg-white/50 rounded-xl overflow-hidden">
+        <canvas
+          ref={canvasRef}
+          style={{
+            width: '100%',
+            height: '100%',
+            maxWidth: `${ORIGINAL_WIDTH}px`,
+            maxHeight: `${ORIGINAL_HEIGHT}px`,
+            objectFit: 'contain',
+          }}
+        />
+      </div>
+      <div className="flex justify-end gap-2 text-sm text-gray-500">
+        <div>{scale}%</div>
+        <div>1080 × {ORIGINAL_HEIGHT} px</div>
       </div>
     </div>
   );

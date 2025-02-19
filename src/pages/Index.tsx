@@ -10,6 +10,8 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/components/ui/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from '@/components/ui/button';
+import { Square, Rectangle } from 'lucide-react';
 
 const Index = () => {
   const [text, setText] = useState('');
@@ -19,6 +21,7 @@ const Index = () => {
   const [effectiveFontSize, setEffectiveFontSize] = useState(64);
   const [textColor, setTextColor] = useState('#FFFFFF');
   const [showSafeZone, setShowSafeZone] = useState(false);
+  const [format, setFormat] = useState<'post' | 'story'>('post');
   const isMobile = useIsMobile();
 
   const handleColorSelect = (background: string, text: string) => {
@@ -73,6 +76,27 @@ const Index = () => {
           <p className="text-sm text-gray-500">Create beautiful social media images in seconds</p>
         </div>
 
+        <div className="flex gap-2 p-1 rounded-lg bg-muted w-fit">
+          <Button
+            variant={format === 'post' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setFormat('post')}
+            className="gap-2"
+          >
+            <Square className="h-4 w-4" />
+            Post
+          </Button>
+          <Button
+            variant={format === 'story' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setFormat('story')}
+            className="gap-2"
+          >
+            <Rectangle className="h-4 w-4" />
+            Story
+          </Button>
+        </div>
+
         <Tabs defaultValue="manual" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="manual">Scrivi Testo</TabsTrigger>
@@ -112,7 +136,7 @@ const Index = () => {
       </div>
       
       <div className="preview-container">
-        <div className="canvas-wrapper">
+        <div className="canvas-wrapper" style={{ aspectRatio: format === 'post' ? '1080/1350' : '1080/1920' }}>
           <Canvas 
             text={text} 
             backgroundColor={backgroundColor} 
@@ -121,6 +145,7 @@ const Index = () => {
             textColor={textColor}
             onEffectiveFontSizeChange={setEffectiveFontSize}
             showSafeZone={showSafeZone}
+            format={format}
           />
         </div>
       </div>
