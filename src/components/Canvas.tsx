@@ -75,25 +75,17 @@ const Canvas: React.FC<CanvasProps> = ({
   }, [text, backgroundColor, textAlign, textColor, fontSize, onEffectiveFontSizeChange, showSafeZone, format]);
 
   return (
-    <div className="flex flex-col space-y-2">
-      <div className="canvas-wrapper relative bg-transparent rounded-xl overflow-hidden" 
-           style={{ 
-             aspectRatio: format === 'post' ? '1080/1350' : '1080/1920',
-             width: '100%',
-             height: 'auto'
-           }}>
-        <canvas
-          ref={canvasRef}
-          style={{
-            width: '100%',
-            height: '100%',
-            maxWidth: `${ORIGINAL_WIDTH}px`,
-            maxHeight: `${ORIGINAL_HEIGHT}px`,
-            objectFit: 'contain',
-          }}
-        />
-      </div>
-      <div className="flex justify-end gap-2 text-sm text-gray-500">
+    <div className="flex flex-col w-full h-full">
+      <canvas
+        ref={canvasRef}
+        className="w-full h-full rounded-xl"
+        style={{
+          maxWidth: '100%',
+          maxHeight: '100%',
+          objectFit: 'contain',
+        }}
+      />
+      <div className="mt-2 flex justify-end gap-2 text-sm text-gray-500">
         <div>{scale}%</div>
         <div>1080 × {ORIGINAL_HEIGHT} px</div>
       </div>
