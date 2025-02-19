@@ -70,16 +70,19 @@ export function drawText(
   text: string,
   textAlign: 'left' | 'center' | 'right',
   textColor: string,
-  fontSize: number
+  fontSize: number,
+  type: 'title' | 'description' = 'title'
 ) {
   const { ctx, width, height } = context;
   
   if (!text.trim()) {
-    ctx.font = '32px Inter';
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('Inserisci il tuo testo...', width / 2, height / 2);
+    if (type === 'title') {
+      ctx.font = '32px Inter';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('Inserisci il tuo testo...', width / 2, height / 2);
+    }
     return;
   }
 
@@ -92,7 +95,14 @@ export function drawText(
   const lines = calculateLines(context, text, fontSize);
   const lineHeight = fontSize * 1.2;
   const totalHeight = lines.length * lineHeight;
-  const startY = (height - totalHeight) / 2;
+  
+  // Calcola la posizione verticale in base al tipo di testo
+  let startY;
+  if (type === 'title') {
+    startY = (height / 2) - (totalHeight / 2) - (fontSize * 0.5); // Sposta il titolo leggermente verso l'alto
+  } else {
+    startY = (height / 2) + (fontSize * 0.5); // Sposta la descrizione leggermente verso il basso
+  }
 
   const x = textAlign === 'left' ? SAFE_ZONE_MARGIN : 
            textAlign === 'right' ? width - SAFE_ZONE_MARGIN : 

@@ -12,6 +12,7 @@ import {
 
 const Canvas: React.FC<CanvasProps> = ({ 
   text, 
+  description,
   backgroundColor, 
   textAlign, 
   textColor, 
@@ -55,7 +56,7 @@ const Canvas: React.FC<CanvasProps> = ({
       drawSafeZone(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
     }
 
-    // Calculate and adjust font size
+    // Calculate and adjust font size for main text
     let adjustedFontSize = fontSize;
     while (!textFitsInSafeZone(context, text, adjustedFontSize) && adjustedFontSize > 32) {
       adjustedFontSize -= 2;
@@ -69,10 +70,16 @@ const Canvas: React.FC<CanvasProps> = ({
       onEffectiveFontSizeChange(adjustedFontSize);
     }
 
-    // Draw text
-    drawText(context, text, textAlign, textColor, adjustedFontSize);
+    // Draw main text
+    drawText(context, text, textAlign, textColor, adjustedFontSize, 'title');
 
-  }, [text, backgroundColor, textAlign, textColor, fontSize, onEffectiveFontSizeChange, showSafeZone, format]);
+    // Draw description text if present
+    if (description) {
+      const descriptionFontSize = Math.max(32, adjustedFontSize * 0.6);
+      drawText(context, description, textAlign, textColor, descriptionFontSize, 'description');
+    }
+
+  }, [text, description, backgroundColor, textAlign, textColor, fontSize, onEffectiveFontSizeChange, showSafeZone, format]);
 
   return (
     <div className="flex flex-col w-full h-full">

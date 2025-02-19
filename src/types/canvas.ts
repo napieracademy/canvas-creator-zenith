@@ -1,6 +1,7 @@
 
 export interface CanvasProps {
   text: string;
+  description?: string;
   backgroundColor: string;
   textAlign: 'left' | 'center' | 'right';
   textColor: string;
