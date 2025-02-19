@@ -4,7 +4,7 @@ import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Label } from './ui/label';
 import { useToast } from './ui/use-toast';
-import { FirecrawlService } from '@/utils/FirecrawlService';
+import { MetaService } from '@/utils/MetaService';
 
 interface UrlInputProps {
   onTitleExtracted: (title: string) => void;
@@ -20,17 +20,10 @@ const UrlInput: React.FC<UrlInputProps> = ({ onTitleExtracted }) => {
     setIsLoading(true);
 
     try {
-      const result = await FirecrawlService.crawlWebsite(url);
+      const result = await MetaService.extractMetadata(url);
       
-      if (result.success && result.data?.data?.[0]) {
-        const pageData = result.data.data[0];
-        // Priorità: 1. Meta title 2. OG title 3. HTML title
-        const title = pageData.metadata?.title || 
-                     pageData.openGraph?.title || 
-                     pageData.title || 
-                     'No title found';
-                     
-        onTitleExtracted(title);
+      if (result.success && result.title) {
+        onTitleExtracted(result.title);
         toast({
           title: "Success",
           description: "Title extracted successfully",
@@ -38,7 +31,7 @@ const UrlInput: React.FC<UrlInputProps> = ({ onTitleExtracted }) => {
       } else {
         toast({
           title: "Error",
-          description: "Could not extract title from URL",
+          description: result.error || "Could not extract title from URL",
           variant: "destructive",
         });
       }
