@@ -128,63 +128,57 @@ export function drawText(
   ctx.textBaseline = 'middle';
   ctx.setLineDash([]);
 
-  const lines = calculateLines(context, text, fontSize, type);
+  // Calcola le linee per il testo corrente
+  const currentLines = calculateLines(context, text, fontSize, type);
   const lineHeight = fontSize * 1.2;
-  const totalHeight = lines.length * lineHeight;
+  const currentTextHeight = currentLines.length * lineHeight;
   
   let startY;
 
-  // Layout completamente separati per Klaus e Lucky
   if (template === 'lucky') {
-    // Lucky template - sempre con immagine e layout verticale
     const imageHeight = height * 0.4;
     const contentStartY = imageHeight + (safeZoneMargin * 1.5);
     
     if (type === 'title') {
+      // Per il titolo, posiziona direttamente sotto l'immagine
       startY = contentStartY;
     } else {
-      // Per la descrizione, calcoliamo prima l'altezza del titolo
+      // Per la descrizione, usa il testo effettivo del titolo per calcolare lo spazio
       const prevFont = ctx.font;
       ctx.font = getFontStyle('title', fontSize, template);
-      const titleLines = calculateLines(context, text, fontSize, 'title');
-      const titleHeight = titleLines.length * (fontSize * 1.2);
+      const actualTitleLines = calculateLines(context, text, fontSize, 'title');
+      const titleHeight = actualTitleLines.length * lineHeight;
       ctx.font = prevFont;
       
       startY = contentStartY + titleHeight + spacing;
     }
   } else {
-    // Klaus template - layout centrato verticalmente senza immagine
-    const totalContentHeight = (() => {
-      if (type === 'title') {
-        const descFont = ctx.font;
-        ctx.font = getFontStyle('description', fontSize, template);
-        const descLines = calculateLines(context, text, fontSize, 'description');
-        const descHeight = descLines.length * (fontSize * 1.2);
-        ctx.font = descFont;
-        return totalHeight + spacing + descHeight;
-      }
-      return totalHeight;
-    })();
+    // Klaus template - layout centrato verticalmente
+    let totalContentHeight = currentTextHeight;
+    
+    if (type === 'title' && text.trim()) {
+      // Se c'è una descrizione, aggiungi il suo spazio al calcolo
+      const descFont = ctx.font;
+      ctx.font = getFontStyle('description', fontSize, template);
+      const descLines = calculateLines(context, text, fontSize, 'description');
+      const descHeight = descLines.length * lineHeight;
+      ctx.font = descFont;
+      totalContentHeight += spacing + descHeight;
+    }
 
     const centerY = height / 2;
     
     if (type === 'title') {
       startY = centerY - (totalContentHeight / 2);
     } else {
-      const titleFont = ctx.font;
-      ctx.font = getFontStyle('title', fontSize, template);
-      const titleLines = calculateLines(context, text, fontSize, 'title');
-      const titleHeight = titleLines.length * (fontSize * 1.2);
-      ctx.font = titleFont;
-      
-      startY = centerY + (totalContentHeight / 2) - totalHeight;
+      startY = centerY + (totalContentHeight / 2) - currentTextHeight;
     }
   }
 
-  // Assicuriamoci che il testo rimanga all'interno dei margini di sicurezza
+  // Verifica che il testo rimanga all'interno dei margini di sicurezza
   const bottomMargin = height - safeZoneMargin;
-  if (startY + totalHeight > bottomMargin) {
-    startY = bottomMargin - totalHeight;
+  if (startY + currentTextHeight > bottomMargin) {
+    startY = bottomMargin - currentTextHeight;
   }
   if (startY < safeZoneMargin) {
     startY = safeZoneMargin;
@@ -194,7 +188,9 @@ export function drawText(
            textAlign === 'right' ? width - safeZoneMargin : 
            width / 2;
 
-  lines.forEach((line, index) => {
-    ctx.fillText(line, x, startY + (index * lineHeight) + (lineHeight / 2));
+  // Disegna ogni linea del testo
+  currentLines.forEach((line, index) => {
+    const y = startY + (index * lineHeight) + (lineHeight / 2);
+    ctx.fillText(line, x, y);
   });
 }
