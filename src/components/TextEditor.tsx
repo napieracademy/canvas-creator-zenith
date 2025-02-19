@@ -74,64 +74,75 @@ const TextEditor: React.FC<TextEditorProps> = ({
     });
   };
 
+  const renderTextControls = () => (
+    <div className="space-y-4">
+      <div className="flex justify-end">
+        <Button 
+          variant="outline" 
+          className="gap-2" 
+          onClick={handleMagicOptimization}
+          disabled={disabled}
+        >
+          <Wand2 className="h-4 w-4" />
+          Magic
+        </Button>
+      </div>
+
+      <TextInput 
+        value={text} 
+        onChange={onTextChange} 
+        textAlign={textAlign}
+        onTextAlignChange={onTextAlignChange}
+        fontSize={fontSize}
+        onFontSizeChange={onFontSizeChange}
+        label="Titolo"
+        disabled={disabled}
+      />
+      
+      {description && (
+        <SpacingControl
+          value={spacing}
+          onChange={onSpacingChange}
+          disabled={disabled}
+        />
+      )}
+
+      <TextInput 
+        value={description} 
+        onChange={onDescriptionChange} 
+        textAlign={descriptionAlign}
+        onTextAlignChange={onDescriptionAlignChange}
+        fontSize={descriptionFontSize}
+        onFontSizeChange={onDescriptionFontSizeChange}
+        label="Descrizione"
+        disabled={disabled}
+      />
+    </div>
+  );
+
   return (
-    <Tabs defaultValue="manual" onValueChange={onTabChange}>
-      <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="manual" disabled={disabled}>Scrivi Testo</TabsTrigger>
-        <TabsTrigger value="fetch" disabled={disabled}>Fetch da URL</TabsTrigger>
-      </TabsList>
-      <TabsContent value="manual" className="space-y-4">
-        <div className="flex justify-end">
-          <Button 
-            variant="outline" 
-            className="gap-2" 
-            onClick={handleMagicOptimization}
-            disabled={disabled}
-          >
-            <Wand2 className="h-4 w-4" />
-            Magic
-          </Button>
-        </div>
-
-        <TextInput 
-          value={text} 
-          onChange={onTextChange} 
-          textAlign={textAlign}
-          onTextAlignChange={onTextAlignChange}
-          fontSize={fontSize}
-          onFontSizeChange={onFontSizeChange}
-          label="Titolo"
-          disabled={disabled}
-        />
-        
-        {description && (
-          <SpacingControl
-            value={spacing}
-            onChange={onSpacingChange}
-            disabled={disabled}
+    <div className="space-y-4">
+      <Tabs defaultValue="manual" onValueChange={onTabChange}>
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="manual" disabled={disabled}>Scrivi Testo</TabsTrigger>
+          <TabsTrigger value="fetch" disabled={disabled}>Fetch da URL</TabsTrigger>
+        </TabsList>
+        <TabsContent value="manual">
+          {renderTextControls()}
+        </TabsContent>
+        <TabsContent value="fetch">
+          <UrlInput 
+            onTitleExtracted={onTitleExtracted}
+            onDescriptionExtracted={onDescriptionExtracted}
+            onTabChange={onTabChange}
+            onLoadingChange={onLoadingChange}
           />
-        )}
+        </TabsContent>
+      </Tabs>
 
-        <TextInput 
-          value={description} 
-          onChange={onDescriptionChange} 
-          textAlign={descriptionAlign}
-          onTextAlignChange={onDescriptionAlignChange}
-          fontSize={descriptionFontSize}
-          onFontSizeChange={onDescriptionFontSizeChange}
-          label="Descrizione"
-          disabled={disabled}
-        />
-      </TabsContent>
-      <TabsContent value="fetch">
-        <UrlInput 
-          onTitleExtracted={onTitleExtracted}
-          onDescriptionExtracted={onDescriptionExtracted}
-          onTabChange={onTabChange}
-          onLoadingChange={onLoadingChange}
-        />
-      </TabsContent>
-    </Tabs>
+      {/* Mostra sempre i controlli quando c'è del testo, indipendentemente dalla tab selezionata */}
+      {(text || description) && <div className="pt-4 border-t">{renderTextControls()}</div>}
+    </div>
   );
 };
 
