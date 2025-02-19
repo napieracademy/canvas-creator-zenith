@@ -212,7 +212,7 @@ const TextInput: React.FC<TextInputProps> = ({
                 </Popover>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Migliora automaticamente il testo</p>
+                <p className="whitespace-nowrap">Migliora il testo: puoi allungarlo, accorciarlo o cambiarlo completamente</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
