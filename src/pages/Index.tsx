@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from '@/components/ui/use-toast';
@@ -32,7 +33,6 @@ const Index = () => {
   const [format, setFormat] = useState<'post' | 'story'>('post');
   const [activeTab, setActiveTab] = useState('manual');
   const [isLoading, setIsLoading] = useState(false);
-  const [featuredImage, setFeaturedImage] = useState<string | undefined>();
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -42,13 +42,8 @@ const Index = () => {
     });
   }, []);
 
-  const handleColorSelect = (background: string, text: string, overlay?: string) => {
-    if (overlay) {
-      const bgImage = background.match(/url\((.*?)\)/)?.[1];
-      setBackgroundColor(`linear-gradient(${overlay}, ${overlay}), url(${bgImage})`);
-    } else {
-      setBackgroundColor(background);
-    }
+  const handleColorSelect = (background: string, text: string) => {
+    setBackgroundColor(background);
     setTextColor(text);
   };
 
@@ -65,19 +60,6 @@ const Index = () => {
     toast({
       title: "Descrizione estratta",
       description: "Il testo secondario è stato aggiornato con la descrizione della pagina",
-    });
-  };
-
-  const handleImageExtracted = (image: string) => {
-    setFeaturedImage(image);
-    const overlay = 'rgba(0, 0, 0, 0.5)';
-    const bgImage = `url(${image})`;
-    setBackgroundColor(`linear-gradient(${overlay}, ${overlay}), ${bgImage}`);
-    setTextColor('#FFFFFF');
-    setActiveTab('featured');
-    toast({
-      title: "Immagine estratta",
-      description: "L'immagine è stata impostata come sfondo",
     });
   };
 
@@ -161,7 +143,6 @@ const Index = () => {
           onSpacingChange={setSpacing}
           onTitleExtracted={handleTitleExtracted}
           onDescriptionExtracted={handleDescriptionExtracted}
-          onImageExtracted={handleImageExtracted}
           onTabChange={setActiveTab}
           onLoadingChange={setIsLoading}
           disabled={isLoading}
@@ -171,7 +152,6 @@ const Index = () => {
           onSelectColors={handleColorSelect}
           currentBackground={backgroundColor}
           currentText={textColor}
-          featuredImage={featuredImage}
         />
         
         <SafeZoneToggle 
