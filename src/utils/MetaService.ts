@@ -10,23 +10,22 @@ interface MetadataResult {
 export class MetaService {
   static async extractMetadata(url: string): Promise<MetadataResult> {
     try {
-      // Log iniziale per debug
-      console.log('Attempting to fetch metadata for URL:', url);
+      console.log('Attempting direct fetch for URL:', url);
 
-      const response = await fetch(`/api/metadata?url=${encodeURIComponent(url)}`);
-      console.log('Response status:', response.status);
+      // Tentiamo il fetch diretto
+      const response = await fetch(url);
+      console.log('Direct fetch response status:', response.status);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const text = await response.text();
-      console.log('Raw response:', text);
+      console.log('Received HTML length:', text.length);
 
       const parser = new DOMParser();
       const doc = parser.parseFromString(text, 'text/html');
 
-      // Estrazione base dei metadati
       const title = doc.querySelector('title')?.textContent || '';
       const description = doc.querySelector('meta[name="description"]')?.getAttribute('content') || '';
       const image = doc.querySelector('meta[property="og:image"]')?.getAttribute('content') || '';
