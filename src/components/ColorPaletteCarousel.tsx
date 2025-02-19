@@ -27,6 +27,7 @@ export const ColorPaletteCarousel: React.FC<ColorPaletteCarouselProps> = ({
     <CarouselContent className="-ml-2 md:-ml-4">
       {colors.map((pair) => {
         const isUrl = pair.background.startsWith('url(');
+        const isGradient = pair.background.includes('gradient');
         const imageUrl = isUrl ? pair.background.match(/url\((.*?)\)/)?.[1] : null;
         
         return (
@@ -57,12 +58,26 @@ export const ColorPaletteCarousel: React.FC<ColorPaletteCarouselProps> = ({
                     className="absolute inset-0" 
                     style={{ 
                       backgroundImage: imageUrl ? `url(${imageUrl})` : 'none',
-                      backgroundColor: !imageUrl ? pair.background : 'transparent',
+                      background: !imageUrl ? (isGradient ? pair.background : 'none') : 'none',
+                      backgroundColor: (!imageUrl && !isGradient) ? pair.background : 'transparent',
                       backgroundSize: 'cover',
                       backgroundPosition: 'center',
                       borderRadius: '50%'
                     }}
                   >
+                    {!isUrl && !isGradient && (
+                      <div 
+                        className="absolute inset-0"
+                        style={{
+                          background: `linear-gradient(135deg, 
+                            ${pair.background} 0%, 
+                            ${pair.background} 50%, 
+                            ${pair.text} 50%, 
+                            ${pair.text} 100%
+                          )`
+                        }}
+                      />
+                    )}
                     {pair.overlay && (
                       <div 
                         className="absolute inset-0"
