@@ -55,7 +55,7 @@ const TextInput: React.FC<TextInputProps> = ({
 
     setIsImproving(true);
     try {
-      console.log('Calling improve-text function with:', {
+      console.log('Chiamata a improve-text con:', {
         text: value,
         type: label.toLowerCase() === 'titolo' ? 'title' : 'description'
       });
@@ -67,7 +67,7 @@ const TextInput: React.FC<TextInputProps> = ({
         }
       });
 
-      console.log('Function response:', { data, error });
+      console.log('Risposta della funzione:', { data, error });
 
       if (error) throw error;
       if (!data?.improvedText) throw new Error('Nessun testo migliorato ricevuto');
@@ -78,7 +78,7 @@ const TextInput: React.FC<TextInputProps> = ({
         description: "Il testo è stato ottimizzato con successo"
       });
     } catch (error) {
-      console.error('Error improving text:', error);
+      console.error('Errore nel miglioramento del testo:', error);
       toast({
         title: "Errore",
         description: error.message || "Si è verificato un errore durante il miglioramento del testo",

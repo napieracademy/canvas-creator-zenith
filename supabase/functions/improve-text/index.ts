@@ -10,22 +10,28 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { text, type } = await req.json();
-    
-    console.log('Received request:', { text, type });
+    const { text, tone, type } = await req.json();
 
-    if (!text || !type) {
-      throw new Error('Missing required parameters');
+    // Costruiamo il prompt in base al tipo di testo e al tono richiesto
+    let systemPrompt = "Sei un esperto copywriter che ottimizza testi per i social media. ";
+    
+    if (type === 'title') {
+      systemPrompt += "Migliora questo titolo mantenendolo conciso, accattivante e d'impatto. ";
+    } else {
+      systemPrompt += "Migliora questa descrizione mantenendola chiara, coinvolgente e persuasiva. ";
     }
 
-    console.log('Making request to OpenAI...');
-    
+    if (tone) {
+      systemPrompt += `Usa un tono ${tone}. `;
+    }
+
+    systemPrompt += "Mantieni la stessa lunghezza approssimativa e lo stesso significato di base, ma rendi il testo più efficace e memorabile.";
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -35,31 +41,22 @@ serve(async (req) => {
       body: JSON.stringify({
         model: 'gpt-4o-mini',
         messages: [
-          {
-            role: 'system',
-            content: type === 'title' 
-              ? 'Sei un esperto di copywriting. Migliora questo titolo mantenendolo conciso, incisivo ed efficace. Correggi eventuali errori grammaticali e migliora la leggibilità. Mantieni lo stesso significato ma rendilo più accattivante.'
-              : 'Sei un esperto di copywriting. Migliora questa descrizione mantenendo un tono professionale e chiaro. Correggi eventuali errori grammaticali e migliora la leggibilità. Mantieni lo stesso significato ma rendi il testo più scorrevole e coinvolgente.'
-          },
+          { role: 'system', content: systemPrompt },
           { role: 'user', content: text }
         ],
         temperature: 0.7,
       }),
     });
 
-    console.log('OpenAI response received');
-
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error('OpenAI API error:', errorData);
-      throw new Error('OpenAI API error: ' + JSON.stringify(errorData));
+      throw new Error('OpenAI API error: ' + await response.text());
     }
 
     const data = await response.json();
-    console.log('OpenAI response processed successfully');
+    const improvedText = data.choices[0].message.content;
 
     return new Response(
-      JSON.stringify({ improvedText: data.choices[0].message.content }),
+      JSON.stringify({ improvedText }),
       { 
         headers: { 
           ...corsHeaders,
@@ -68,12 +65,9 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    console.error('Error in improve-text function:', error);
+    console.error('Error:', error);
     return new Response(
-      JSON.stringify({ 
-        error: true,
-        message: error.message 
-      }),
+      JSON.stringify({ error: error.message }),
       { 
         status: 500,
         headers: { 
