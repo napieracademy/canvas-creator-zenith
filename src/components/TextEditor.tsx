@@ -4,6 +4,10 @@ import TextInput from '@/components/TextInput';
 import SpacingControl from '@/components/SpacingControl';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import UrlInput from '@/components/UrlInput';
+import { Button } from "@/components/ui/button";
+import { Wand2 } from "lucide-react";
+import { calculateOptimalSizes } from '@/utils/fontSizeCalculator';
+import { toast } from "@/components/ui/use-toast";
 
 interface TextEditorProps {
   text: string;
@@ -48,6 +52,28 @@ const TextEditor: React.FC<TextEditorProps> = ({
   onLoadingChange,
   disabled
 }) => {
+  const handleMagicOptimization = () => {
+    if (!text && !description) {
+      toast({
+        title: "Contenuto mancante",
+        description: "Inserisci del testo prima di utilizzare l'ottimizzazione automatica",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const { titleFontSize, descriptionFontSize: newDescFontSize, spacing: newSpacing } = calculateOptimalSizes(text, description);
+    
+    onFontSizeChange(titleFontSize);
+    onDescriptionFontSizeChange(newDescFontSize);
+    onSpacingChange(newSpacing);
+
+    toast({
+      title: "Layout ottimizzato",
+      description: "Le dimensioni sono state ottimizzate in base al contenuto"
+    });
+  };
+
   return (
     <Tabs defaultValue="manual" onValueChange={onTabChange}>
       <TabsList className="grid w-full grid-cols-2">
@@ -55,6 +81,18 @@ const TextEditor: React.FC<TextEditorProps> = ({
         <TabsTrigger value="fetch" disabled={disabled}>Fetch da URL</TabsTrigger>
       </TabsList>
       <TabsContent value="manual" className="space-y-4">
+        <div className="flex justify-end">
+          <Button 
+            variant="outline" 
+            className="gap-2" 
+            onClick={handleMagicOptimization}
+            disabled={disabled}
+          >
+            <Wand2 className="h-4 w-4" />
+            Magic
+          </Button>
+        </div>
+
         <TextInput 
           value={text} 
           onChange={onTextChange} 
