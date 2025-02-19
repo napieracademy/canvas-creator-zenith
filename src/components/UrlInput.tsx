@@ -22,8 +22,15 @@ const UrlInput: React.FC<UrlInputProps> = ({ onTitleExtracted }) => {
     try {
       const result = await FirecrawlService.crawlWebsite(url);
       
-      if (result.success && result.data?.data?.[0]?.title) {
-        onTitleExtracted(result.data.data[0].title);
+      if (result.success && result.data?.data?.[0]) {
+        const pageData = result.data.data[0];
+        // Priorità: 1. Meta title 2. OG title 3. HTML title
+        const title = pageData.metadata?.title || 
+                     pageData.openGraph?.title || 
+                     pageData.title || 
+                     'No title found';
+                     
+        onTitleExtracted(title);
         toast({
           title: "Success",
           description: "Title extracted successfully",
