@@ -15,9 +15,9 @@ serve(async (req) => {
   }
 
   try {
-    const { text, tone, type } = await req.json();
+    const { text, tone, type, length } = await req.json();
 
-    // Costruiamo il prompt in base al tipo di testo e al tono richiesto
+    // Costruiamo il prompt in base al tipo di testo, al tono e alla lunghezza richiesta
     let systemPrompt = "Sei un esperto copywriter che ottimizza testi per i social media. ";
     
     if (type === 'title') {
@@ -30,7 +30,16 @@ serve(async (req) => {
       systemPrompt += `Usa un tono ${tone}. `;
     }
 
-    systemPrompt += "Mantieni la stessa lunghezza approssimativa e lo stesso significato di base, ma rendi il testo più efficace e memorabile.";
+    // Aggiungiamo istruzioni per la lunghezza
+    if (length === 'shorter') {
+      systemPrompt += "Il testo risultante deve essere più corto dell'originale, ma mantenere tutti i concetti chiave. ";
+    } else if (length === 'longer') {
+      systemPrompt += "Espandi il testo aggiungendo più dettagli e sfumature, mantenendo lo stesso messaggio di base. ";
+    } else {
+      systemPrompt += "Mantieni approssimativamente la stessa lunghezza del testo originale. ";
+    }
+
+    systemPrompt += "Rendi il testo più efficace e memorabile.";
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
