@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from './ui/button';
 import {
@@ -72,20 +71,19 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
       background: "#10002B",
       text: "#E0AAFF"
     },
-    // Nuovi temi fluorescenti
     {
       name: "Neon Pulse",
-      background: "#8B5CF6",
+      background: "linear-gradient(135deg, #8B5CF6 0%, #D946EF 100%)",
       text: "#F9FF21"
     },
     {
       name: "Toxic Glow",
-      background: "#D946EF",
+      background: "linear-gradient(135deg, #D946EF 0%, #F97316 100%)",
       text: "#4ADE80"
     },
     {
       name: "Plasma Fire",
-      background: "#F97316",
+      background: "linear-gradient(135deg, #F97316 0%, #8B5CF6 100%)",
       text: "#22D3EE"
     }
   ];
@@ -116,12 +114,14 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
                     <div 
                       className="absolute inset-0" 
                       style={{ 
-                        background: `linear-gradient(135deg, 
-                          ${pair.background} 0%, 
-                          ${pair.background} 50%, 
-                          ${pair.text} 50%, 
-                          ${pair.text} 100%
-                        )`,
+                        background: typeof pair.background === 'string' && pair.background.includes('gradient')
+                          ? `${pair.background}`
+                          : `linear-gradient(135deg, 
+                              ${pair.background} 0%, 
+                              ${pair.background} 50%, 
+                              ${pair.text} 50%, 
+                              ${pair.text} 100%
+                            )`,
                         borderRadius: '50%'
                       }}
                     />
