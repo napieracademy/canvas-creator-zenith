@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from '@/components/ui/use-toast';
 import { Loader2 } from 'lucide-react';
@@ -9,23 +9,40 @@ import FormatSelector from '@/components/FormatSelector';
 import SafeZoneToggle from '@/components/SafeZoneToggle';
 import TextEditor from '@/components/TextEditor';
 import CanvasPreview from '@/components/CanvasPreview';
+import { colorPairs } from '@/data/colorPairs';
 
 const Index = () => {
+  // Seleziona un tema random dai colorPairs
+  const getRandomTheme = () => {
+    const randomIndex = Math.floor(Math.random() * colorPairs.length);
+    return colorPairs[randomIndex];
+  };
+
+  const randomTheme = getRandomTheme();
+
   const [text, setText] = useState('Social Image Creator');
   const [description, setDescription] = useState('Crea bellissime immagini per i social media in pochi secondi. Personalizza colori, font e layout per ottenere il massimo impatto visivo.');
-  const [backgroundColor, setBackgroundColor] = useState('#8B5CF6');
-  const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right'>('center');
-  const [descriptionAlign, setDescriptionAlign] = useState<'left' | 'center' | 'right'>('center');
-  const [fontSize, setFontSize] = useState(64);
-  const [descriptionFontSize, setDescriptionFontSize] = useState(32);
-  const [spacing, setSpacing] = useState(40);
-  const [effectiveFontSize, setEffectiveFontSize] = useState(64);
-  const [textColor, setTextColor] = useState('#FFFFFF');
+  const [backgroundColor, setBackgroundColor] = useState(randomTheme.background);
+  const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right'>('left');
+  const [descriptionAlign, setDescriptionAlign] = useState<'left' | 'center' | 'right'>('left');
+  const [fontSize, setFontSize] = useState(111);
+  const [descriptionFontSize, setDescriptionFontSize] = useState(56);
+  const [spacing, setSpacing] = useState(100);
+  const [effectiveFontSize, setEffectiveFontSize] = useState(111);
+  const [textColor, setTextColor] = useState(randomTheme.text);
   const [showSafeZone, setShowSafeZone] = useState(false);
   const [format, setFormat] = useState<'post' | 'story'>('post');
   const [activeTab, setActiveTab] = useState('manual');
   const [isLoading, setIsLoading] = useState(false);
   const isMobile = useIsMobile();
+
+  useEffect(() => {
+    // Notifica l'utente del tema selezionato
+    toast({
+      title: "Tema selezionato",
+      description: `Tema: ${randomTheme.name}`,
+    });
+  }, []);
 
   const handleColorSelect = (background: string, text: string) => {
     setBackgroundColor(background);
