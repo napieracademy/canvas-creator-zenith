@@ -7,9 +7,10 @@ interface FontSizeControlProps {
   value: number;
   effectiveSize: number;
   onChange: (value: number) => void;
+  disabled?: boolean;
 }
 
-const FontSizeControl: React.FC<FontSizeControlProps> = ({ value, effectiveSize, onChange }) => {
+const FontSizeControl: React.FC<FontSizeControlProps> = ({ value, effectiveSize, onChange, disabled }) => {
   return (
     <div className="space-y-2">
       <div className="flex justify-between items-center">
@@ -30,6 +31,7 @@ const FontSizeControl: React.FC<FontSizeControlProps> = ({ value, effectiveSize,
         max={120}
         step={1}
         className="w-full"
+        disabled={disabled}
       />
       <p className="text-xs text-gray-500 mt-1">
         La dimensione effettiva del testo potrebbe essere adattata automaticamente per rimanere all'interno dei margini
