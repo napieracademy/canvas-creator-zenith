@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from '@/components/ui/use-toast';
@@ -154,12 +153,6 @@ const Index = () => {
             currentBackground={backgroundColor}
             currentText={textColor}
           />
-          
-          <SafeZoneToggle 
-            showSafeZone={showSafeZone}
-            onShowSafeZoneChange={setShowSafeZone}
-            disabled={isLoading}
-          />
         </div>
       </div>
       
@@ -179,6 +172,11 @@ const Index = () => {
             showSafeZone={showSafeZone}
             format={format}
             onSpacingChange={setSpacing}
+          />
+          <SafeZoneToggle 
+            showSafeZone={showSafeZone}
+            onShowSafeZoneChange={setShowSafeZone}
+            disabled={isLoading}
           />
           <DownloadButton onDownload={handleDownload} />
         </div>

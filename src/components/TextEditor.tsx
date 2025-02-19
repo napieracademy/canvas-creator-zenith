@@ -76,18 +76,6 @@ const TextEditor: React.FC<TextEditorProps> = ({
 
   const renderTextControls = () => (
     <div className="space-y-4">
-      <div className="flex justify-end">
-        <Button 
-          variant="outline" 
-          className="gap-2" 
-          onClick={handleMagicOptimization}
-          disabled={disabled}
-        >
-          <Wand2 className="h-4 w-4" />
-          Magic
-        </Button>
-      </div>
-
       <TextInput 
         value={text} 
         onChange={onTextChange} 
@@ -121,25 +109,37 @@ const TextEditor: React.FC<TextEditorProps> = ({
   );
 
   return (
-    <div className="space-y-4">
-      <Tabs defaultValue="manual" onValueChange={onTabChange}>
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="manual" disabled={disabled}>Scrivi Testo</TabsTrigger>
-          <TabsTrigger value="fetch" disabled={disabled}>Fetch da URL</TabsTrigger>
-        </TabsList>
-        <TabsContent value="manual">
-          {renderTextControls()}
-        </TabsContent>
-        <TabsContent value="fetch">
-          <UrlInput 
-            onTitleExtracted={onTitleExtracted}
-            onDescriptionExtracted={onDescriptionExtracted}
-            onTabChange={onTabChange}
-            onLoadingChange={onLoadingChange}
-          />
-        </TabsContent>
-      </Tabs>
-    </div>
+    <>
+      <Button 
+        variant="ghost"
+        size="icon"
+        className="absolute top-3 right-25 bg-white/80 hover:bg-white/90 backdrop-blur-sm transition-all duration-200" 
+        onClick={handleMagicOptimization}
+        disabled={disabled}
+      >
+        <Wand2 className="h-4 w-4" />
+      </Button>
+
+      <div className="space-y-4">
+        <Tabs defaultValue="manual" onValueChange={onTabChange}>
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="manual" disabled={disabled}>Scrivi Testo</TabsTrigger>
+            <TabsTrigger value="fetch" disabled={disabled}>Fetch da URL</TabsTrigger>
+          </TabsList>
+          <TabsContent value="manual">
+            {renderTextControls()}
+          </TabsContent>
+          <TabsContent value="fetch">
+            <UrlInput 
+              onTitleExtracted={onTitleExtracted}
+              onDescriptionExtracted={onDescriptionExtracted}
+              onTabChange={onTabChange}
+              onLoadingChange={onLoadingChange}
+            />
+          </TabsContent>
+        </Tabs>
+      </div>
+    </>
   );
 };
 
