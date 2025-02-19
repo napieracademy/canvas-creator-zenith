@@ -9,6 +9,11 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const MAX_TOKENS = {
+  title: 50,    // Circa 10-12 parole
+  description: 150  // Circa 30-35 parole
+};
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -21,25 +26,25 @@ serve(async (req) => {
     let systemPrompt = "Sei un esperto copywriter che ottimizza testi per i social media. ";
     
     if (type === 'title') {
-      systemPrompt += "Migliora questo titolo mantenendolo conciso, accattivante e d'impatto. ";
+      systemPrompt += `Migliora questo titolo mantenendolo conciso, accattivante e d'impatto. Il testo non deve superare ${MAX_TOKENS.title} token. `;
     } else {
-      systemPrompt += "Migliora questa descrizione mantenendola chiara, coinvolgente e persuasiva. ";
+      systemPrompt += `Migliora questa descrizione mantenendola chiara, coinvolgente e persuasiva. Il testo non deve superare ${MAX_TOKENS.description} token. `;
     }
 
     if (tone) {
       systemPrompt += `Usa un tono ${tone}. `;
     }
 
-    // Aggiungiamo istruzioni per la lunghezza
+    // Aggiungiamo istruzioni per la lunghezza, ma sempre rispettando i limiti massimi
     if (length === 'shorter') {
       systemPrompt += "Il testo risultante deve essere più corto dell'originale, ma mantenere tutti i concetti chiave. ";
     } else if (length === 'longer') {
-      systemPrompt += "Espandi il testo aggiungendo più dettagli e sfumature, mantenendo lo stesso messaggio di base. ";
+      systemPrompt += `Espandi il testo aggiungendo più dettagli e sfumature, ma senza superare il limite massimo di token. `;
     } else {
       systemPrompt += "Mantieni approssimativamente la stessa lunghezza del testo originale. ";
     }
 
-    systemPrompt += "Rendi il testo più efficace e memorabile.";
+    systemPrompt += "Rendi il testo più efficace e memorabile, mantenendolo sempre adatto al formato social.";
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -54,7 +59,8 @@ serve(async (req) => {
           { role: 'user', content: text }
         ],
         temperature: 0.7,
-        top_p: 0.9, // Aggiunto il parametro top_p
+        top_p: 0.9,
+        max_tokens: type === 'title' ? MAX_TOKENS.title : MAX_TOKENS.description  // Limite massimo di token
       }),
     });
 
