@@ -188,10 +188,10 @@ const Canvas: React.FC<CanvasProps> = ({
         }}
       />
       <div className="absolute bottom-4 right-4 flex gap-2">
-        <div className="bg-black/70 text-white px-3 py-1.5 rounded-full text-sm font-medium">
+        <div className="bg-black/40 text-white px-3 py-1.5 rounded-full text-sm font-medium backdrop-blur-sm">
           {scale}%
         </div>
-        <div className="bg-black/70 text-white px-3 py-1.5 rounded-full text-sm font-medium">
+        <div className="bg-black/40 text-white px-3 py-1.5 rounded-full text-sm font-medium backdrop-blur-sm">
           1080 × 1350 px
         </div>
       </div>
