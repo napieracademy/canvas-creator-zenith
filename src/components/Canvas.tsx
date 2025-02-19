@@ -25,7 +25,8 @@ const Canvas: React.FC<CanvasProps> = ({
   showSafeZone = false,
   format = 'post',
   overlay,
-  onSpacingChange
+  onSpacingChange,
+  imageUrl
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -64,21 +65,37 @@ const Canvas: React.FC<CanvasProps> = ({
       safeZoneMargin: SAFE_ZONE_MARGIN
     };
 
-    // Gestione sfondo
-    if (backgroundColor.startsWith('url(')) {
+    // Disegna lo sfondo
+    drawBackground(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT, backgroundColor);
+
+    // Se c'è un'immagine, caricala e disegnala
+    if (imageUrl) {
       const img = new Image();
       img.onload = () => {
-        const scale = Math.max(canvas.width / img.width, canvas.height / img.height);
-        const x = (canvas.width - img.width * scale) / 2;
-        const y = (canvas.height - img.height * scale) / 2;
+        // Calcola le dimensioni mantenendo l'aspect ratio
+        const imgAspectRatio = img.width / img.height;
+        const canvasAspectRatio = ORIGINAL_WIDTH / ORIGINAL_HEIGHT;
         
-        ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
-
-        if (overlay) {
-          ctx.fillStyle = overlay;
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
+        let drawWidth, drawHeight, x, y;
+        
+        if (imgAspectRatio > canvasAspectRatio) {
+          // L'immagine è più larga rispetto al canvas
+          drawHeight = ORIGINAL_HEIGHT * 0.5; // Usa metà dell'altezza del canvas
+          drawWidth = drawHeight * imgAspectRatio;
+          x = (ORIGINAL_WIDTH - drawWidth) / 2;
+          y = ORIGINAL_HEIGHT * 0.25; // Posiziona a 1/4 dell'altezza
+        } else {
+          // L'immagine è più alta rispetto al canvas
+          drawWidth = ORIGINAL_WIDTH * 0.5; // Usa metà della larghezza del canvas
+          drawHeight = drawWidth / imgAspectRatio;
+          x = ORIGINAL_WIDTH * 0.25;
+          y = (ORIGINAL_HEIGHT - drawHeight) / 2;
         }
 
+        // Disegna l'immagine
+        ctx.drawImage(img, x, y, drawWidth, drawHeight);
+
+        // Ridisegna il resto del contenuto
         if (showSafeZone) {
           drawSafeZone(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
         }
@@ -88,21 +105,9 @@ const Canvas: React.FC<CanvasProps> = ({
           drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', localSpacing);
         }
       };
-      img.src = backgroundColor.slice(4, -1);
+      img.src = imageUrl;
     } else {
-      if (backgroundColor.includes('gradient')) {
-        const gradient = ctx.createLinearGradient(0, 0, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
-        const colors = backgroundColor.match(/#[a-fA-F0-9]{6}/g);
-        if (colors && colors.length >= 2) {
-          gradient.addColorStop(0, colors[0]);
-          gradient.addColorStop(1, colors[1]);
-        }
-        ctx.fillStyle = gradient;
-      } else {
-        ctx.fillStyle = backgroundColor;
-      }
-      ctx.fillRect(0, 0, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
-
+      // Se non c'è un'immagine, procedi con il rendering normale
       if (showSafeZone) {
         drawSafeZone(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
       }
@@ -112,7 +117,7 @@ const Canvas: React.FC<CanvasProps> = ({
         drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', localSpacing);
       }
     }
-  }, [text, description, backgroundColor, textAlign, descriptionAlign, textColor, fontSize, descriptionFontSize, localSpacing, onEffectiveFontSizeChange, showSafeZone, format, overlay]);
+  }, [text, description, backgroundColor, textAlign, descriptionAlign, textColor, fontSize, descriptionFontSize, localSpacing, onEffectiveFontSizeChange, showSafeZone, format, overlay, imageUrl]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!containerRef.current) return;
@@ -130,7 +135,7 @@ const Canvas: React.FC<CanvasProps> = ({
     
     const rect = containerRef.current.getBoundingClientRect();
     const y = e.clientY - rect.top;
-    const delta = (y - lastYRef.current) * 2; // Moltiplichiamo per 2 per un movimento più ampio
+    const delta = (y - lastYRef.current) * 2;
     
     const newSpacing = Math.max(0, Math.min(200, localSpacing + delta));
     setLocalSpacing(newSpacing);
