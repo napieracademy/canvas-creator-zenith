@@ -153,11 +153,11 @@ export function drawText(
       // Posiziona la descrizione dopo il titolo con lo spacing richiesto
       startY = contentStartY + titleHeight + spacing;
       
-      // Se il testo supera i limiti, mantiene comunque lo spacing minimo
+      // Se il testo supera i limiti, riduce lo spacing mantenendo un minimo di 20px
       if (startY + currentTextHeight > bottomLimit) {
-        const availableSpace = bottomLimit - (contentStartY + titleHeight);
-        const minSpacing = Math.min(spacing, availableSpace);
-        startY = contentStartY + titleHeight + Math.max(40, minSpacing);
+        const availableSpace = bottomLimit - contentStartY - titleHeight - currentTextHeight;
+        const adjustedSpacing = Math.max(20, Math.min(spacing, availableSpace));
+        startY = contentStartY + titleHeight + adjustedSpacing;
       }
     }
   } else {
