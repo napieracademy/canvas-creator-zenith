@@ -38,7 +38,7 @@ const TextInput: React.FC<TextInputProps> = ({
           onChange={(e) => onChange(e.target.value)}
           className="w-full min-h-[100px] resize-y"
           style={{
-            textAlign: textAlign,
+            textAlign,
             lineHeight: 1.2,
             whiteSpace: 'pre-wrap',
             overflowWrap: 'break-word'
@@ -48,7 +48,11 @@ const TextInput: React.FC<TextInputProps> = ({
       </div>
       
       <div className="space-y-4">
-        <TextAlignControl value={textAlign} onChange={onTextAlignChange} disabled={disabled} />
+        <TextAlignControl 
+          value={textAlign} 
+          onChange={onTextAlignChange} 
+          disabled={disabled} 
+        />
         <FontSizeControl 
           value={fontSize} 
           effectiveSize={effectiveSize} 

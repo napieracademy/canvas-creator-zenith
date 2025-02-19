@@ -16,7 +16,8 @@ const Index = () => {
   const [text, setText] = useState('');
   const [description, setDescription] = useState('');
   const [backgroundColor, setBackgroundColor] = useState('#8B5CF6');
-  const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right'>('center');
+  const [titleAlign, setTitleAlign] = useState<'left' | 'center' | 'right'>('center');
+  const [descriptionAlign, setDescriptionAlign] = useState<'left' | 'center' | 'right'>('center');
   const [fontSize, setFontSize] = useState(64);
   const [descriptionFontSize, setDescriptionFontSize] = useState(32);
   const [effectiveFontSize, setEffectiveFontSize] = useState(64);
@@ -140,8 +141,8 @@ const Index = () => {
             <TextInput 
               value={text} 
               onChange={setText} 
-              textAlign={textAlign}
-              onTextAlignChange={setTextAlign}
+              textAlign={titleAlign}
+              onTextAlignChange={setTitleAlign}
               fontSize={fontSize}
               onFontSizeChange={setFontSize}
               label="Titolo"
@@ -150,8 +151,8 @@ const Index = () => {
             <TextInput 
               value={description} 
               onChange={setDescription} 
-              textAlign={textAlign}
-              onTextAlignChange={setTextAlign}
+              textAlign={descriptionAlign}
+              onTextAlignChange={setDescriptionAlign}
               fontSize={descriptionFontSize}
               onFontSizeChange={setDescriptionFontSize}
               label="Descrizione"
@@ -196,7 +197,8 @@ const Index = () => {
             text={text}
             description={description}
             backgroundColor={backgroundColor} 
-            textAlign={textAlign}
+            textAlign={titleAlign}
+            descriptionAlign={descriptionAlign}
             fontSize={fontSize}
             descriptionFontSize={descriptionFontSize}
             textColor={textColor}
