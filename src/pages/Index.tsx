@@ -3,14 +3,13 @@ import React, { useState } from 'react';
 import TextInput from '@/components/TextInput';
 import Canvas from '@/components/Canvas';
 import DownloadButton from '@/components/DownloadButton';
-import TextAlignControl from '@/components/TextAlignControl';
-import FontSizeControl from '@/components/FontSizeControl';
 import ColorPresets from '@/components/ColorPresets';
 import UrlInput from '@/components/UrlInput';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/components/ui/use-toast';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Index = () => {
   const [text, setText] = useState('');
@@ -73,15 +72,33 @@ const Index = () => {
           <h1 className="text-xl font-semibold text-gray-900">Social Image Creator</h1>
           <p className="text-sm text-gray-500">Create beautiful social media images in seconds</p>
         </div>
-        <UrlInput onTitleExtracted={handleTitleExtracted} />
-        <TextInput value={text} onChange={setText} />
-        <TextAlignControl value={textAlign} onChange={setTextAlign} />
-        <FontSizeControl value={fontSize} onChange={setFontSize} effectiveSize={effectiveFontSize} />
+
+        <Tabs defaultValue="manual" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="manual">Scrivi Testo</TabsTrigger>
+            <TabsTrigger value="fetch">Fetch da URL</TabsTrigger>
+          </TabsList>
+          <TabsContent value="manual">
+            <TextInput 
+              value={text} 
+              onChange={setText} 
+              textAlign={textAlign}
+              onTextAlignChange={setTextAlign}
+              fontSize={fontSize}
+              onFontSizeChange={setFontSize}
+            />
+          </TabsContent>
+          <TabsContent value="fetch">
+            <UrlInput onTitleExtracted={handleTitleExtracted} />
+          </TabsContent>
+        </Tabs>
+
         <ColorPresets 
           onSelectColors={handleColorSelect}
           currentBackground={backgroundColor}
           currentText={textColor}
         />
+        
         <div className="flex items-center space-x-2">
           <Switch
             id="safe-zone"
@@ -90,6 +107,7 @@ const Index = () => {
           />
           <Label htmlFor="safe-zone">Mostra margini di sicurezza</Label>
         </div>
+        
         <DownloadButton onDownload={handleDownload} />
       </div>
       
