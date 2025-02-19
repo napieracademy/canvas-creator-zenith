@@ -5,13 +5,15 @@ import { Button } from './ui/button';
 import { Label } from './ui/label';
 import { useToast } from './ui/use-toast';
 import { MetaService } from '@/utils/MetaService';
+import { Loader2 } from 'lucide-react';
 
 interface UrlInputProps {
   onTitleExtracted: (title: string) => void;
   onDescriptionExtracted: (description: string) => void;
+  onTabChange?: (value: string) => void;
 }
 
-const UrlInput: React.FC<UrlInputProps> = ({ onTitleExtracted, onDescriptionExtracted }) => {
+const UrlInput: React.FC<UrlInputProps> = ({ onTitleExtracted, onDescriptionExtracted, onTabChange }) => {
   const [url, setUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -34,6 +36,11 @@ const UrlInput: React.FC<UrlInputProps> = ({ onTitleExtracted, onDescriptionExtr
           title: "Contenuto estratto",
           description: "Il titolo e la descrizione sono stati estratti con successo",
         });
+        
+        // Cambia tab dopo il successo
+        if (onTabChange) {
+          onTabChange('manual');
+        }
       } else {
         toast({
           title: "Errore",
@@ -63,9 +70,17 @@ const UrlInput: React.FC<UrlInputProps> = ({ onTitleExtracted, onDescriptionExtr
           placeholder="https://example.com/article"
           className="flex-1"
           required
+          disabled={isLoading}
         />
         <Button type="submit" disabled={isLoading}>
-          {isLoading ? "Caricamento..." : "Estrai contenuti"}
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Caricamento...
+            </>
+          ) : (
+            "Estrai contenuti"
+          )}
         </Button>
       </div>
     </form>

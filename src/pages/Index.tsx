@@ -24,6 +24,7 @@ const Index = () => {
   const [textColor, setTextColor] = useState('#FFFFFF');
   const [showSafeZone, setShowSafeZone] = useState(false);
   const [format, setFormat] = useState<'post' | 'story'>('post');
+  const [activeTab, setActiveTab] = useState('manual');
   const isMobile = useIsMobile();
 
   const handleColorSelect = (background: string, text: string) => {
@@ -116,7 +117,7 @@ const Index = () => {
           </Button>
         </div>
 
-        <Tabs defaultValue="manual" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="manual">Scrivi Testo</TabsTrigger>
             <TabsTrigger value="fetch">Fetch da URL</TabsTrigger>
@@ -147,6 +148,7 @@ const Index = () => {
             <UrlInput 
               onTitleExtracted={handleTitleExtracted}
               onDescriptionExtracted={handleDescriptionExtracted}
+              onTabChange={setActiveTab}
             />
           </TabsContent>
         </Tabs>
