@@ -135,30 +135,33 @@ export function drawText(
   let startY;
 
   if (template === 'lucky') {
-    // Calcola l'area disponibile dopo l'immagine con margini di sicurezza
+    // Area dopo l'immagine
     const imageHeight = height * 0.4;
     const contentStartY = imageHeight + (safeZoneMargin * 0.75);
+    const bottomLimit = height - (safeZoneMargin * 1.25);
     
     if (type === 'title') {
       startY = contentStartY;
     } else {
+      // Calcola l'altezza del titolo
       const titleFont = ctx.font;
       ctx.font = getFontStyle('title', fontSize, template);
       const titleLines = calculateLines(context, text, fontSize, 'title');
       const titleHeight = titleLines.length * lineHeight;
       ctx.font = titleFont;
       
-      // Applica lo spacing solo tra i blocchi di testo
+      // Posiziona la descrizione dopo il titolo con lo spacing richiesto
       startY = contentStartY + titleHeight + spacing;
       
-      // Se il testo supera i limiti, lo riporta dentro la safe zone
-      const bottomLimit = height - (safeZoneMargin * 1.25);
+      // Se il testo supera i limiti, mantiene comunque lo spacing minimo
       if (startY + currentTextHeight > bottomLimit) {
-        startY = bottomLimit - currentTextHeight;
+        const availableSpace = bottomLimit - (contentStartY + titleHeight);
+        const minSpacing = Math.min(spacing, availableSpace);
+        startY = contentStartY + titleHeight + Math.max(40, minSpacing);
       }
     }
   } else {
-    // Klaus template mantiene il layout centrato con i margini di sicurezza completi
+    // Klaus template mantiene il layout centrato
     let totalContentHeight = currentTextHeight;
     
     if (type === 'title' && text.trim()) {
@@ -178,7 +181,7 @@ export function drawText(
       startY = centerY + (totalContentHeight / 2) - currentTextHeight;
     }
 
-    // Per Klaus, manteniamo i controlli completi della safe zone
+    // Controlli safe zone per Klaus
     const bottomMargin = height - safeZoneMargin;
     if (startY + currentTextHeight > bottomMargin) {
       startY = bottomMargin - currentTextHeight;
