@@ -150,15 +150,17 @@ export function drawText(
       const titleHeight = titleLines.length * lineHeight;
       ctx.font = titleFont;
       
-      // Posiziona la descrizione dopo il titolo con lo spacing richiesto
-      startY = contentStartY + titleHeight + spacing;
+      // Calcola lo spazio totale disponibile
+      const totalAvailableSpace = bottomLimit - contentStartY;
+      // Calcola lo spazio necessario per i testi
+      const requiredSpace = titleHeight + currentTextHeight;
+      // Calcola lo spazio rimanente per lo spacing
+      const remainingSpace = totalAvailableSpace - requiredSpace;
       
-      // Se il testo supera i limiti, riduce lo spacing mantenendo un minimo di 20px
-      if (startY + currentTextHeight > bottomLimit) {
-        const availableSpace = bottomLimit - contentStartY - titleHeight - currentTextHeight;
-        const adjustedSpacing = Math.max(20, Math.min(spacing, availableSpace));
-        startY = contentStartY + titleHeight + adjustedSpacing;
-      }
+      // Determina lo spacing effettivo
+      const effectiveSpacing = Math.max(20, Math.min(spacing, remainingSpace));
+      
+      startY = contentStartY + titleHeight + effectiveSpacing;
     }
   } else {
     // Klaus template mantiene il layout centrato
