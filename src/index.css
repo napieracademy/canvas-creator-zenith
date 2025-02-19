@@ -80,12 +80,12 @@
 }
 
 .canvas-container {
-  @apply w-full h-full flex items-center justify-center rounded-2xl bg-gray-100 backdrop-blur-sm border border-gray-200;
+  @apply w-full h-full flex items-center justify-center rounded-2xl bg-white/50 backdrop-blur-sm border border-white/20;
   background-image: 
-    linear-gradient(45deg, #e5e5e5 25%, transparent 25%), 
-    linear-gradient(-45deg, #e5e5e5 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #e5e5e5 75%),
-    linear-gradient(-45deg, transparent 75%, #e5e5e5 75%);
+    linear-gradient(45deg, #f0f0f0 25%, transparent 25%), 
+    linear-gradient(-45deg, #f0f0f0 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #f0f0f0 75%),
+    linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
   background-size: 20px 20px;
   background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
 }
@@ -95,15 +95,15 @@
 }
 
 .preview-container {
-  @apply flex-1 p-8 ml-[380px] min-h-screen flex items-start justify-center;
+  @apply flex-1 p-8 ml-[380px] min-h-screen flex items-center justify-center;
 }
 
 .canvas-wrapper {
-  @apply relative rounded-2xl overflow-hidden shadow-2xl bg-gray-100;
+  @apply relative rounded-2xl overflow-hidden shadow-2xl bg-white/50;
   width: 100%;
-  max-width: calc(1080px * 0.6);
+  max-width: 1080px;
   aspect-ratio: 1 / 1;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
 }
