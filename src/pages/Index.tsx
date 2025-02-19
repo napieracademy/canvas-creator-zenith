@@ -92,21 +92,28 @@ const Index = () => {
   };
 
   const handleDownload = () => {
+    // Quando c'è un'immagine caricata, non permettiamo il download diretto
+    if (imageUrl) {
+      toast({
+        title: "Screenshot necessario",
+        description: "Per salvare un'immagine con contenuti esterni, utilizza la funzione screenshot del tuo browser (⌘+Shift+S su Mac, Ctrl+Shift+S su Windows)",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Se non c'è un'immagine esterna, procediamo con il download normale
     const canvas = document.querySelector('canvas');
-    if (!canvas) return;
+    if (!canvas) {
+      toast({
+        title: "Errore",
+        description: "Canvas non trovato",
+        variant: "destructive"
+      });
+      return;
+    }
 
     try {
-      // Se c'è un'immagine caricata, mostriamo un messaggio di avviso
-      if (imageUrl) {
-        toast({
-          title: "Immagine con contenuto esterno",
-          description: "L'immagine contiene contenuti da altri domini. Per motivi di sicurezza, puoi utilizzare uno screenshot per salvare l'immagine.",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      // Altrimenti procediamo normalmente
       const dataUrl = canvas.toDataURL('image/png');
       const link = document.createElement('a');
       link.download = `social-image-${format}.png`;
@@ -120,8 +127,8 @@ const Index = () => {
     } catch (error) {
       console.error('Errore durante il download:', error);
       toast({
-        title: "Errore nel download",
-        description: "Non è possibile scaricare l'immagine a causa di restrizioni di sicurezza. Puoi utilizzare uno screenshot per salvare l'immagine.",
+        title: "Screenshot necessario",
+        description: "Per salvare l'immagine, utilizza la funzione screenshot del tuo browser (⌘+Shift+S su Mac, Ctrl+Shift+S su Windows)",
         variant: "destructive"
       });
     }
