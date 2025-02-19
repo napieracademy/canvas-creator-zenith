@@ -12,7 +12,8 @@ interface CanvasProps {
 const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textColor, fontSize }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [scale, setScale] = useState(100);
-  const ORIGINAL_SIZE = 1080;
+  const ORIGINAL_WIDTH = 1080;
+  const ORIGINAL_HEIGHT = 1350;
 
   const updateScale = () => {
     const canvas = canvasRef.current;
@@ -23,8 +24,8 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
       const containerWidth = container.clientWidth;
       const containerHeight = container.clientHeight;
       const scaleFactor = Math.min(
-        containerWidth / ORIGINAL_SIZE,
-        containerHeight / ORIGINAL_SIZE
+        containerWidth / ORIGINAL_WIDTH,
+        containerHeight / ORIGINAL_HEIGHT
       );
       setScale(Math.round(scaleFactor * 100));
     }
@@ -48,8 +49,8 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    canvas.width = ORIGINAL_SIZE;
-    canvas.height = ORIGINAL_SIZE;
+    canvas.width = ORIGINAL_WIDTH;
+    canvas.height = ORIGINAL_HEIGHT;
 
     // Calculate initial scale
     updateScale();
@@ -100,8 +101,8 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
         style={{
           width: '100%',
           height: '100%',
-          maxWidth: `${ORIGINAL_SIZE}px`,
-          maxHeight: `${ORIGINAL_SIZE}px`,
+          maxWidth: `${ORIGINAL_WIDTH}px`,
+          maxHeight: `${ORIGINAL_HEIGHT}px`,
           objectFit: 'contain',
         }}
       />
