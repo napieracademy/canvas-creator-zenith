@@ -58,6 +58,10 @@ const Canvas: React.FC<CanvasProps> = ({
 
     // Calculate and adjust font size for main text
     let adjustedFontSize = fontSize;
+    const maxSafeHeight = ORIGINAL_HEIGHT - (2 * SAFE_ZONE_MARGIN);
+    const totalContentHeight = description ? maxSafeHeight * 0.8 : maxSafeHeight; // Riduce l'altezza disponibile se c'è una descrizione
+
+    // Riduci il font size se il testo non entra nello spazio disponibile
     while (!textFitsInSafeZone(context, text, adjustedFontSize) && adjustedFontSize > 32) {
       adjustedFontSize -= 2;
     }
@@ -75,7 +79,7 @@ const Canvas: React.FC<CanvasProps> = ({
 
     // Draw description text if present
     if (description) {
-      const descriptionFontSize = Math.max(32, adjustedFontSize * 0.6);
+      const descriptionFontSize = Math.max(32, Math.min(adjustedFontSize * 0.6, 64));
       drawText(context, description, textAlign, textColor, descriptionFontSize, 'description');
     }
 

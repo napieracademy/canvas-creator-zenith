@@ -99,9 +99,9 @@ export function drawText(
   // Calcola la posizione verticale in base al tipo di testo
   let startY;
   if (type === 'title') {
-    startY = (height / 2) - (totalHeight / 2) - (fontSize * 0.5); // Sposta il titolo leggermente verso l'alto
+    startY = (height / 2) - totalHeight; // Posiziona il titolo più in alto
   } else {
-    startY = (height / 2) + (fontSize * 0.5); // Sposta la descrizione leggermente verso il basso
+    startY = (height / 2) + (fontSize * 0.5); // Mantiene la descrizione sotto con un margine fisso
   }
 
   const x = textAlign === 'left' ? SAFE_ZONE_MARGIN : 
