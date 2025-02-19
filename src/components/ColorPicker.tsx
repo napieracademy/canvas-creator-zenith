@@ -3,6 +3,7 @@ import React from 'react';
 import { SketchPicker } from 'react-color';
 import { Label } from './ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import ColorPresets from './ColorPresets';
 
 interface ColorPickerProps {
   color: string;
@@ -25,11 +26,16 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ color, onChange }) => {
           </button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-3 border-none rounded-xl shadow-xl">
-          <SketchPicker
-            color={color}
-            onChange={(color) => onChange(color.hex)}
-            disableAlpha
-          />
+          <div className="space-y-4">
+            <ColorPresets onColorSelect={onChange} type="background" />
+            <div className="pt-4 border-t">
+              <SketchPicker
+                color={color}
+                onChange={(color) => onChange(color.hex)}
+                disableAlpha
+              />
+            </div>
+          </div>
         </PopoverContent>
       </Popover>
     </div>
