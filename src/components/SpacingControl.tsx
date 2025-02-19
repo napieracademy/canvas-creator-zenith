@@ -1,9 +1,30 @@
 
 import React from 'react';
 import { Label } from '@/components/ui/label';
-import { ArrowLeftToLine, ArrowLeftRight, ArrowRightToLine } from 'lucide-react';
+import { Square } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
+
+interface SpacingIconProps {
+  spacing: 'small' | 'medium' | 'large';
+}
+
+const SpacingIcon: React.FC<SpacingIconProps> = ({ spacing }) => {
+  const getSpacing = () => {
+    switch (spacing) {
+      case 'small': return 'gap-1';
+      case 'medium': return 'gap-3';
+      case 'large': return 'gap-5';
+    }
+  };
+
+  return (
+    <div className={`flex flex-col items-center ${getSpacing()} h-4`}>
+      <div className="w-4 h-[2px] bg-current" />
+      <div className="w-4 h-[2px] bg-current" />
+    </div>
+  );
+};
 
 interface SpacingControlProps {
   value: number;
@@ -13,9 +34,9 @@ interface SpacingControlProps {
 
 const SpacingControl: React.FC<SpacingControlProps> = ({ value, onChange, disabled }) => {
   const spacingPresets = [
-    { name: 'Stretto', value: 40, icon: ArrowLeftToLine },
-    { name: 'Medio', value: 100, icon: ArrowLeftRight },
-    { name: 'Largo', value: 160, icon: ArrowRightToLine }
+    { name: 'Stretto', value: 40, iconSpacing: 'small' as const },
+    { name: 'Medio', value: 100, iconSpacing: 'medium' as const },
+    { name: 'Largo', value: 160, iconSpacing: 'large' as const }
   ];
 
   return (
@@ -23,7 +44,6 @@ const SpacingControl: React.FC<SpacingControlProps> = ({ value, onChange, disabl
       <Label className="text-sm font-medium text-gray-700">Spazio tra titolo e descrizione</Label>
       <div className="flex gap-2 mt-2">
         {spacingPresets.map((preset) => {
-          const Icon = preset.icon;
           const isActive = value === preset.value;
           
           return (
@@ -37,8 +57,8 @@ const SpacingControl: React.FC<SpacingControlProps> = ({ value, onChange, disabl
                     onClick={() => onChange(preset.value)}
                     disabled={disabled}
                   >
-                    <Icon className="h-4 w-4 mr-2" />
-                    {preset.name}
+                    <SpacingIcon spacing={preset.iconSpacing} />
+                    <span className="ml-2">{preset.name}</span>
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
