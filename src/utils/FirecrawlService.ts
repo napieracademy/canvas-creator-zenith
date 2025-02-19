@@ -28,8 +28,8 @@ export class FirecrawlService {
         limit: 1,
         scrapeOptions: {
           formats: ['markdown'],
-          selectors: {
-            title: 'h1, title'
+          pattern: {
+            title: ['h1', 'title']
           }
         }
       }) as CrawlResponse;
