@@ -31,7 +31,7 @@ export function calculateLines(context: CanvasContext, text: string, size: numbe
   const { ctx, width, safeZoneMargin } = context;
   const maxWidth = width - (2 * safeZoneMargin);
   
-  ctx.font = `bold ${size}px Inter`;
+  ctx.font = `${size}px Inter`;
   const words = text.split(' ');
   const lines: string[] = [];
   let currentLine = '';
@@ -86,7 +86,7 @@ export function drawText(
     return;
   }
 
-  ctx.font = `bold ${fontSize}px Inter`;
+  ctx.font = `${fontSize}px Inter`;
   ctx.fillStyle = textColor;
   ctx.textAlign = textAlign;
   ctx.textBaseline = 'middle';
