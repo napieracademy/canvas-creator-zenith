@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import TextInput from '@/components/TextInput';
 import Canvas from '@/components/Canvas';
@@ -11,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from '@/components/ui/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from '@/components/ui/button';
-import { Square, LayoutTemplate } from 'lucide-react';
+import { Square, RectangleHorizontal } from 'lucide-react';
 
 const Index = () => {
   const [text, setText] = useState('');
@@ -41,16 +40,13 @@ const Index = () => {
     const canvas = document.querySelector('canvas');
     if (!canvas) return;
 
-    // Creiamo un canvas temporaneo con le dimensioni corrette
     const tempCanvas = document.createElement('canvas');
     const ctx = tempCanvas.getContext('2d');
     if (!ctx) return;
 
-    // Impostiamo le dimensioni corrette in base al formato
     tempCanvas.width = 1080;
     tempCanvas.height = format === 'post' ? 1350 : 1920;
 
-    // Copiamo l'immagine dal canvas originale a quello temporaneo
     ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, tempCanvas.width, tempCanvas.height);
 
     const link = document.createElement('a');
@@ -95,7 +91,7 @@ const Index = () => {
             onClick={() => setFormat('post')}
             className="gap-2"
           >
-            <Square className="h-4 w-4" />
+            <Square className="h-4.5 w-4.5" />
             Post
           </Button>
           <Button
@@ -104,7 +100,7 @@ const Index = () => {
             onClick={() => setFormat('story')}
             className="gap-2"
           >
-            <LayoutTemplate className="h-4 w-4" />
+            <RectangleHorizontal className="h-4.5 w-4.5 rotate-90" />
             Story
           </Button>
         </div>
