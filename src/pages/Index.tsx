@@ -8,7 +8,9 @@ import FormatSelector from '@/components/FormatSelector';
 import SafeZoneToggle from '@/components/SafeZoneToggle';
 import TextEditor from '@/components/TextEditor';
 import CanvasPreview from '@/components/CanvasPreview';
+import MagicButton from '@/components/MagicButton';
 import { colorPairs } from '@/data/colorPairs';
+import { calculateOptimalSizes } from '@/utils/fontSizeCalculator';
 
 const Index = () => {
   const getRandomTheme = () => {
@@ -83,6 +85,28 @@ const Index = () => {
     toast({
       title: "Immagine scaricata",
       description: `L'immagine è stata salvata nel formato ${format === 'post' ? 'post (1080x1350)' : 'story (1080x1920)'}`,
+    });
+  };
+
+  const handleMagicOptimization = () => {
+    if (!text && !description) {
+      toast({
+        title: "Contenuto mancante",
+        description: "Inserisci del testo prima di utilizzare l'ottimizzazione automatica",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const { titleFontSize, descriptionFontSize: newDescFontSize, spacing: newSpacing } = calculateOptimalSizes(text, description);
+    
+    setFontSize(titleFontSize);
+    setDescriptionFontSize(newDescFontSize);
+    setSpacing(newSpacing);
+
+    toast({
+      title: "Layout ottimizzato",
+      description: "Le dimensioni sono state ottimizzate in base al contenuto"
     });
   };
 
@@ -173,12 +197,15 @@ const Index = () => {
             format={format}
             onSpacingChange={setSpacing}
           />
-          <SafeZoneToggle 
-            showSafeZone={showSafeZone}
-            onShowSafeZoneChange={setShowSafeZone}
-            disabled={isLoading}
-          />
-          <DownloadButton onDownload={handleDownload} />
+          <div className="absolute top-3 right-3 flex gap-2">
+            <MagicButton onMagicOptimization={handleMagicOptimization} disabled={isLoading} />
+            <SafeZoneToggle 
+              showSafeZone={showSafeZone}
+              onShowSafeZoneChange={setShowSafeZone}
+              disabled={isLoading}
+            />
+            <DownloadButton onDownload={handleDownload} />
+          </div>
         </div>
       </div>
     </div>

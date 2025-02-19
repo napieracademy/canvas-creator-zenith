@@ -18,7 +18,7 @@ const SafeZoneToggle: React.FC<SafeZoneToggleProps> = ({
     <Button
       size="icon"
       variant="ghost"
-      className="absolute top-3 right-14 bg-white/80 hover:bg-white/90 backdrop-blur-sm transition-all duration-200"
+      className="bg-white/80 hover:bg-white/90 backdrop-blur-sm transition-all duration-200"
       onClick={() => onShowSafeZoneChange(!showSafeZone)}
       disabled={disabled}
       aria-label="Mostra margini di sicurezza"
