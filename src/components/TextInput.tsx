@@ -19,6 +19,7 @@ interface TextInputProps {
   fontSize: number;
   onFontSizeChange: (value: number) => void;
   label: string;
+  disabled?: boolean;
 }
 
 const TextInput: React.FC<TextInputProps> = ({ 
@@ -28,7 +29,8 @@ const TextInput: React.FC<TextInputProps> = ({
   onTextAlignChange,
   fontSize,
   onFontSizeChange,
-  label
+  label,
+  disabled
 }) => {
   return (
     <div className="space-y-2">
@@ -41,6 +43,7 @@ const TextInput: React.FC<TextInputProps> = ({
               size="sm"
               className={`px-2.5 ${textAlign === 'left' ? 'bg-accent' : ''}`}
               onClick={() => onTextAlignChange('left')}
+              disabled={disabled}
             >
               <AlignLeft className="h-4 w-4" />
             </Button>
@@ -49,6 +52,7 @@ const TextInput: React.FC<TextInputProps> = ({
               size="sm"
               className={`px-2.5 ${textAlign === 'center' ? 'bg-accent' : ''}`}
               onClick={() => onTextAlignChange('center')}
+              disabled={disabled}
             >
               <AlignCenter className="h-4 w-4" />
             </Button>
@@ -57,6 +61,7 @@ const TextInput: React.FC<TextInputProps> = ({
               size="sm"
               className={`px-2.5 ${textAlign === 'right' ? 'bg-accent' : ''}`}
               onClick={() => onTextAlignChange('right')}
+              disabled={disabled}
             >
               <AlignRight className="h-4 w-4" />
             </Button>
@@ -64,7 +69,7 @@ const TextInput: React.FC<TextInputProps> = ({
           
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="gap-2">
+              <Button variant="outline" size="sm" className="gap-2" disabled={disabled}>
                 <Type className="h-4 w-4" />
                 {fontSize}px
               </Button>
@@ -81,6 +86,7 @@ const TextInput: React.FC<TextInputProps> = ({
                   min={32}
                   max={120}
                   step={1}
+                  disabled={disabled}
                 />
               </div>
             </PopoverContent>
@@ -94,6 +100,7 @@ const TextInput: React.FC<TextInputProps> = ({
         onChange={(e) => onChange(e.target.value)}
         className="resize-none h-32 bg-white/50 backdrop-blur-sm focus:bg-white transition-colors duration-200"
         style={{ textAlign }}
+        disabled={disabled}
       />
     </div>
   );
