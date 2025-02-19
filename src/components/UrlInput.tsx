@@ -35,11 +35,15 @@ const UrlInput: React.FC<UrlInputProps> = ({
       const result = await MetaService.extractMetadata(url);
       
       if (result.success) {
+        let extracted = false;
+
         if (result.title) {
           onTitleExtracted(result.title);
+          extracted = true;
         }
         if (result.description) {
           onDescriptionExtracted(result.description);
+          extracted = true;
         }
         if (result.image && onImageExtracted) {
           onImageExtracted(result.image);
@@ -47,15 +51,24 @@ const UrlInput: React.FC<UrlInputProps> = ({
             title: "Immagine estratta",
             description: "L'immagine di anteprima è stata estratta e aggiunta come tema",
           });
+          extracted = true;
         }
-        toast({
-          title: "Contenuto estratto",
-          description: "Il titolo e la descrizione sono stati estratti con successo",
-        });
-        
-        // Cambia tab dopo il successo
-        if (onTabChange) {
-          onTabChange('manual');
+
+        if (extracted) {
+          toast({
+            title: "Contenuto estratto",
+            description: "Il contenuto è stato estratto con successo",
+          });
+          
+          if (onTabChange) {
+            onTabChange('manual');
+          }
+        } else {
+          toast({
+            title: "Nessun contenuto",
+            description: "Nessun contenuto è stato trovato nell'URL specificato",
+            variant: "destructive",
+          });
         }
       } else {
         toast({
@@ -65,6 +78,7 @@ const UrlInput: React.FC<UrlInputProps> = ({
         });
       }
     } catch (error) {
+      console.error('Error in URL submission:', error);
       toast({
         title: "Errore",
         description: "Errore durante il recupero dell'URL",
