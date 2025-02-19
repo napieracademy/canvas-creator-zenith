@@ -134,33 +134,27 @@ export function drawText(
   
   let startY;
   if (template === 'lucky') {
-    const imageHeight = height / 3; // Altezza dell'immagine
-    const availableHeight = height - imageHeight - (safeZoneMargin * 3); // Spazio disponibile per il testo
+    const imageHeight = height * 0.4; // Aumentato da 1/3 a 0.4
     
     if (type === 'title') {
-      startY = imageHeight + (safeZoneMargin * 2);
+      // Posiziona il titolo sotto l'immagine con un margine
+      startY = imageHeight + (safeZoneMargin * 1.5);
     } else {
-      // Per la descrizione, calcoliamo la posizione basata sul titolo precedente
-      ctx.font = getFontStyle('title', fontSize, template);
-      const titleLines = calculateLines(context, text, fontSize, 'title');
-      const titleHeight = titleLines.length * lineHeight;
+      // Per la descrizione, calcoliamo lo spazio dopo il titolo
+      const titleFont = getFontStyle('title', fontSize, template);
+      ctx.font = titleFont;
+      const titleMetrics = ctx.measureText(text);
+      const titleHeight = titleMetrics.actualBoundingBoxAscent + titleMetrics.actualBoundingBoxDescent;
       
-      // La descrizione inizia dopo il titolo più lo spacing
-      startY = imageHeight + (safeZoneMargin * 2) + titleHeight + spacing;
+      // La descrizione inizia dopo il titolo con uno spacing appropriato
+      startY = imageHeight + (safeZoneMargin * 1.5) + titleHeight + spacing;
     }
 
-    // Verifica che il testo non esca dal canvas
-    if (startY + totalHeight > height - safeZoneMargin) {
-      // Calcola quanto spazio abbiamo effettivamente disponibile
-      const availableSpace = height - safeZoneMargin - startY;
-      if (availableSpace < totalHeight) {
-        // Se non c'è abbastanza spazio, riduci lo spacing e sposta tutto più in alto
-        const reduction = totalHeight - availableSpace;
-        startY = Math.max(
-          imageHeight + safeZoneMargin,
-          startY - reduction
-        );
-      }
+    // Verifica che il testo rimanga all'interno dei margini di sicurezza
+    const bottomMargin = height - safeZoneMargin;
+    if (startY + totalHeight > bottomMargin) {
+      const maxAllowedY = bottomMargin - totalHeight;
+      startY = Math.min(startY, maxAllowedY);
     }
   } else {
     // Layout originale per Klaus
