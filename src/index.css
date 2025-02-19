@@ -92,10 +92,12 @@
 
 .controls-panel {
   @apply fixed left-6 top-6 p-6 rounded-2xl glass-panel w-[340px] space-y-6 animate-in z-50;
+  @apply md:relative md:left-0 md:top-0;
 }
 
 .preview-container {
-  @apply flex-1 p-8 ml-[380px] min-h-screen flex items-center justify-center;
+  @apply flex-1 p-8 md:ml-[380px] min-h-screen flex items-center justify-center;
+  @apply mt-[520px] md:mt-0; /* Aggiunge spazio sopra il canvas su mobile */
 }
 
 .canvas-wrapper {
