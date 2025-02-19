@@ -16,13 +16,13 @@ export const canvasTemplates: CanvasTemplate[] = [
   {
     name: 'Lucky',
     id: 'lucky',
-    backgroundColor: '#FF719A',
+    backgroundColor: '#000000',
     textColor: '#ffffff',
-    fontSize: 64,
-    descriptionFontSize: 28,
+    fontSize: 48,
+    descriptionFontSize: 24,
     textAlign: 'left',
     descriptionAlign: 'left',
-    spacing: 30
+    spacing: 20
   }
 ];
 

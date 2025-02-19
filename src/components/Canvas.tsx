@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect, useState } from 'react';
 import { CanvasProps } from '@/types/canvas';
 import { useCanvasScale } from '@/hooks/useCanvasScale';
@@ -101,9 +100,9 @@ const Canvas: React.FC<CanvasProps> = ({
           drawSafeZone(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
         }
 
-        drawText(context, text, textAlign, textColor, fontSize, 'title', localSpacing);
+        drawText(context, text, textAlign, textColor, fontSize, 'title', localSpacing, template);
         if (description) {
-          drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', localSpacing);
+          drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', localSpacing, template);
         }
       };
       img.src = imageUrl;
@@ -113,12 +112,12 @@ const Canvas: React.FC<CanvasProps> = ({
         drawSafeZone(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
       }
 
-      drawText(context, text, textAlign, textColor, fontSize, 'title', localSpacing);
+      drawText(context, text, textAlign, textColor, fontSize, 'title', localSpacing, template);
       if (description) {
-        drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', localSpacing);
+        drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', localSpacing, template);
       }
     }
-  }, [text, description, backgroundColor, textAlign, descriptionAlign, textColor, fontSize, descriptionFontSize, localSpacing, onEffectiveFontSizeChange, showSafeZone, format, overlay, imageUrl]);
+  }, [text, description, backgroundColor, textAlign, descriptionAlign, textColor, fontSize, descriptionFontSize, localSpacing, onEffectiveFontSizeChange, showSafeZone, format, overlay, imageUrl, template]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!containerRef.current) return;
@@ -194,5 +193,64 @@ const Canvas: React.FC<CanvasProps> = ({
     </div>
   );
 };
+
+export function drawText(
+  context: CanvasContext,
+  text: string,
+  textAlign: 'left' | 'center' | 'right',
+  textColor: string,
+  fontSize: number,
+  type: 'title' | 'description' = 'title',
+  spacing: number = 40,
+  template: 'klaus' | 'lucky' = 'klaus'
+) {
+  const { ctx, width, height, safeZoneMargin } = context;
+  
+  if (!text.trim()) {
+    if (type === 'title') {
+      ctx.font = 'bold 32px Inter';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('Inserisci il tuo testo...', width / 2, height / 2);
+    }
+    return;
+  }
+
+  ctx.font = `${type === 'title' ? 'bold' : ''} ${fontSize}px Inter`;
+  ctx.fillStyle = textColor;
+  ctx.textAlign = textAlign;
+  ctx.textBaseline = 'middle';
+  ctx.setLineDash([]);
+
+  const lines = calculateLines(context, text, fontSize, type);
+  const lineHeight = fontSize * 1.2;
+  const totalHeight = lines.length * lineHeight;
+  
+  let startY;
+  if (template === 'lucky') {
+    // Nel template Lucky, il testo inizia dopo l'immagine
+    if (type === 'title') {
+      startY = height * 0.6; // Il titolo inizia al 60% dell'altezza
+    } else {
+      startY = height * 0.6 + totalHeight + spacing; // La descrizione segue il titolo
+    }
+  } else {
+    // Layout originale per Klaus
+    if (type === 'title') {
+      startY = (height / 2) - (spacing / 2) - totalHeight;
+    } else {
+      startY = (height / 2) + (spacing / 2);
+    }
+  }
+
+  const x = textAlign === 'left' ? SAFE_ZONE_MARGIN : 
+           textAlign === 'right' ? width - SAFE_ZONE_MARGIN : 
+           width / 2;
+
+  lines.forEach((line, index) => {
+    ctx.fillText(line, x, startY + (index * lineHeight) + (lineHeight / 2));
+  });
+}
 
 export default Canvas;
