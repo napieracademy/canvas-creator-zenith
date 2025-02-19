@@ -23,9 +23,8 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
       const containerWidth = container.clientWidth;
       const containerHeight = container.clientHeight;
       const scaleFactor = Math.min(
-        (containerWidth - 40) / ORIGINAL_SIZE,  // Sottraiamo un po' di spazio per il padding
-        (containerHeight - 40) / ORIGINAL_SIZE,
-        0.9 // Limitiamo la scala al 90% per mantenere un po' di spazio intorno
+        containerWidth / ORIGINAL_SIZE,
+        containerHeight / ORIGINAL_SIZE
       );
       setScale(Math.round(scaleFactor * 100));
     }
@@ -33,11 +32,11 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
 
   useEffect(() => {
     const handleResize = () => {
-      requestAnimationFrame(updateScale); // Usiamo requestAnimationFrame per ottimizzare le performance
+      requestAnimationFrame(updateScale);
     };
 
     window.addEventListener('resize', handleResize);
-    updateScale(); // Calcoliamo la scala iniziale
+    updateScale();
     
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -49,7 +48,6 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Set actual canvas size
     canvas.width = ORIGINAL_SIZE;
     canvas.height = ORIGINAL_SIZE;
 
@@ -96,12 +94,12 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
   }, [text, backgroundColor, textAlign, textColor, fontSize]);
 
   return (
-    <div className="relative flex items-center justify-center w-full h-full p-5">
+    <div className="relative w-full h-full bg-white/50 rounded-xl overflow-hidden">
       <canvas
         ref={canvasRef}
         style={{
-          width: `${scale}%`,
-          height: `${scale}%`,
+          width: '100%',
+          height: '100%',
           maxWidth: `${ORIGINAL_SIZE}px`,
           maxHeight: `${ORIGINAL_SIZE}px`,
           objectFit: 'contain',
