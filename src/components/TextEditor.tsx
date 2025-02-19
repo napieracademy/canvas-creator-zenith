@@ -4,6 +4,8 @@ import TextInput from '@/components/TextInput';
 import SpacingControl from '@/components/SpacingControl';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import UrlInput from '@/components/UrlInput';
+import { Button } from '@/components/ui/button';
+import { Upload } from 'lucide-react';
 
 interface TextEditorProps {
   text: string;
@@ -22,7 +24,7 @@ interface TextEditorProps {
   onSpacingChange: (spacing: number) => void;
   onTitleExtracted: (title: string) => void;
   onDescriptionExtracted: (description: string) => void;
-  onImageExtracted?: (image: string) => void;
+  onImageUpload?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onTabChange: (value: string) => void;
   onLoadingChange: (loading: boolean) => void;
   disabled?: boolean;
@@ -45,17 +47,19 @@ const TextEditor: React.FC<TextEditorProps> = ({
   onSpacingChange,
   onTitleExtracted,
   onDescriptionExtracted,
-  onImageExtracted,
+  onImageUpload,
   onTabChange,
   onLoadingChange,
   disabled
 }) => {
   return (
     <Tabs defaultValue="manual" onValueChange={onTabChange}>
-      <TabsList className="grid w-full grid-cols-2">
+      <TabsList className="grid w-full grid-cols-3">
         <TabsTrigger value="manual" disabled={disabled}>Scrivi Testo</TabsTrigger>
         <TabsTrigger value="fetch" disabled={disabled}>Fetch da URL</TabsTrigger>
+        <TabsTrigger value="featured" disabled={disabled}>Carica Immagine</TabsTrigger>
       </TabsList>
+      
       <TabsContent value="manual" className="space-y-4">
         <TextInput 
           value={text} 
@@ -87,14 +91,34 @@ const TextEditor: React.FC<TextEditorProps> = ({
           disabled={disabled}
         />
       </TabsContent>
+
       <TabsContent value="fetch">
         <UrlInput 
           onTitleExtracted={onTitleExtracted}
           onDescriptionExtracted={onDescriptionExtracted}
-          onImageExtracted={onImageExtracted}
           onTabChange={onTabChange}
           onLoadingChange={onLoadingChange}
         />
+      </TabsContent>
+
+      <TabsContent value="featured" className="space-y-4">
+        <div className="space-y-4">
+          <p className="text-sm text-gray-500">
+            Carica un'immagine di sfondo per creare un impatto visivo più forte. 
+            L'immagine verrà automaticamente adattata e sovrapposta con un overlay scuro per garantire la leggibilità del testo.
+          </p>
+          <Button variant="outline" className="w-full" onClick={() => document.getElementById('imageUpload')?.click()}>
+            <Upload className="mr-2 h-4 w-4" />
+            Carica un'immagine di sfondo
+          </Button>
+          <input
+            type="file"
+            id="imageUpload"
+            className="hidden"
+            accept="image/*"
+            onChange={onImageUpload}
+          />
+        </div>
       </TabsContent>
     </Tabs>
   );
