@@ -15,6 +15,7 @@ interface CanvasPreviewProps {
   onEffectiveFontSizeChange?: (size: number) => void;
   showSafeZone?: boolean;
   format?: 'post' | 'story';
+  overlay?: string;
 }
 
 const CanvasPreview: React.FC<CanvasPreviewProps> = ({
@@ -29,7 +30,8 @@ const CanvasPreview: React.FC<CanvasPreviewProps> = ({
   spacing,
   onEffectiveFontSizeChange,
   showSafeZone,
-  format
+  format,
+  overlay
 }) => {
   return (
     <div className="preview-container">
@@ -47,6 +49,7 @@ const CanvasPreview: React.FC<CanvasPreviewProps> = ({
           onEffectiveFontSizeChange={onEffectiveFontSizeChange}
           showSafeZone={showSafeZone}
           format={format}
+          overlay={overlay}
         />
       </div>
     </div>

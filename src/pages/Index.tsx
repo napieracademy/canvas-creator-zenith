@@ -65,9 +65,11 @@ const Index = () => {
 
   const handleImageExtracted = (image: string) => {
     setFeaturedImage(image);
+    setBackgroundColor(`url(${image})`);
+    setTextColor('#ffffff');
     toast({
       title: "Immagine estratta",
-      description: "L'immagine è stata aggiunta come tema disponibile",
+      description: "L'immagine è stata impostata come sfondo",
     });
   };
 
