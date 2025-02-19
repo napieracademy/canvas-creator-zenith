@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 @tailwind base;
@@ -91,20 +90,19 @@
 }
 
 .controls-panel {
-  @apply fixed left-0 top-0 right-0 p-6 glass-panel space-y-6 animate-in z-50;
-  @apply md:fixed md:left-6 md:top-6 md:w-[340px] md:right-auto;
+  @apply fixed left-0 top-0 right-0 p-4 glass-panel space-y-4 animate-in z-50;
+  @apply md:fixed md:left-6 md:top-6 md:w-[340px] md:right-auto md:p-6 md:space-y-6 md:rounded-2xl;
 }
 
 .preview-container {
-  @apply flex-1 p-4 min-h-screen flex items-center justify-center;
-  @apply pt-[600px] pb-8; /* Spazio per il pannello di controllo fisso */
-  @apply md:p-8 md:pt-8 md:ml-[380px];
+  @apply flex-1 min-h-screen flex items-center justify-center px-4;
+  @apply pt-[520px] pb-16; /* Aumentato lo spazio sopra su mobile */
+  @apply md:p-8 md:pt-8 md:pb-8 md:ml-[380px];
 }
 
 .canvas-wrapper {
-  @apply relative rounded-2xl overflow-hidden shadow-2xl bg-white/50;
-  width: 100%;
-  max-width: 800px;
+  @apply relative rounded-2xl overflow-hidden shadow-2xl bg-white/50 w-full;
+  max-width: min(800px, 100vw - 2rem);
   aspect-ratio: 1080 / 1350;
   display: flex;
   align-items: center;
