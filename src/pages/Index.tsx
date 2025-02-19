@@ -44,7 +44,8 @@ const Index = () => {
 
   const handleColorSelect = (background: string, text: string, overlay?: string) => {
     if (overlay) {
-      setBackgroundColor(`linear-gradient(${overlay}, ${overlay}), ${background}`);
+      const bgImage = background.match(/url\((.*?)\)/)?.[1];
+      setBackgroundColor(`linear-gradient(${overlay}, ${overlay}), url(${bgImage})`);
     } else {
       setBackgroundColor(background);
     }
@@ -69,7 +70,10 @@ const Index = () => {
 
   const handleImageExtracted = (image: string) => {
     setFeaturedImage(image);
-    handleColorSelect(`url(${image})`, '#FFFFFF', 'rgba(0, 0, 0, 0.5)');
+    const overlay = 'rgba(0, 0, 0, 0.5)';
+    const bgImage = `url(${image})`;
+    setBackgroundColor(`linear-gradient(${overlay}, ${overlay}), ${bgImage}`);
+    setTextColor('#FFFFFF');
     setActiveTab('featured');
     toast({
       title: "Immagine estratta",
