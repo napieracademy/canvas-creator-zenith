@@ -1,17 +1,14 @@
 
 import React, { useState } from 'react';
-import TextInput from '@/components/TextInput';
-import Canvas from '@/components/Canvas';
-import DownloadButton from '@/components/DownloadButton';
-import ColorPresets from '@/components/ColorPresets';
-import UrlInput from '@/components/UrlInput';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
 import { toast } from '@/components/ui/use-toast';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from '@/components/ui/button';
-import { Square, RectangleHorizontal, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import ColorPresets from '@/components/ColorPresets';
+import DownloadButton from '@/components/DownloadButton';
+import FormatSelector from '@/components/FormatSelector';
+import SafeZoneToggle from '@/components/SafeZoneToggle';
+import TextEditor from '@/components/TextEditor';
+import CanvasPreview from '@/components/CanvasPreview';
 
 const Index = () => {
   const [text, setText] = useState('');
@@ -106,67 +103,29 @@ const Index = () => {
           <p className="text-sm text-gray-500">Create beautiful social media images in seconds</p>
         </div>
 
-        <div className="flex gap-2 p-1 rounded-lg bg-muted w-fit">
-          <Button
-            variant={format === 'post' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setFormat('post')}
-            className="gap-2"
-            disabled={isLoading}
-          >
-            <Square className="h-4.5 w-4.5" />
-            Post
-          </Button>
-          <Button
-            variant={format === 'story' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setFormat('story')}
-            className="gap-2"
-            disabled={isLoading}
-          >
-            <RectangleHorizontal className="h-4.5 w-4.5 rotate-90" />
-            Story
-          </Button>
-        </div>
+        <FormatSelector 
+          format={format}
+          onFormatChange={setFormat}
+          disabled={isLoading}
+        />
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="manual" disabled={isLoading}>Scrivi Testo</TabsTrigger>
-            <TabsTrigger value="fetch" disabled={isLoading}>Fetch da URL</TabsTrigger>
-          </TabsList>
-          <TabsContent value="manual">
-            <div className="space-y-4">
-              <TextInput 
-                value={text} 
-                onChange={setText} 
-                textAlign={textAlign}
-                onTextAlignChange={setTextAlign}
-                fontSize={fontSize}
-                onFontSizeChange={setFontSize}
-                label="Titolo"
-                disabled={isLoading}
-              />
-              <TextInput 
-                value={description} 
-                onChange={setDescription} 
-                textAlign={textAlign}
-                onTextAlignChange={setTextAlign}
-                fontSize={descriptionFontSize}
-                onFontSizeChange={setDescriptionFontSize}
-                label="Descrizione"
-                disabled={isLoading}
-              />
-            </div>
-          </TabsContent>
-          <TabsContent value="fetch">
-            <UrlInput 
-              onTitleExtracted={handleTitleExtracted}
-              onDescriptionExtracted={handleDescriptionExtracted}
-              onTabChange={setActiveTab}
-              onLoadingChange={setIsLoading}
-            />
-          </TabsContent>
-        </Tabs>
+        <TextEditor 
+          text={text}
+          description={description}
+          textAlign={textAlign}
+          fontSize={fontSize}
+          descriptionFontSize={descriptionFontSize}
+          onTextChange={setText}
+          onDescriptionChange={setDescription}
+          onTextAlignChange={setTextAlign}
+          onFontSizeChange={setFontSize}
+          onDescriptionFontSizeChange={setDescriptionFontSize}
+          onTitleExtracted={handleTitleExtracted}
+          onDescriptionExtracted={handleDescriptionExtracted}
+          onTabChange={setActiveTab}
+          onLoadingChange={setIsLoading}
+          disabled={isLoading}
+        />
 
         <ColorPresets 
           onSelectColors={handleColorSelect}
@@ -175,35 +134,27 @@ const Index = () => {
           disabled={isLoading}
         />
         
-        <div className="flex items-center space-x-2">
-          <Switch
-            id="safe-zone"
-            checked={showSafeZone}
-            onCheckedChange={setShowSafeZone}
-            disabled={isLoading}
-          />
-          <Label htmlFor="safe-zone">Mostra margini di sicurezza</Label>
-        </div>
+        <SafeZoneToggle 
+          showSafeZone={showSafeZone}
+          onShowSafeZoneChange={setShowSafeZone}
+          disabled={isLoading}
+        />
         
         <DownloadButton onDownload={handleDownload} disabled={isLoading} />
       </div>
       
-      <div className="preview-container">
-        <div className="canvas-wrapper" style={{ aspectRatio: format === 'post' ? '1080/1350' : '1080/1920' }}>
-          <Canvas 
-            text={text}
-            description={description}
-            backgroundColor={backgroundColor} 
-            textAlign={textAlign}
-            fontSize={fontSize}
-            descriptionFontSize={descriptionFontSize}
-            textColor={textColor}
-            onEffectiveFontSizeChange={setEffectiveFontSize}
-            showSafeZone={showSafeZone}
-            format={format}
-          />
-        </div>
-      </div>
+      <CanvasPreview 
+        text={text}
+        description={description}
+        backgroundColor={backgroundColor}
+        textAlign={textAlign}
+        fontSize={fontSize}
+        descriptionFontSize={descriptionFontSize}
+        textColor={textColor}
+        onEffectiveFontSizeChange={setEffectiveFontSize}
+        showSafeZone={showSafeZone}
+        format={format}
+      />
     </div>
   );
 };
