@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import { Input } from './ui/input';
 import { Label } from './ui/label';
 import FontSizeControl from './FontSizeControl';
 import TextAlignControl from './TextAlignControl';
@@ -32,11 +31,10 @@ const TextInput: React.FC<TextInputProps> = ({
     <div className="space-y-6 bg-white/50 rounded-lg p-4">
       <div className="space-y-2">
         <Label className="text-sm font-medium text-gray-700">{label}</Label>
-        <Input
-          type="text"
+        <textarea
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full min-h-[100px] resize-y"
+          className="w-full min-h-[100px] resize-y rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
           style={{
             textAlign,
             lineHeight: 1.2,
