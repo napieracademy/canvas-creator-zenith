@@ -75,8 +75,13 @@ const Canvas: React.FC<CanvasProps> = ({
   }, [text, backgroundColor, textAlign, textColor, fontSize, onEffectiveFontSizeChange, showSafeZone, format]);
 
   return (
-    <div className="space-y-2">
-      <div className="relative w-full h-full bg-transparent rounded-xl overflow-hidden">
+    <div className="flex flex-col space-y-2">
+      <div className="canvas-wrapper relative bg-transparent rounded-xl overflow-hidden" 
+           style={{ 
+             aspectRatio: format === 'post' ? '1080/1350' : '1080/1920',
+             width: '100%',
+             height: 'auto'
+           }}>
         <canvas
           ref={canvasRef}
           style={{
