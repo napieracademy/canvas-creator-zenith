@@ -30,6 +30,18 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
   const colorPairs: ColorPresetPair[] = [
     // Temi Classici
     {
+      name: "Pure Light",
+      background: "#FFFFFF",
+      text: "#000000",
+      category: 'classic'
+    },
+    {
+      name: "Pure Dark",
+      background: "#000000",
+      text: "#FFFFFF",
+      category: 'classic'
+    },
+    {
       name: "Cyber Purple",
       background: "#7209B7",
       text: "#4CC9F0",
@@ -100,6 +112,36 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
       name: "Nebula Storm",
       background: "linear-gradient(135deg, #1E40AF 0%, #7E22CE 100%)",
       text: "#F0ABFC",
+      category: 'cosmic'
+    },
+    {
+      name: "Solar Flare",
+      background: "linear-gradient(135deg, #FF0080 0%, #FF8C00 100%)",
+      text: "#00FFFF",
+      category: 'cosmic'
+    },
+    {
+      name: "Plasma Wave",
+      background: "linear-gradient(135deg, #6E0DD0 0%, #FF3864 100%)",
+      text: "#7FFFD4",
+      category: 'cosmic'
+    },
+    {
+      name: "Galactic Core",
+      background: "linear-gradient(135deg, #000428 0%, #004E92 100%)",
+      text: "#FFD700",
+      category: 'cosmic'
+    },
+    {
+      name: "Cosmic Fusion",
+      background: "linear-gradient(135deg, #330867 0%, #30CFD0 100%)",
+      text: "#FF69B4",
+      category: 'cosmic'
+    },
+    {
+      name: "Quantum Realm",
+      background: "linear-gradient(135deg, #1A2980 0%, #26D0CE 100%)",
+      text: "#FF1493",
       category: 'cosmic'
     }
   ];
