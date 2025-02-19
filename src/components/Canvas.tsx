@@ -72,17 +72,29 @@ const Canvas: React.FC<CanvasProps> = ({
     if (imageUrl) {
       const img = new Image();
       img.onload = () => {
-        // L'immagine occuperà un terzo dell'altezza totale
+        // Calcola la larghezza massima disponibile considerando i margini di sicurezza
+        const maxWidth = ORIGINAL_WIDTH - (2 * SAFE_ZONE_MARGIN);
         const targetHeight = ORIGINAL_HEIGHT / 3;
-        const imgAspectRatio = img.width / img.height;
         
-        // Calcola la larghezza mantenendo l'aspect ratio
-        const targetWidth = targetHeight * imgAspectRatio;
+        // Calcola le dimensioni mantenendo l'aspect ratio
+        const imgAspectRatio = img.width / img.height;
+        let targetWidth = targetHeight * imgAspectRatio;
+        
+        // Se la larghezza calcolata supera la larghezza massima disponibile,
+        // ricalcola le dimensioni basandosi sulla larghezza massima
+        if (targetWidth > maxWidth) {
+          targetWidth = maxWidth;
+          const newHeight = targetWidth / imgAspectRatio;
+          if (newHeight > targetHeight) {
+            // Se l'altezza risultante è maggiore di quella desiderata,
+            // mantieni l'altezza target e accetta una larghezza minore
+            targetWidth = targetHeight * imgAspectRatio;
+          }
+        }
         
         // Centra l'immagine orizzontalmente
         const x = (ORIGINAL_WIDTH - targetWidth) / 2;
-        
-        // Posiziona l'immagine in alto con un piccolo margine
+        // Posiziona l'immagine in alto con un margine di sicurezza
         const y = SAFE_ZONE_MARGIN;
 
         // Disegna l'immagine
