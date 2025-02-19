@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect, useState } from 'react';
 import { CanvasProps } from '@/types/canvas';
 import { useCanvasScale } from '@/hooks/useCanvasScale';
@@ -34,8 +33,8 @@ const Canvas: React.FC<CanvasProps> = ({
   const lastYRef = useRef(0);
   const [showSpacingControl, setShowSpacingControl] = useState(false);
   const [localSpacing, setLocalSpacing] = useState(spacing);
-  const [imagePosition, setImagePosition] = useState(0.2); // Cambiato a 20% dell'altezza per essere più visibile
-  const [showImageControl, setShowImageControl] = useState(true); // Sempre visibile inizialmente
+  const [imagePosition, setImagePosition] = useState(0.2);
+  const [showImageControl, setShowImageControl] = useState(true);
   const isImageDraggingRef = useRef(false);
   
   const ORIGINAL_WIDTH = 1080;
@@ -72,8 +71,9 @@ const Canvas: React.FC<CanvasProps> = ({
 
     if (template === 'lucky' && imageUrl) {
       const img = new Image();
+      img.crossOrigin = 'anonymous';
       img.onload = () => {
-        const maxHeight = ORIGINAL_HEIGHT * 0.3; // Ridotto per una migliore proporzione
+        const maxHeight = ORIGINAL_HEIGHT * 0.3;
         const maxWidth = ORIGINAL_WIDTH - (2 * SAFE_ZONE_MARGIN);
         
         const imgAspectRatio = img.width / img.height;
@@ -86,7 +86,7 @@ const Canvas: React.FC<CanvasProps> = ({
         }
         
         const x = (ORIGINAL_WIDTH - targetWidth) / 2;
-        const y = ORIGINAL_HEIGHT * imagePosition - targetHeight / 2; // Centrato verticalmente
+        const y = ORIGINAL_HEIGHT * imagePosition - targetHeight / 2;
 
         ctx.drawImage(img, x, y, targetWidth, targetHeight);
 
@@ -94,12 +94,14 @@ const Canvas: React.FC<CanvasProps> = ({
           drawSafeZone(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
         }
 
-        // Disegna il testo dopo l'immagine
         const textY = y + targetHeight + SAFE_ZONE_MARGIN;
         drawText(context, text, textAlign, textColor, fontSize, 'title', localSpacing, template);
         if (description) {
           drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', localSpacing, template);
         }
+      };
+      img.onerror = () => {
+        console.error('Errore nel caricamento dell\'immagine');
       };
       img.src = imageUrl;
     } else {
