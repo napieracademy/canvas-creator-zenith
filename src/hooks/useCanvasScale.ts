@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 export function useCanvasScale(
   canvasRef: React.RefObject<HTMLCanvasElement>,
@@ -7,7 +7,6 @@ export function useCanvasScale(
   originalHeight: number
 ) {
   const [scale, setScale] = useState(100);
-  const frameRef = useRef<number>();
 
   const updateScale = useCallback(() => {
     const canvas = canvasRef.current;
@@ -26,24 +25,12 @@ export function useCanvasScale(
   }, [canvasRef, originalWidth, originalHeight]);
 
   useEffect(() => {
-    let timeout: NodeJS.Timeout;
-    
     // Create a ResizeObserver instance
-    const resizeObserver = new ResizeObserver(() => {
-      // Cancel any pending updates
-      if (frameRef.current) {
-        cancelAnimationFrame(frameRef.current);
-      }
-      if (timeout) {
-        clearTimeout(timeout);
-      }
-
-      // Schedule a new update with debouncing
-      timeout = setTimeout(() => {
-        frameRef.current = requestAnimationFrame(() => {
-          updateScale();
-        });
-      }, 100); // 100ms debounce
+    const resizeObserver = new ResizeObserver((entries) => {
+      // Use requestIdleCallback or setTimeout to debounce the update
+      window.requestIdleCallback ? 
+        window.requestIdleCallback(() => updateScale()) : 
+        setTimeout(() => updateScale(), 0);
     });
 
     // Observe the canvas parent element
@@ -58,12 +45,6 @@ export function useCanvasScale(
     // Cleanup
     return () => {
       resizeObserver.disconnect();
-      if (frameRef.current) {
-        cancelAnimationFrame(frameRef.current);
-      }
-      if (timeout) {
-        clearTimeout(timeout);
-      }
     };
   }, [updateScale]);
 
