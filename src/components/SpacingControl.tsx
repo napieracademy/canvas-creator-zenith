@@ -1,9 +1,14 @@
 
 import React from 'react';
 import { Label } from '@/components/ui/label';
-import { Square } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
+import { ChevronDown } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface SpacingIconProps {
   spacing: 'small' | 'medium' | 'large';
@@ -39,35 +44,40 @@ const SpacingControl: React.FC<SpacingControlProps> = ({ value, onChange, disabl
     { name: 'Largo', value: 160, iconSpacing: 'large' as const }
   ];
 
+  const currentPreset = spacingPresets.find(preset => preset.value === value) || spacingPresets[1];
+
   return (
     <div className="space-y-2 bg-white/50 rounded-lg p-4">
       <Label className="text-sm font-medium text-gray-700">Spazio tra titolo e descrizione</Label>
-      <div className="flex gap-2 mt-2">
-        {spacingPresets.map((preset) => {
-          const isActive = value === preset.value;
-          
-          return (
-            <TooltipProvider key={preset.name}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant={isActive ? "default" : "outline"}
-                    size="sm"
-                    className="flex-1"
-                    onClick={() => onChange(preset.value)}
-                    disabled={disabled}
-                  >
-                    <SpacingIcon spacing={preset.iconSpacing} />
-                    <span className="ml-2">{preset.name}</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Imposta spaziatura {preset.name.toLowerCase()} ({preset.value}px)</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          );
-        })}
+      <div className="mt-2">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full justify-between"
+              disabled={disabled}
+            >
+              <div className="flex items-center gap-2">
+                <SpacingIcon spacing={currentPreset.iconSpacing} />
+                <span>{currentPreset.name}</span>
+              </div>
+              <ChevronDown className="h-4 w-4 opacity-50" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-[200px]">
+            {spacingPresets.map((preset) => (
+              <DropdownMenuItem
+                key={preset.name}
+                onClick={() => onChange(preset.value)}
+                className="flex items-center gap-2"
+              >
+                <SpacingIcon spacing={preset.iconSpacing} />
+                <span>{preset.name}</span>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );
