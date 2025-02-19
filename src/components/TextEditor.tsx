@@ -5,6 +5,7 @@ import SpacingControl from '@/components/SpacingControl';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import UrlInput from '@/components/UrlInput';
 import { toast } from "@/components/ui/use-toast";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
 interface TextEditorProps {
   text: string;
@@ -87,22 +88,39 @@ const TextEditor: React.FC<TextEditorProps> = ({
     <div className="space-y-4">
       <Tabs defaultValue="manual" onValueChange={onTabChange}>
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger 
-            value="manual" 
-            disabled={disabled}
-            title="Inserisci manualmente il testo"
-            aria-label="Inserisci manualmente il testo"
-          >
-            Scrivi Testo
-          </TabsTrigger>
-          <TabsTrigger 
-            value="fetch" 
-            disabled={disabled}
-            title="Estrai testo da un URL"
-            aria-label="Estrai testo da un URL"
-          >
-            Fetch da URL
-          </TabsTrigger>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <TabsTrigger 
+                  value="manual" 
+                  disabled={disabled}
+                  aria-label="Inserisci manualmente il testo"
+                >
+                  Scrivi Testo
+                </TabsTrigger>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Inserisci manualmente il testo</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <TabsTrigger 
+                  value="fetch" 
+                  disabled={disabled}
+                  aria-label="Estrai testo da un URL"
+                >
+                  Fetch da URL
+                </TabsTrigger>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Estrai automaticamente il testo da un URL</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </TabsList>
         <TabsContent value="manual">
           {renderTextControls()}

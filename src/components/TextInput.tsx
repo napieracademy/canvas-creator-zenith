@@ -18,6 +18,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
 interface TextInputProps {
   value: string;
@@ -99,61 +100,89 @@ const TextInput: React.FC<TextInputProps> = ({
       <div className="flex items-center justify-between mb-2">
         <Label className="text-sm font-medium text-gray-700">{label}</Label>
         <div className="flex items-center gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" disabled={disabled || isImproving}>
-                <AlignIcon className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => onTextAlignChange('left')}>
-                <AlignLeft className="h-4 w-4 mr-2" />
-                Sinistra
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onTextAlignChange('center')}>
-                <AlignCenter className="h-4 w-4 mr-2" />
-                Centro
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onTextAlignChange('right')}>
-                <AlignRight className="h-4 w-4 mr-2" />
-                Destra
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" disabled={disabled || isImproving}>
+                      <AlignIcon className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => onTextAlignChange('left')}>
+                      <AlignLeft className="h-4 w-4 mr-2" />
+                      Allinea a sinistra
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onTextAlignChange('center')}>
+                      <AlignCenter className="h-4 w-4 mr-2" />
+                      Centra
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onTextAlignChange('right')}>
+                      <AlignRight className="h-4 w-4 mr-2" />
+                      Allinea a destra
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Allineamento del testo</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
 
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" disabled={disabled || isImproving}>
-                <Type className="h-4 w-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-80">
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <Label>Dimensione testo</Label>
-                  <span className="text-sm text-muted-foreground">{fontSize}px</span>
-                </div>
-                <Slider
-                  value={[fontSize]}
-                  onValueChange={(values) => onFontSizeChange(values[0])}
-                  min={32}
-                  max={120}
-                  step={1}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" size="sm" disabled={disabled || isImproving}>
+                      <Type className="h-4 w-4" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-80">
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <Label>Dimensione testo</Label>
+                        <span className="text-sm text-muted-foreground">{fontSize}px</span>
+                      </div>
+                      <Slider
+                        value={[fontSize]}
+                        onValueChange={(values) => onFontSizeChange(values[0])}
+                        min={32}
+                        max={120}
+                        step={1}
+                        disabled={disabled || isImproving}
+                      />
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Dimensione del testo</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="w-9 p-0"
+                  onClick={handleImproveText}
                   disabled={disabled || isImproving}
-                />
-              </div>
-            </PopoverContent>
-          </Popover>
-
-          <Button 
-            variant="outline" 
-            size="sm"
-            className="w-9 p-0"
-            onClick={handleImproveText}
-            disabled={disabled || isImproving}
-          >
-            <Sparkles className="h-4 w-4 text-yellow-500" />
-          </Button>
+                  aria-label="Migliora automaticamente il testo"
+                >
+                  <Sparkles className="h-4 w-4 text-yellow-500" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Migliora automaticamente il testo</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
       

@@ -6,6 +6,7 @@ import { Label } from './ui/label';
 import { useToast } from './ui/use-toast';
 import { MetaService } from '@/utils/MetaService';
 import { Loader2 } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
 interface UrlInputProps {
   onTitleExtracted: (title: string) => void;
@@ -103,16 +104,25 @@ const UrlInput: React.FC<UrlInputProps> = ({
           required
           disabled={isLoading}
         />
-        <Button type="submit" disabled={isLoading}>
-          {isLoading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Caricamento...
-            </>
-          ) : (
-            "Estrai contenuti"
-          )}
-        </Button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Caricamento...
+                  </>
+                ) : (
+                  "Estrai contenuti"
+                )}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Estrai automaticamente titolo e descrizione dall'URL</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
     </form>
   );
