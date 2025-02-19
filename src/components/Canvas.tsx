@@ -5,9 +5,11 @@ interface CanvasProps {
   text: string;
   backgroundColor: string;
   textAlign: 'left' | 'center' | 'right';
+  textColor: string;
+  fontSize: number;
 }
 
-const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign }) => {
+const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textColor, fontSize }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -23,8 +25,8 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign }) => 
     ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 64px Inter';
+    ctx.fillStyle = textColor;
+    ctx.font = `bold ${fontSize}px Inter`;
     ctx.textAlign = textAlign;
     ctx.textBaseline = 'middle';
 
@@ -47,7 +49,7 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign }) => 
       lines.push(currentLine);
     }
 
-    const lineHeight = 80;
+    const lineHeight = fontSize * 1.2;
     const totalHeight = lines.length * lineHeight;
     const startY = (canvas.height - totalHeight) / 2;
     const x = textAlign === 'left' ? 100 : 
@@ -58,10 +60,10 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign }) => 
       ctx.fillStyle = 'rgba(0,0,0,0.3)';
       ctx.fillText(line, x + 2, startY + index * lineHeight + 2);
       
-      ctx.fillStyle = '#ffffff';
+      ctx.fillStyle = textColor;
       ctx.fillText(line, x, startY + index * lineHeight);
     });
-  }, [text, backgroundColor, textAlign]);
+  }, [text, backgroundColor, textAlign, textColor, fontSize]);
 
   return (
     <canvas

@@ -5,11 +5,15 @@ import ColorPicker from '@/components/ColorPicker';
 import Canvas from '@/components/Canvas';
 import DownloadButton from '@/components/DownloadButton';
 import TextAlignControl from '@/components/TextAlignControl';
+import FontSizeControl from '@/components/FontSizeControl';
+import TextColorPicker from '@/components/TextColorPicker';
 
 const Index = () => {
   const [text, setText] = useState('');
   const [backgroundColor, setBackgroundColor] = useState('#8B5CF6');
   const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right'>('center');
+  const [fontSize, setFontSize] = useState(64);
+  const [textColor, setTextColor] = useState('#FFFFFF');
 
   const handleDownload = () => {
     const canvas = document.querySelector('canvas');
@@ -30,6 +34,8 @@ const Index = () => {
         </div>
         <TextInput value={text} onChange={setText} />
         <TextAlignControl value={textAlign} onChange={setTextAlign} />
+        <FontSizeControl value={fontSize} onChange={setFontSize} />
+        <TextColorPicker color={textColor} onChange={setTextColor} />
         <ColorPicker color={backgroundColor} onChange={setBackgroundColor} />
         <DownloadButton onDownload={handleDownload} />
       </div>
@@ -40,6 +46,8 @@ const Index = () => {
             text={text} 
             backgroundColor={backgroundColor} 
             textAlign={textAlign}
+            fontSize={fontSize}
+            textColor={textColor}
           />
         </div>
       </div>
