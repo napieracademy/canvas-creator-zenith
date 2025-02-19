@@ -7,6 +7,7 @@ export interface CanvasProps {
   textColor: string;
   fontSize: number;
   descriptionFontSize?: number;
+  spacing?: number;
   onEffectiveFontSizeChange?: (size: number) => void;
   showSafeZone?: boolean;
   format?: 'post' | 'story';

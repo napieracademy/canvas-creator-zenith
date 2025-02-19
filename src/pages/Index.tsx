@@ -17,6 +17,7 @@ const Index = () => {
   const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right'>('center');
   const [fontSize, setFontSize] = useState(64);
   const [descriptionFontSize, setDescriptionFontSize] = useState(32);
+  const [spacing, setSpacing] = useState(40);
   const [effectiveFontSize, setEffectiveFontSize] = useState(64);
   const [textColor, setTextColor] = useState('#FFFFFF');
   const [showSafeZone, setShowSafeZone] = useState(false);
@@ -115,11 +116,13 @@ const Index = () => {
           textAlign={textAlign}
           fontSize={fontSize}
           descriptionFontSize={descriptionFontSize}
+          spacing={spacing}
           onTextChange={setText}
           onDescriptionChange={setDescription}
           onTextAlignChange={setTextAlign}
           onFontSizeChange={setFontSize}
           onDescriptionFontSizeChange={setDescriptionFontSize}
+          onSpacingChange={setSpacing}
           onTitleExtracted={handleTitleExtracted}
           onDescriptionExtracted={handleDescriptionExtracted}
           onTabChange={setActiveTab}
@@ -131,7 +134,6 @@ const Index = () => {
           onSelectColors={handleColorSelect}
           currentBackground={backgroundColor}
           currentText={textColor}
-          disabled={isLoading}
         />
         
         <SafeZoneToggle 
@@ -140,7 +142,7 @@ const Index = () => {
           disabled={isLoading}
         />
         
-        <DownloadButton onDownload={handleDownload} disabled={isLoading} />
+        <DownloadButton onDownload={handleDownload} />
       </div>
       
       <CanvasPreview 
@@ -150,6 +152,7 @@ const Index = () => {
         textAlign={textAlign}
         fontSize={fontSize}
         descriptionFontSize={descriptionFontSize}
+        spacing={spacing}
         textColor={textColor}
         onEffectiveFontSizeChange={setEffectiveFontSize}
         showSafeZone={showSafeZone}

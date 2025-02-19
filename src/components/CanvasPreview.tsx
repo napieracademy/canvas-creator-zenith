@@ -9,6 +9,7 @@ interface CanvasPreviewProps {
   textAlign: 'left' | 'center' | 'right';
   fontSize: number;
   descriptionFontSize: number;
+  spacing: number;
   textColor: string;
   onEffectiveFontSizeChange: (size: number) => void;
   showSafeZone: boolean;
@@ -22,6 +23,7 @@ const CanvasPreview: React.FC<CanvasPreviewProps> = ({
   textAlign,
   fontSize,
   descriptionFontSize,
+  spacing,
   textColor,
   onEffectiveFontSizeChange,
   showSafeZone,
@@ -37,6 +39,7 @@ const CanvasPreview: React.FC<CanvasPreviewProps> = ({
           textAlign={textAlign}
           fontSize={fontSize}
           descriptionFontSize={descriptionFontSize}
+          spacing={spacing}
           textColor={textColor}
           onEffectiveFontSizeChange={onEffectiveFontSizeChange}
           showSafeZone={showSafeZone}

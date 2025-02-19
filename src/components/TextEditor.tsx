@@ -1,6 +1,7 @@
 
 import React from 'react';
 import TextInput from '@/components/TextInput';
+import SpacingControl from '@/components/SpacingControl';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import UrlInput from '@/components/UrlInput';
 
@@ -10,11 +11,13 @@ interface TextEditorProps {
   textAlign: 'left' | 'center' | 'right';
   fontSize: number;
   descriptionFontSize: number;
+  spacing: number;
   onTextChange: (text: string) => void;
   onDescriptionChange: (description: string) => void;
   onTextAlignChange: (align: 'left' | 'center' | 'right') => void;
   onFontSizeChange: (size: number) => void;
   onDescriptionFontSizeChange: (size: number) => void;
+  onSpacingChange: (spacing: number) => void;
   onTitleExtracted: (title: string) => void;
   onDescriptionExtracted: (description: string) => void;
   onTabChange: (value: string) => void;
@@ -28,11 +31,13 @@ const TextEditor: React.FC<TextEditorProps> = ({
   textAlign,
   fontSize,
   descriptionFontSize,
+  spacing,
   onTextChange,
   onDescriptionChange,
   onTextAlignChange,
   onFontSizeChange,
   onDescriptionFontSizeChange,
+  onSpacingChange,
   onTitleExtracted,
   onDescriptionExtracted,
   onTabChange,
@@ -45,29 +50,36 @@ const TextEditor: React.FC<TextEditorProps> = ({
         <TabsTrigger value="manual" disabled={disabled}>Scrivi Testo</TabsTrigger>
         <TabsTrigger value="fetch" disabled={disabled}>Fetch da URL</TabsTrigger>
       </TabsList>
-      <TabsContent value="manual">
-        <div className="space-y-4">
-          <TextInput 
-            value={text} 
-            onChange={onTextChange} 
-            textAlign={textAlign}
-            onTextAlignChange={onTextAlignChange}
-            fontSize={fontSize}
-            onFontSizeChange={onFontSizeChange}
-            label="Titolo"
+      <TabsContent value="manual" className="space-y-4">
+        <TextInput 
+          value={text} 
+          onChange={onTextChange} 
+          textAlign={textAlign}
+          onTextAlignChange={onTextAlignChange}
+          fontSize={fontSize}
+          onFontSizeChange={onFontSizeChange}
+          label="Titolo"
+          disabled={disabled}
+        />
+        
+        {description && (
+          <SpacingControl
+            value={spacing}
+            onChange={onSpacingChange}
             disabled={disabled}
           />
-          <TextInput 
-            value={description} 
-            onChange={onDescriptionChange} 
-            textAlign={textAlign}
-            onTextAlignChange={onTextAlignChange}
-            fontSize={descriptionFontSize}
-            onFontSizeChange={onDescriptionFontSizeChange}
-            label="Descrizione"
-            disabled={disabled}
-          />
-        </div>
+        )}
+
+        <TextInput 
+          value={description} 
+          onChange={onDescriptionChange} 
+          textAlign={textAlign}
+          onTextAlignChange={onTextAlignChange}
+          fontSize={descriptionFontSize}
+          onFontSizeChange={onDescriptionFontSizeChange}
+          label="Descrizione"
+          disabled={disabled}
+        />
       </TabsContent>
       <TabsContent value="fetch">
         <UrlInput 
