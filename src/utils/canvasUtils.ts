@@ -135,16 +135,15 @@ export function drawText(
   let startY;
 
   if (template === 'lucky') {
-    // Calcola l'area disponibile dopo l'immagine
+    // Calcola l'area disponibile dopo l'immagine con margini di sicurezza
     const imageHeight = height * 0.4;
-    const contentStartY = imageHeight + safeZoneMargin;
-    const availableHeight = height - contentStartY - safeZoneMargin;
+    const contentStartY = imageHeight + (safeZoneMargin * 0.75); // Margine ridotto dopo l'immagine
+    const availableHeight = height - contentStartY - (safeZoneMargin * 1.25); // Margine bottom aumentato
     
     if (type === 'title') {
-      // Per il titolo, inizia subito dopo l'immagine
       startY = contentStartY;
       
-      // Verifica se c'è spazio sufficiente per titolo e descrizione
+      // Verifica e adatta lo spazio per titolo e descrizione
       const descFont = ctx.font;
       ctx.font = getFontStyle('description', fontSize, template);
       const descLines = calculateLines(context, text, fontSize, 'description');
@@ -153,12 +152,12 @@ export function drawText(
       
       const totalNeededHeight = currentTextHeight + spacing + descHeight;
       
+      // Adatta lo spacing se necessario
       if (totalNeededHeight > availableHeight) {
-        // Se non c'è abbastanza spazio, riduci lo spacing
-        spacing = Math.max(20, (availableHeight - currentTextHeight - descHeight));
+        const newSpacing = Math.max(30, availableHeight - currentTextHeight - descHeight);
+        spacing = Math.min(spacing, newSpacing);
       }
     } else {
-      // Per la descrizione, calcola lo spazio dopo il titolo
       const titleFont = ctx.font;
       ctx.font = getFontStyle('title', fontSize, template);
       const titleLines = calculateLines(context, text, fontSize, 'title');
@@ -167,10 +166,11 @@ export function drawText(
       
       startY = contentStartY + titleHeight + spacing;
       
-      // Se la descrizione va oltre lo spazio disponibile, aggiusta lo spacing
-      if (startY + currentTextHeight > height - safeZoneMargin) {
-        const maxStartY = height - safeZoneMargin - currentTextHeight;
-        spacing = Math.max(20, maxStartY - (contentStartY + titleHeight));
+      // Verifica che la descrizione non superi l'area disponibile
+      const bottomLimit = height - (safeZoneMargin * 1.25);
+      if (startY + currentTextHeight > bottomLimit) {
+        const maxStartY = bottomLimit - currentTextHeight;
+        spacing = Math.max(30, maxStartY - (contentStartY + titleHeight));
         startY = contentStartY + titleHeight + spacing;
       }
     }
