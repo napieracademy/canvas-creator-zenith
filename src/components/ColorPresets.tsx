@@ -79,43 +79,27 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
       <h3 className="text-sm font-medium text-gray-700">Color Themes</h3>
       <Carousel className="w-full">
         <CarouselContent className="-ml-2 md:-ml-4">
-          {colorPairs.map((pair, index) => (
-            <CarouselItem key={pair.name} className="pl-2 md:pl-4 basis-1/3">
+          {colorPairs.map((pair) => (
+            <CarouselItem key={pair.name} className="pl-2 md:pl-4 basis-1/4">
               <Button
                 variant="outline"
-                className={`h-24 w-full p-2 overflow-hidden flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:scale-105 ${
+                className={`w-full aspect-square p-0 overflow-hidden border-0 hover:opacity-90 transition-all duration-300 ${
                   currentBackground === pair.background && currentText === pair.text
-                    ? 'ring-2 ring-primary shadow-lg'
+                    ? 'ring-2 ring-primary' 
                     : ''
                 }`}
                 onClick={() => onSelectColors(pair.background, pair.text)}
-                style={{ 
-                  backgroundColor: pair.background,
-                  border: `1px solid ${pair.text}40`
-                }}
               >
-                <span 
-                  className="text-sm font-medium tracking-wide" 
-                  style={{ 
-                    color: pair.text,
-                    textShadow: '0 2px 4px rgba(0,0,0,0.3)'
-                  }}
-                >
-                  {pair.name}
-                </span>
-                <div className="flex gap-2">
-                  <div
-                    className="w-4 h-4 rounded-full shadow-inner"
+                <div className="w-full h-full rounded-full overflow-hidden relative">
+                  <div 
+                    className="absolute inset-0" 
                     style={{ 
-                      backgroundColor: pair.background,
-                      border: `2px solid ${pair.text}80`
-                    }}
-                  />
-                  <div
-                    className="w-4 h-4 rounded-full shadow-inner"
-                    style={{ 
-                      backgroundColor: pair.text,
-                      border: `2px solid ${pair.text}80`
+                      background: `linear-gradient(135deg, 
+                        ${pair.background} 0%, 
+                        ${pair.background} 50%, 
+                        ${pair.text} 50%, 
+                        ${pair.text} 100%
+                      )`
                     }}
                   />
                 </div>
