@@ -14,18 +14,10 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
   const [scale, setScale] = useState(100);
   const ORIGINAL_SIZE = 1080;
 
-  useEffect(() => {
+  const updateScale = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    // Set actual canvas size
-    canvas.width = ORIGINAL_SIZE;
-    canvas.height = ORIGINAL_SIZE;
-
-    // Calculate container width and scale
     const container = canvas.parentElement;
     if (container) {
       const containerWidth = container.clientWidth;
@@ -37,6 +29,26 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
       );
       setScale(Math.round(scaleFactor * 100));
     }
+  };
+
+  useEffect(() => {
+    window.addEventListener('resize', updateScale);
+    return () => window.removeEventListener('resize', updateScale);
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Set actual canvas size
+    canvas.width = ORIGINAL_SIZE;
+    canvas.height = ORIGINAL_SIZE;
+
+    // Calculate initial scale
+    updateScale();
 
     ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
