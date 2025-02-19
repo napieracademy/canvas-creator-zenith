@@ -14,7 +14,7 @@ interface ColorPaletteCarouselProps {
   colors: ColorPresetPair[];
   currentBackground: string;
   currentText: string;
-  onSelectColors: (background: string, text: string) => void;
+  onSelectColors: (background: string, text: string, overlay?: string) => void;
 }
 
 export const ColorPaletteCarousel: React.FC<ColorPaletteCarouselProps> = ({
@@ -40,29 +40,31 @@ export const ColorPaletteCarousel: React.FC<ColorPaletteCarouselProps> = ({
                 height: '48px',
                 borderRadius: '50%'
               }}
-              onClick={() => onSelectColors(pair.background, pair.text)}
+              onClick={() => onSelectColors(pair.background, pair.text, pair.overlay)}
             >
               <div className="w-full h-full rounded-full overflow-hidden">
                 <div 
                   className="absolute inset-0" 
                   style={{ 
-                    background: typeof pair.background === 'string' && pair.background.includes('gradient')
+                    background: pair.background.startsWith('url') 
                       ? pair.background
-                      : `linear-gradient(135deg, 
-                          ${pair.background} 0%, 
-                          ${pair.background} 50%, 
-                          ${pair.text} 50%, 
-                          ${pair.text} 100%
-                        )`,
+                      : typeof pair.background === 'string' && pair.background.includes('gradient')
+                        ? pair.background
+                        : `linear-gradient(135deg, 
+                            ${pair.background} 0%, 
+                            ${pair.background} 50%, 
+                            ${pair.text} 50%, 
+                            ${pair.text} 100%
+                          )`,
                     borderRadius: '50%'
                   }}
                 >
-                  {typeof pair.background === 'string' && pair.background.includes('gradient') && (
+                  {pair.overlay && (
                     <div 
-                      className="absolute right-0 bottom-0 w-1/2 h-1/2"
+                      className="absolute inset-0"
                       style={{
-                        background: pair.text,
-                        borderTopLeftRadius: '50%'
+                        background: pair.overlay,
+                        mixBlendMode: 'multiply'
                       }}
                     />
                   )}

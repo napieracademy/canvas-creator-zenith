@@ -67,6 +67,7 @@ const Index = () => {
     setFeaturedImage(image);
     setBackgroundColor(`url(${image})`);
     setTextColor('#ffffff');
+    setActiveTab('featured');
     toast({
       title: "Immagine estratta",
       description: "L'immagine è stata impostata come sfondo",
