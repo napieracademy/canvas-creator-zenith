@@ -2,9 +2,11 @@
 import React from 'react';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
-import { AlignLeft, AlignCenter, AlignRight, Type } from 'lucide-react';
+import { AlignLeft, AlignCenter, AlignRight, Type, Wand2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Slider } from './ui/slider';
+import { toast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Popover,
   PopoverContent,
@@ -32,6 +34,46 @@ const TextInput: React.FC<TextInputProps> = ({
   label,
   disabled
 }) => {
+  const [isImproving, setIsImproving] = React.useState(false);
+
+  const handleImproveText = async () => {
+    if (!value.trim()) {
+      toast({
+        title: "Testo mancante",
+        description: "Inserisci del testo prima di utilizzare il miglioramento automatico",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsImproving(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('improve-text', {
+        body: {
+          text: value,
+          type: label.toLowerCase() === 'titolo' ? 'title' : 'description'
+        }
+      });
+
+      if (error) throw error;
+
+      onChange(data.improvedText);
+      toast({
+        title: "Testo migliorato",
+        description: "Il testo è stato ottimizzato con successo"
+      });
+    } catch (error) {
+      console.error('Error improving text:', error);
+      toast({
+        title: "Errore",
+        description: "Si è verificato un errore durante il miglioramento del testo",
+        variant: "destructive"
+      });
+    } finally {
+      setIsImproving(false);
+    }
+  };
+
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
@@ -43,7 +85,7 @@ const TextInput: React.FC<TextInputProps> = ({
               size="sm"
               className={`px-2.5 ${textAlign === 'left' ? 'bg-accent' : ''}`}
               onClick={() => onTextAlignChange('left')}
-              disabled={disabled}
+              disabled={disabled || isImproving}
             >
               <AlignLeft className="h-4 w-4" />
             </Button>
@@ -52,7 +94,7 @@ const TextInput: React.FC<TextInputProps> = ({
               size="sm"
               className={`px-2.5 ${textAlign === 'center' ? 'bg-accent' : ''}`}
               onClick={() => onTextAlignChange('center')}
-              disabled={disabled}
+              disabled={disabled || isImproving}
             >
               <AlignCenter className="h-4 w-4" />
             </Button>
@@ -61,15 +103,26 @@ const TextInput: React.FC<TextInputProps> = ({
               size="sm"
               className={`px-2.5 ${textAlign === 'right' ? 'bg-accent' : ''}`}
               onClick={() => onTextAlignChange('right')}
-              disabled={disabled}
+              disabled={disabled || isImproving}
             >
               <AlignRight className="h-4 w-4" />
             </Button>
           </div>
           
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="gap-2" 
+            onClick={handleImproveText}
+            disabled={disabled || isImproving}
+          >
+            <Wand2 className="h-4 w-4" />
+            {isImproving ? 'Miglioramento...' : 'Migliora'}
+          </Button>
+
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="gap-2" disabled={disabled}>
+              <Button variant="outline" size="sm" className="gap-2" disabled={disabled || isImproving}>
                 <Type className="h-4 w-4" />
                 {fontSize}px
               </Button>
@@ -86,7 +139,7 @@ const TextInput: React.FC<TextInputProps> = ({
                   min={32}
                   max={120}
                   step={1}
-                  disabled={disabled}
+                  disabled={disabled || isImproving}
                 />
               </div>
             </PopoverContent>
@@ -100,10 +153,11 @@ const TextInput: React.FC<TextInputProps> = ({
         onChange={(e) => onChange(e.target.value)}
         className="resize-none h-32 bg-white/50 backdrop-blur-sm focus:bg-white transition-colors duration-200"
         style={{ textAlign }}
-        disabled={disabled}
+        disabled={disabled || isImproving}
       />
     </div>
   );
 };
 
 export default TextInput;
+
