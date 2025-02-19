@@ -73,8 +73,21 @@ const Canvas: React.FC<CanvasProps> = ({
 
     // Safe zone
     if (showSafeZone) {
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-      ctx.setLineDash([5, 5]);
+      // Overlay semi-trasparente fuori dalla safe zone
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+      // Top
+      ctx.fillRect(0, 0, ORIGINAL_WIDTH, SAFE_ZONE_MARGIN);
+      // Bottom
+      ctx.fillRect(0, ORIGINAL_HEIGHT - SAFE_ZONE_MARGIN, ORIGINAL_WIDTH, SAFE_ZONE_MARGIN);
+      // Left
+      ctx.fillRect(0, SAFE_ZONE_MARGIN, SAFE_ZONE_MARGIN, ORIGINAL_HEIGHT - (2 * SAFE_ZONE_MARGIN));
+      // Right
+      ctx.fillRect(ORIGINAL_WIDTH - SAFE_ZONE_MARGIN, SAFE_ZONE_MARGIN, SAFE_ZONE_MARGIN, ORIGINAL_HEIGHT - (2 * SAFE_ZONE_MARGIN));
+      
+      // Bordo della safe zone
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([8, 8]);
       ctx.strokeRect(
         SAFE_ZONE_MARGIN, 
         SAFE_ZONE_MARGIN, 
@@ -106,6 +119,7 @@ const Canvas: React.FC<CanvasProps> = ({
       return lines;
     };
 
+    // Verifica se il testo sta nella safe zone
     const textFitsInSafeZone = (size: number) => {
       const lines = calculateLines(size);
       const totalHeight = lines.length * (size * 1.2);
@@ -115,8 +129,14 @@ const Canvas: React.FC<CanvasProps> = ({
       });
     };
 
+    // Trova la dimensione del font ottimale che garantisce che il testo stia nella safe zone
     let adjustedFontSize = fontSize;
     while (!textFitsInSafeZone(adjustedFontSize) && adjustedFontSize > 32) {
+      adjustedFontSize -= 2; // Riduzione più aggressiva per trovare più velocemente la dimensione corretta
+    }
+
+    // Se ancora non entra, continua a ridurre fino a trovare una dimensione che funziona
+    while (!textFitsInSafeZone(adjustedFontSize) && adjustedFontSize > 12) {
       adjustedFontSize -= 1;
     }
 
@@ -142,7 +162,7 @@ const Canvas: React.FC<CanvasProps> = ({
                ORIGINAL_WIDTH / 2;
 
       lines.forEach((line, index) => {
-        ctx.fillText(line, x, startY + (index * lineHeight));
+        ctx.fillText(line, x, startY + (index * lineHeight) + (lineHeight / 2));
       });
     } else {
       // Placeholder quando non c'è testo
