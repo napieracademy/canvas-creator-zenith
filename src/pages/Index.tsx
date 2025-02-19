@@ -103,12 +103,12 @@ const Index = () => {
       )}
       
       <div className="controls-panel">
-        <div className="space-y-1.5">
+        <div className="space-y-1.5 mb-6">
           <h1 className="text-xl font-semibold text-gray-900">Social Image Creator</h1>
-          <p className="text-sm text-gray-500">Create beautiful social media images in seconds</p>
+          <p className="text-sm text-gray-500">Crea immagini per i social media in pochi secondi</p>
         </div>
 
-        <div className="flex gap-2 p-1 rounded-lg bg-muted w-fit">
+        <div className="flex gap-2 p-1 rounded-lg bg-muted w-fit mb-6">
           <Button
             variant={format === 'post' ? 'default' : 'ghost'}
             size="sm"
@@ -116,7 +116,7 @@ const Index = () => {
             className="gap-2"
             disabled={isLoading}
           >
-            <Square className="h-4.5 w-4.5" />
+            <Square className="h-4 w-4" />
             Post
           </Button>
           <Button
@@ -126,39 +126,37 @@ const Index = () => {
             className="gap-2"
             disabled={isLoading}
           >
-            <RectangleHorizontal className="h-4.5 w-4.5 rotate-90" />
+            <RectangleHorizontal className="h-4 w-4 rotate-90" />
             Story
           </Button>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mb-6">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="manual" disabled={isLoading}>Scrivi Testo</TabsTrigger>
             <TabsTrigger value="fetch" disabled={isLoading}>Fetch da URL</TabsTrigger>
           </TabsList>
-          <TabsContent value="manual">
-            <div className="space-y-4">
-              <TextInput 
-                value={text} 
-                onChange={setText} 
-                textAlign={textAlign}
-                onTextAlignChange={setTextAlign}
-                fontSize={fontSize}
-                onFontSizeChange={setFontSize}
-                label="Titolo"
-                disabled={isLoading}
-              />
-              <TextInput 
-                value={description} 
-                onChange={setDescription} 
-                textAlign={textAlign}
-                onTextAlignChange={setTextAlign}
-                fontSize={descriptionFontSize}
-                onFontSizeChange={setDescriptionFontSize}
-                label="Descrizione"
-                disabled={isLoading}
-              />
-            </div>
+          <TabsContent value="manual" className="space-y-6">
+            <TextInput 
+              value={text} 
+              onChange={setText} 
+              textAlign={textAlign}
+              onTextAlignChange={setTextAlign}
+              fontSize={fontSize}
+              onFontSizeChange={setFontSize}
+              label="Titolo"
+              disabled={isLoading}
+            />
+            <TextInput 
+              value={description} 
+              onChange={setDescription} 
+              textAlign={textAlign}
+              onTextAlignChange={setTextAlign}
+              fontSize={descriptionFontSize}
+              onFontSizeChange={setDescriptionFontSize}
+              label="Descrizione"
+              disabled={isLoading}
+            />
           </TabsContent>
           <TabsContent value="fetch">
             <UrlInput 
@@ -170,24 +168,26 @@ const Index = () => {
           </TabsContent>
         </Tabs>
 
-        <ColorPresets 
-          onSelectColors={handleColorSelect}
-          currentBackground={backgroundColor}
-          currentText={textColor}
-          disabled={isLoading}
-        />
-        
-        <div className="flex items-center space-x-2">
-          <Switch
-            id="safe-zone"
-            checked={showSafeZone}
-            onCheckedChange={setShowSafeZone}
+        <div className="space-y-6">
+          <ColorPresets 
+            onSelectColors={handleColorSelect}
+            currentBackground={backgroundColor}
+            currentText={textColor}
             disabled={isLoading}
           />
-          <Label htmlFor="safe-zone">Mostra margini di sicurezza</Label>
+          
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="safe-zone"
+              checked={showSafeZone}
+              onCheckedChange={setShowSafeZone}
+              disabled={isLoading}
+            />
+            <Label htmlFor="safe-zone">Mostra margini di sicurezza</Label>
+          </div>
+          
+          <DownloadButton onDownload={handleDownload} disabled={isLoading} />
         </div>
-        
-        <DownloadButton onDownload={handleDownload} disabled={isLoading} />
       </div>
       
       <div className="preview-container">

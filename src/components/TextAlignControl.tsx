@@ -13,11 +13,11 @@ interface TextAlignControlProps {
 const TextAlignControl: React.FC<TextAlignControlProps> = ({ value, onChange, disabled }) => {
   return (
     <div className="space-y-2">
-      <Label className="text-sm font-medium text-gray-700">Text Alignment</Label>
-      <div className="flex gap-2">
+      <Label className="text-sm font-medium text-gray-700">Allineamento Testo</Label>
+      <div className="grid grid-cols-3 gap-2">
         <Button
           variant="outline"
-          className={`flex-1 ${value === 'left' ? 'bg-violet-50 border-violet-200' : ''}`}
+          className={value === 'left' ? 'bg-violet-50 border-violet-200' : ''}
           onClick={() => onChange('left')}
           disabled={disabled}
         >
@@ -25,7 +25,7 @@ const TextAlignControl: React.FC<TextAlignControlProps> = ({ value, onChange, di
         </Button>
         <Button
           variant="outline"
-          className={`flex-1 ${value === 'center' ? 'bg-violet-50 border-violet-200' : ''}`}
+          className={value === 'center' ? 'bg-violet-50 border-violet-200' : ''}
           onClick={() => onChange('center')}
           disabled={disabled}
         >
@@ -33,7 +33,7 @@ const TextAlignControl: React.FC<TextAlignControlProps> = ({ value, onChange, di
         </Button>
         <Button
           variant="outline"
-          className={`flex-1 ${value === 'right' ? 'bg-violet-50 border-violet-200' : ''}`}
+          className={value === 'right' ? 'bg-violet-50 border-violet-200' : ''}
           onClick={() => onChange('right')}
           disabled={disabled}
         >

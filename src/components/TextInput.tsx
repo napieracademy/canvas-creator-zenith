@@ -29,16 +29,19 @@ const TextInput: React.FC<TextInputProps> = ({
   const [effectiveSize, setEffectiveSize] = useState(fontSize);
 
   return (
-    <div className="space-y-2">
-      <Label className="text-sm font-medium text-gray-700">{label}</Label>
-      <div className="flex gap-2">
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <Label className="text-sm font-medium text-gray-700">{label}</Label>
         <Input
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="flex-1"
+          className="w-full"
           disabled={disabled}
         />
+      </div>
+      
+      <div className="space-y-4">
         <TextAlignControl value={textAlign} onChange={onTextAlignChange} disabled={disabled} />
         <FontSizeControl 
           value={fontSize} 
