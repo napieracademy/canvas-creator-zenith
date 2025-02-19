@@ -1,4 +1,3 @@
-
 import { CanvasContext } from '@/types/canvas';
 
 export const SAFE_ZONE_MARGIN = 120;
@@ -110,7 +109,7 @@ export function drawText(
   spacing: number = 40,
   template: 'klaus' | 'lucky' = 'klaus'
 ) {
-  const { ctx, width, height } = context;
+  const { ctx, width, height, safeZoneMargin } = context;
   
   if (!text.trim()) {
     if (type === 'title') {
@@ -136,12 +135,25 @@ export function drawText(
   let startY;
   if (template === 'lucky') {
     const imageHeight = height / 3; // Altezza dell'immagine
-    const textStartY = imageHeight + SAFE_ZONE_MARGIN * 2; // Inizia dopo l'immagine con un margine
+    const availableHeight = height - imageHeight - (safeZoneMargin * 3); // Spazio disponibile per il testo
+    const totalTextHeight = type === 'title' ? totalHeight : totalHeight * 2 + spacing; // Altezza totale necessaria
+    
+    // Calcola il punto di partenza del testo per centrarlo nello spazio disponibile
+    const textBlockStart = imageHeight + (safeZoneMargin * 2);
     
     if (type === 'title') {
-      startY = textStartY;
+      startY = textBlockStart;
     } else {
-      startY = textStartY + totalHeight + spacing;
+      const titleLines = calculateLines(context, text, fontSize, 'title');
+      const titleHeight = titleLines.length * lineHeight;
+      startY = textBlockStart + titleHeight + spacing;
+    }
+
+    // Verifica che il testo non esca dal canvas
+    if (startY + totalHeight > height - safeZoneMargin) {
+      // Se il testo esce, riposizionalo più in alto
+      const overlap = (startY + totalHeight) - (height - safeZoneMargin);
+      startY -= overlap;
     }
   } else {
     // Layout originale per Klaus
@@ -152,8 +164,8 @@ export function drawText(
     }
   }
 
-  const x = textAlign === 'left' ? SAFE_ZONE_MARGIN : 
-           textAlign === 'right' ? width - SAFE_ZONE_MARGIN : 
+  const x = textAlign === 'left' ? safeZoneMargin : 
+           textAlign === 'right' ? width - safeZoneMargin : 
            width / 2;
 
   lines.forEach((line, index) => {
