@@ -23,17 +23,23 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
       const containerWidth = container.clientWidth;
       const containerHeight = container.clientHeight;
       const scaleFactor = Math.min(
-        containerWidth / ORIGINAL_SIZE,
-        containerHeight / ORIGINAL_SIZE,
-        1 // Never scale up beyond 100%
+        (containerWidth - 40) / ORIGINAL_SIZE,  // Sottraiamo un po' di spazio per il padding
+        (containerHeight - 40) / ORIGINAL_SIZE,
+        0.9 // Limitiamo la scala al 90% per mantenere un po' di spazio intorno
       );
       setScale(Math.round(scaleFactor * 100));
     }
   };
 
   useEffect(() => {
-    window.addEventListener('resize', updateScale);
-    return () => window.removeEventListener('resize', updateScale);
+    const handleResize = () => {
+      requestAnimationFrame(updateScale); // Usiamo requestAnimationFrame per ottimizzare le performance
+    };
+
+    window.addEventListener('resize', handleResize);
+    updateScale(); // Calcoliamo la scala iniziale
+    
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   useEffect(() => {
@@ -90,12 +96,12 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
   }, [text, backgroundColor, textAlign, textColor, fontSize]);
 
   return (
-    <div className="relative">
+    <div className="relative flex items-center justify-center w-full h-full p-5">
       <canvas
         ref={canvasRef}
         style={{
-          width: '100%',
-          height: '100%',
+          width: `${scale}%`,
+          height: `${scale}%`,
           maxWidth: `${ORIGINAL_SIZE}px`,
           maxHeight: `${ORIGINAL_SIZE}px`,
           objectFit: 'contain',
