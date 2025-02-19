@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from '@/components/ui/use-toast';
@@ -95,52 +96,32 @@ const Index = () => {
     if (!canvas) return;
 
     try {
-      const tempCanvas = document.createElement('canvas');
-      const ctx = tempCanvas.getContext('2d');
-      if (!ctx) return;
-
-      tempCanvas.width = 1080;
-      tempCanvas.height = format === 'post' ? 1350 : 1920;
-
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-
-      new Promise((resolve, reject) => {
-        img.onload = () => {
-          try {
-            ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, tempCanvas.width, tempCanvas.height);
-            const dataUrl = tempCanvas.toDataURL('image/png');
-            const link = document.createElement('a');
-            link.download = `social-image-${format}.png`;
-            link.href = dataUrl;
-            link.click();
-
-            toast({
-              title: "Immagine scaricata",
-              description: `L'immagine è stata salvata nel formato ${format === 'post' ? 'post (1080x1350)' : 'story (1080x1920)'}`,
-            });
-            resolve(true);
-          } catch (error) {
-            reject(error);
-          }
-        };
-        img.onerror = () => {
-          reject(new Error("Errore nel caricamento dell'immagine"));
-        };
-        img.src = canvas.toDataURL();
-      }).catch((error) => {
-        console.error('Errore durante il download:', error);
+      // Se c'è un'immagine caricata, mostriamo un messaggio di avviso
+      if (imageUrl) {
         toast({
-          title: "Errore nel download",
-          description: "Non è possibile scaricare l'immagine a causa di restrizioni di sicurezza. Prova a utilizzare un'immagine dal tuo dominio.",
+          title: "Immagine con contenuto esterno",
+          description: "L'immagine contiene contenuti da altri domini. Per motivi di sicurezza, puoi utilizzare uno screenshot per salvare l'immagine.",
           variant: "destructive"
         });
+        return;
+      }
+
+      // Altrimenti procediamo normalmente
+      const dataUrl = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.download = `social-image-${format}.png`;
+      link.href = dataUrl;
+      link.click();
+
+      toast({
+        title: "Immagine scaricata",
+        description: `L'immagine è stata salvata nel formato ${format === 'post' ? 'post (1080x1350)' : 'story (1080x1920)'}`,
       });
     } catch (error) {
       console.error('Errore durante il download:', error);
       toast({
         title: "Errore nel download",
-        description: "Non è possibile scaricare l'immagine a causa di restrizioni di sicurezza. Prova a utilizzare un'immagine dal tuo dominio.",
+        description: "Non è possibile scaricare l'immagine a causa di restrizioni di sicurezza. Puoi utilizzare uno screenshot per salvare l'immagine.",
         variant: "destructive"
       });
     }
