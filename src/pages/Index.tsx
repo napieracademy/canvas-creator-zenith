@@ -1,8 +1,9 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from '@/components/ui/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Upload } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import ColorPresets from '@/components/ColorPresets';
 import DownloadButton from '@/components/DownloadButton';
 import FormatSelector from '@/components/FormatSelector';
@@ -46,6 +47,37 @@ const Index = () => {
     setBackgroundColor(background);
     setTextColor(text);
   };
+
+  const handleImageUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Verifica il tipo di file
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Errore",
+        description: "Per favore, carica solo file immagine",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const imageUrl = e.target?.result as string;
+      if (imageUrl) {
+        // Applica l'overlay grigio sull'immagine
+        const overlay = 'rgba(0, 0, 0, 0.5)';
+        setBackgroundColor(`linear-gradient(${overlay}, ${overlay}), url(${imageUrl})`);
+        setTextColor('#FFFFFF'); // Imposta il testo in bianco per maggiore leggibilità
+        toast({
+          title: "Immagine caricata",
+          description: "L'immagine è stata impostata come sfondo",
+        });
+      }
+    };
+    reader.readAsDataURL(file);
+  }, []);
 
   const handleTitleExtracted = (extractedTitle: string) => {
     setText(extractedTitle);
@@ -118,6 +150,20 @@ const Index = () => {
         <div className="space-y-1.5">
           <h1 className="text-xl font-semibold text-gray-900">Social Image Creator</h1>
           <p className="text-sm text-gray-500">Create beautiful social media images in seconds</p>
+        </div>
+
+        <div className="space-y-4">
+          <Button variant="outline" className="w-full" onClick={() => document.getElementById('imageUpload')?.click()}>
+            <Upload className="mr-2 h-4 w-4" />
+            Carica un'immagine di sfondo
+          </Button>
+          <input
+            type="file"
+            id="imageUpload"
+            className="hidden"
+            accept="image/*"
+            onChange={handleImageUpload}
+          />
         </div>
 
         <FormatSelector 
