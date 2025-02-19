@@ -14,7 +14,8 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({ onDownload }) => {
       size="icon"
       variant="ghost"
       className="bg-white/80 hover:bg-white/90 backdrop-blur-sm transition-all duration-200"
-      aria-label="Scarica immagine"
+      title="Scarica l'immagine generata"
+      aria-label="Scarica l'immagine generata"
     >
       <Download className="h-4 w-4" />
     </Button>

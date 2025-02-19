@@ -87,8 +87,22 @@ const TextEditor: React.FC<TextEditorProps> = ({
     <div className="space-y-4">
       <Tabs defaultValue="manual" onValueChange={onTabChange}>
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="manual" disabled={disabled}>Scrivi Testo</TabsTrigger>
-          <TabsTrigger value="fetch" disabled={disabled}>Fetch da URL</TabsTrigger>
+          <TabsTrigger 
+            value="manual" 
+            disabled={disabled}
+            title="Inserisci manualmente il testo"
+            aria-label="Inserisci manualmente il testo"
+          >
+            Scrivi Testo
+          </TabsTrigger>
+          <TabsTrigger 
+            value="fetch" 
+            disabled={disabled}
+            title="Estrai testo da un URL"
+            aria-label="Estrai testo da un URL"
+          >
+            Fetch da URL
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="manual">
           {renderTextControls()}

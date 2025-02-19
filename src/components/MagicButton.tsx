@@ -16,7 +16,8 @@ const MagicButton: React.FC<MagicButtonProps> = ({ onMagicOptimization, disabled
       variant="ghost"
       className="bg-white/80 hover:bg-white/90 backdrop-blur-sm transition-all duration-200"
       disabled={disabled}
-      aria-label="Ottimizza layout automaticamente"
+      title="Ottimizza automaticamente il layout del testo"
+      aria-label="Ottimizza automaticamente il layout del testo"
     >
       <Wand2 className="h-4 w-4" />
     </Button>

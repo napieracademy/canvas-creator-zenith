@@ -21,7 +21,8 @@ const SafeZoneToggle: React.FC<SafeZoneToggleProps> = ({
       className="bg-white/80 hover:bg-white/90 backdrop-blur-sm transition-all duration-200"
       onClick={() => onShowSafeZoneChange(!showSafeZone)}
       disabled={disabled}
-      aria-label="Mostra margini di sicurezza"
+      title="Mostra/nascondi i margini di sicurezza dell'immagine"
+      aria-label="Mostra/nascondi i margini di sicurezza dell'immagine"
     >
       <LayoutGrid className="h-4 w-4" />
     </Button>
