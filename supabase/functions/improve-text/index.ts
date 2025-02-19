@@ -60,7 +60,9 @@ serve(async (req) => {
           messages: [
             { 
               role: 'system', 
-              content: 'Sei un traduttore professionale. Traduci il testo in italiano mantenendolo conciso e d\'impatto.' 
+              content: type === 'title' 
+                ? 'Sei un traduttore esperto. Traduci questo titolo in italiano RIMANENDO IL PIÙ FEDELE POSSIBILE al significato originale. Non interpretare o rielaborare, mantieni la traduzione molto vicina all\'originale. Usa solo parole semplici e dirette. Se ci sono giochi di parole o modi di dire, cerca l\'equivalente italiano più simile possibile.'
+                : 'Sei un traduttore esperto. Traduci questo testo in italiano rimanendo il più fedele possibile al significato originale. Mantieni lo stesso tono e stile, evitando interpretazioni libere. Se ci sono espressioni idiomatiche, usa l\'equivalente italiano più vicino possibile.' 
             },
             { role: 'user', content: text }
           ],
@@ -116,8 +118,8 @@ serve(async (req) => {
           { role: 'system', content: systemPrompt },
           { role: 'user', content: textToImprove }
         ],
-        temperature: type === 'title' ? 0.5 : 0.7, // Temperature più bassa per i titoli
-        top_p: type === 'title' ? 0.7 : 0.9, // Top P più basso per i titoli
+        temperature: type === 'title' ? 0.5 : 0.7,
+        top_p: type === 'title' ? 0.7 : 0.9,
         max_tokens: type === 'title' ? MAX_TOKENS.title : MAX_TOKENS.description
       }),
     });
