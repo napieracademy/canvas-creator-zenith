@@ -21,10 +21,7 @@ const SpacingIcon: React.FC<SpacingIconProps> = ({ spacing }) => {
   return (
     <div className={`flex flex-col items-center ${getSpacing()} h-5`}>
       <div className="w-5 h-[3px] bg-current rounded-sm" />
-      <div className="flex flex-col gap-[2px]">
-        <div className="w-5 h-[2px] bg-current/70 rounded-sm" />
-        <div className="w-4 h-[2px] bg-current/70 rounded-sm" />
-      </div>
+      <div className="w-5 h-[3px] bg-current rounded-sm" />
     </div>
   );
 };
