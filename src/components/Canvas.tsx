@@ -11,8 +11,9 @@ interface CanvasProps {
 
 const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textColor, fontSize }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [scale, setScale] = useState(100);
+  const [scale, setScale] = useState(60);
   const ORIGINAL_SIZE = 1080;
+  const MAX_SCALE = 0.6; // 60%
 
   const updateScale = () => {
     const canvas = canvasRef.current;
@@ -25,7 +26,7 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
       const scaleFactor = Math.min(
         containerWidth / ORIGINAL_SIZE,
         containerHeight / ORIGINAL_SIZE,
-        1 // Never scale up beyond 100%
+        MAX_SCALE // Limit to 60%
       );
       setScale(Math.round(scaleFactor * 100));
     }
@@ -90,14 +91,14 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
   }, [text, backgroundColor, textAlign, textColor, fontSize]);
 
   return (
-    <div className="relative">
+    <div className="relative self-start">
       <canvas
         ref={canvasRef}
         style={{
-          width: '100%',
-          height: '100%',
-          maxWidth: `${ORIGINAL_SIZE}px`,
-          maxHeight: `${ORIGINAL_SIZE}px`,
+          width: `${scale}%`,
+          height: `${scale}%`,
+          maxWidth: `${ORIGINAL_SIZE * MAX_SCALE}px`,
+          maxHeight: `${ORIGINAL_SIZE * MAX_SCALE}px`,
           objectFit: 'contain',
         }}
       />
