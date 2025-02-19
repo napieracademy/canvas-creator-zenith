@@ -14,8 +14,8 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
   const [scale, setScale] = useState(100);
   const ORIGINAL_WIDTH = 1080;
   const ORIGINAL_HEIGHT = 1350;
-  const SAFE_ZONE_MARGIN = 120; // Margine di sicurezza aumentato per la safe zone
-  const MAX_WIDTH = ORIGINAL_WIDTH - (2 * SAFE_ZONE_MARGIN); // Larghezza massima disponibile per il testo
+  const SAFE_ZONE_MARGIN = 120;
+  const MAX_WIDTH = ORIGINAL_WIDTH - (2 * SAFE_ZONE_MARGIN);
 
   const updateScale = () => {
     const canvas = canvasRef.current;
@@ -53,37 +53,90 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
 
     canvas.width = ORIGINAL_WIDTH;
     canvas.height = ORIGINAL_HEIGHT;
-
-    // Calculate initial scale
+    
     updateScale();
 
-    // Disegna il background
     ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Imposta lo stile del testo
     ctx.fillStyle = textColor;
     ctx.font = `bold ${fontSize}px Inter`;
     ctx.textAlign = textAlign;
     ctx.textBaseline = 'middle';
 
-    // Dividi il testo in parole
+    // Funzione di supporto per misurare e spezzare le parole lunghe
+    const wrapWord = (word: string): string[] => {
+      const wrappedParts: string[] = [];
+      let currentPart = '';
+      
+      for (let char of word) {
+        const testPart = currentPart + char;
+        const metrics = ctx.measureText(testPart);
+        
+        if (metrics.width > MAX_WIDTH) {
+          if (currentPart) {
+            wrappedParts.push(currentPart);
+            currentPart = char;
+          } else {
+            currentPart = char;
+          }
+        } else {
+          currentPart += char;
+        }
+      }
+      
+      if (currentPart) {
+        wrappedParts.push(currentPart);
+      }
+      
+      return wrappedParts;
+    };
+
+    // Divide il testo in parole e gestisce il wrapping
     const words = text.split(' ');
     const lines: string[] = [];
     let currentLine = '';
 
-    // Gestisci il wrapping del testo rispettando la safe zone
-    words.forEach(word => {
-      const testLine = currentLine ? `${currentLine} ${word}` : word;
-      const metrics = ctx.measureText(testLine);
-      
-      if (metrics.width > MAX_WIDTH) {
-        lines.push(currentLine);
-        currentLine = word;
-      } else {
-        currentLine = testLine;
+    for (let word of words) {
+      // Se la parola è vuota, salta
+      if (!word) continue;
+
+      // Se la linea corrente è vuota
+      if (!currentLine) {
+        const wordParts = wrapWord(word);
+        currentLine = wordParts[0];
+        
+        // Aggiungi eventuali parti rimanenti come nuove linee
+        if (wordParts.length > 1) {
+          lines.push(currentLine);
+          wordParts.slice(1).forEach(part => lines.push(part));
+          currentLine = '';
+        }
+        continue;
       }
-    });
+
+      // Prova ad aggiungere la parola alla linea corrente
+      const testLine = `${currentLine} ${word}`;
+      const metrics = ctx.measureText(testLine);
+
+      if (metrics.width <= MAX_WIDTH) {
+        currentLine = testLine;
+      } else {
+        // Aggiungi la linea corrente e inizia una nuova con la parola
+        lines.push(currentLine);
+        const wordParts = wrapWord(word);
+        currentLine = wordParts[0];
+        
+        // Aggiungi eventuali parti rimanenti come nuove linee
+        if (wordParts.length > 1) {
+          lines.push(currentLine);
+          wordParts.slice(1).forEach(part => lines.push(part));
+          currentLine = '';
+        }
+      }
+    }
+
+    // Aggiungi l'ultima linea se necessario
     if (currentLine) {
       lines.push(currentLine);
     }
@@ -100,10 +153,12 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
 
     // Disegna le linee di testo
     lines.forEach((line, index) => {
-      ctx.fillText(line, x, startY + index * lineHeight);
+      if (line.trim()) {  // Disegna solo se la linea non è vuota
+        ctx.fillText(line.trim(), x, startY + index * lineHeight);
+      }
     });
 
-    // Debug: visualizza la safe zone (commentato in produzione)
+    // Debug: visualizza la safe zone
     // ctx.strokeStyle = 'rgba(255, 0, 0, 0.3)';
     // ctx.strokeRect(SAFE_ZONE_MARGIN, SAFE_ZONE_MARGIN, 
     //                ORIGINAL_WIDTH - (2 * SAFE_ZONE_MARGIN), 
