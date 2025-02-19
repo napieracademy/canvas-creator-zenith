@@ -11,10 +11,11 @@ import TextEditor from '@/components/TextEditor';
 import CanvasPreview from '@/components/CanvasPreview';
 
 const Index = () => {
-  const [text, setText] = useState('');
-  const [description, setDescription] = useState('');
+  const [text, setText] = useState('Social Image Creator');
+  const [description, setDescription] = useState('Crea bellissime immagini per i social media in pochi secondi. Personalizza colori, font e layout per ottenere il massimo impatto visivo.');
   const [backgroundColor, setBackgroundColor] = useState('#8B5CF6');
   const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right'>('center');
+  const [descriptionAlign, setDescriptionAlign] = useState<'left' | 'center' | 'right'>('center');
   const [fontSize, setFontSize] = useState(64);
   const [descriptionFontSize, setDescriptionFontSize] = useState(32);
   const [spacing, setSpacing] = useState(40);
@@ -114,12 +115,14 @@ const Index = () => {
           text={text}
           description={description}
           textAlign={textAlign}
+          descriptionAlign={descriptionAlign}
           fontSize={fontSize}
           descriptionFontSize={descriptionFontSize}
           spacing={spacing}
           onTextChange={setText}
           onDescriptionChange={setDescription}
           onTextAlignChange={setTextAlign}
+          onDescriptionAlignChange={setDescriptionAlign}
           onFontSizeChange={setFontSize}
           onDescriptionFontSizeChange={setDescriptionFontSize}
           onSpacingChange={setSpacing}
