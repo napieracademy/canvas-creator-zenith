@@ -94,7 +94,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
         textAlign={textAlign}
         onTextAlignChange={onTextAlignChange}
         fontSize={fontSize}
-        onFontSizeChange={onFontSize
+        onFontSizeChange={onFontSizeChange}
         label="Titolo"
         disabled={disabled}
       />
@@ -139,8 +139,6 @@ const TextEditor: React.FC<TextEditorProps> = ({
           />
         </TabsContent>
       </Tabs>
-
-      {/* Rimuoviamo la duplicazione dei controlli qui */}
     </div>
   );
 };
