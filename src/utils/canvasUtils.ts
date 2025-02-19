@@ -135,25 +135,44 @@ export function drawText(
   let startY;
 
   if (template === 'lucky') {
+    // Calcola l'area disponibile dopo l'immagine
     const imageHeight = height * 0.4;
-    const contentStartY = imageHeight + (safeZoneMargin / 2); // Ridotto il margine dopo l'immagine
+    const contentStartY = imageHeight + safeZoneMargin;
+    const availableHeight = height - contentStartY - safeZoneMargin;
     
     if (type === 'title') {
+      // Per il titolo, inizia subito dopo l'immagine
       startY = contentStartY;
+      
+      // Verifica se c'è spazio sufficiente per titolo e descrizione
+      const descFont = ctx.font;
+      ctx.font = getFontStyle('description', fontSize, template);
+      const descLines = calculateLines(context, text, fontSize, 'description');
+      const descHeight = descLines.length * lineHeight;
+      ctx.font = descFont;
+      
+      const totalNeededHeight = currentTextHeight + spacing + descHeight;
+      
+      if (totalNeededHeight > availableHeight) {
+        // Se non c'è abbastanza spazio, riduci lo spacing
+        spacing = Math.max(20, (availableHeight - currentTextHeight - descHeight));
+      }
     } else {
-      const prevFont = ctx.font;
+      // Per la descrizione, calcola lo spazio dopo il titolo
+      const titleFont = ctx.font;
       ctx.font = getFontStyle('title', fontSize, template);
-      const actualTitleLines = calculateLines(context, text, fontSize, 'title');
-      const titleHeight = actualTitleLines.length * lineHeight;
-      ctx.font = prevFont;
+      const titleLines = calculateLines(context, text, fontSize, 'title');
+      const titleHeight = titleLines.length * lineHeight;
+      ctx.font = titleFont;
       
       startY = contentStartY + titleHeight + spacing;
-    }
-
-    // Per Lucky, verifichiamo solo il margine inferiore
-    const bottomMargin = height - (safeZoneMargin / 2); // Ridotto il margine inferiore
-    if (startY + currentTextHeight > bottomMargin) {
-      startY = bottomMargin - currentTextHeight;
+      
+      // Se la descrizione va oltre lo spazio disponibile, aggiusta lo spacing
+      if (startY + currentTextHeight > height - safeZoneMargin) {
+        const maxStartY = height - safeZoneMargin - currentTextHeight;
+        spacing = Math.max(20, maxStartY - (contentStartY + titleHeight));
+        startY = contentStartY + titleHeight + spacing;
+      }
     }
   } else {
     // Klaus template mantiene il layout centrato con i margini di sicurezza completi
