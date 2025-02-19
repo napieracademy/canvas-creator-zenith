@@ -16,6 +16,7 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
   const ORIGINAL_HEIGHT = 1350;
   const SAFE_ZONE_MARGIN = 120;
   const MAX_WIDTH = ORIGINAL_WIDTH - (2 * SAFE_ZONE_MARGIN);
+  const MAX_HEIGHT = ORIGINAL_HEIGHT - (2 * SAFE_ZONE_MARGIN);
 
   const updateScale = () => {
     const canvas = canvasRef.current;
@@ -59,103 +60,63 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
     ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+    // Funzione per calcolare le linee di testo con una data dimensione del font
+    const calculateLines = (size: number) => {
+      ctx.font = `bold ${size}px Inter`;
+      const words = text.split(' ');
+      const lines: string[] = [];
+      let currentLine = '';
+
+      for (const word of words) {
+        const testLine = currentLine ? `${currentLine} ${word}` : word;
+        const metrics = ctx.measureText(testLine);
+
+        if (metrics.width > MAX_WIDTH) {
+          if (currentLine) lines.push(currentLine);
+          currentLine = word;
+        } else {
+          currentLine = testLine;
+        }
+      }
+      if (currentLine) lines.push(currentLine);
+      
+      return lines;
+    };
+
+    // Funzione per verificare se il testo sta nella safe zone
+    const textFitsInSafeZone = (size: number) => {
+      const lines = calculateLines(size);
+      const totalHeight = lines.length * (size * 1.2); // 1.2 è il line height
+      return totalHeight <= MAX_HEIGHT && lines.every(line => {
+        const metrics = ctx.measureText(line);
+        return metrics.width <= MAX_WIDTH;
+      });
+    };
+
+    // Trova la dimensione del font ottimale
+    let adjustedFontSize = fontSize;
+    while (!textFitsInSafeZone(adjustedFontSize) && adjustedFontSize > 32) {
+      adjustedFontSize -= 1;
+    }
+
+    // Applica il font size finale
+    ctx.font = `bold ${adjustedFontSize}px Inter`;
     ctx.fillStyle = textColor;
-    ctx.font = `bold ${fontSize}px Inter`;
     ctx.textAlign = textAlign;
     ctx.textBaseline = 'middle';
 
-    // Funzione di supporto per misurare e spezzare le parole lunghe
-    const wrapWord = (word: string): string[] => {
-      const wrappedParts: string[] = [];
-      let currentPart = '';
-      
-      for (let char of word) {
-        const testPart = currentPart + char;
-        const metrics = ctx.measureText(testPart);
-        
-        if (metrics.width > MAX_WIDTH) {
-          if (currentPart) {
-            wrappedParts.push(currentPart);
-            currentPart = char;
-          } else {
-            currentPart = char;
-          }
-        } else {
-          currentPart += char;
-        }
-      }
-      
-      if (currentPart) {
-        wrappedParts.push(currentPart);
-      }
-      
-      return wrappedParts;
-    };
-
-    // Divide il testo in parole e gestisce il wrapping
-    const words = text.split(' ');
-    const lines: string[] = [];
-    let currentLine = '';
-
-    for (let word of words) {
-      // Se la parola è vuota, salta
-      if (!word) continue;
-
-      // Se la linea corrente è vuota
-      if (!currentLine) {
-        const wordParts = wrapWord(word);
-        currentLine = wordParts[0];
-        
-        // Aggiungi eventuali parti rimanenti come nuove linee
-        if (wordParts.length > 1) {
-          lines.push(currentLine);
-          wordParts.slice(1).forEach(part => lines.push(part));
-          currentLine = '';
-        }
-        continue;
-      }
-
-      // Prova ad aggiungere la parola alla linea corrente
-      const testLine = `${currentLine} ${word}`;
-      const metrics = ctx.measureText(testLine);
-
-      if (metrics.width <= MAX_WIDTH) {
-        currentLine = testLine;
-      } else {
-        // Aggiungi la linea corrente e inizia una nuova con la parola
-        lines.push(currentLine);
-        const wordParts = wrapWord(word);
-        currentLine = wordParts[0];
-        
-        // Aggiungi eventuali parti rimanenti come nuove linee
-        if (wordParts.length > 1) {
-          lines.push(currentLine);
-          wordParts.slice(1).forEach(part => lines.push(part));
-          currentLine = '';
-        }
-      }
-    }
-
-    // Aggiungi l'ultima linea se necessario
-    if (currentLine) {
-      lines.push(currentLine);
-    }
-
-    // Calcola la posizione verticale del testo
-    const lineHeight = fontSize * 1.2;
+    // Disegna il testo con il font size corretto
+    const lines = calculateLines(adjustedFontSize);
+    const lineHeight = adjustedFontSize * 1.2;
     const totalHeight = lines.length * lineHeight;
     const startY = (ORIGINAL_HEIGHT - totalHeight) / 2;
 
-    // Calcola la posizione orizzontale in base all'allineamento
     const x = textAlign === 'left' ? SAFE_ZONE_MARGIN : 
              textAlign === 'right' ? ORIGINAL_WIDTH - SAFE_ZONE_MARGIN : 
              ORIGINAL_WIDTH / 2;
 
-    // Disegna le linee di testo
     lines.forEach((line, index) => {
-      if (line.trim()) {  // Disegna solo se la linea non è vuota
-        ctx.fillText(line.trim(), x, startY + index * lineHeight);
-      }
+      ctx.fillText(line, x, startY + (index * lineHeight));
     });
 
     // Debug: visualizza la safe zone
