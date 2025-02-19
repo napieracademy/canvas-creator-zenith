@@ -1,5 +1,5 @@
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 
 interface CanvasProps {
   text: string;
@@ -11,6 +11,8 @@ interface CanvasProps {
 
 const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textColor, fontSize }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [scale, setScale] = useState(100);
+  const ORIGINAL_SIZE = 1080;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -19,8 +21,22 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    canvas.width = 1080;
-    canvas.height = 1080;
+    // Set actual canvas size
+    canvas.width = ORIGINAL_SIZE;
+    canvas.height = ORIGINAL_SIZE;
+
+    // Calculate container width and scale
+    const container = canvas.parentElement;
+    if (container) {
+      const containerWidth = container.clientWidth;
+      const containerHeight = container.clientHeight;
+      const scaleFactor = Math.min(
+        containerWidth / ORIGINAL_SIZE,
+        containerHeight / ORIGINAL_SIZE,
+        1 // Never scale up beyond 100%
+      );
+      setScale(Math.round(scaleFactor * 100));
+    }
 
     ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -62,14 +78,21 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
   }, [text, backgroundColor, textAlign, textColor, fontSize]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      style={{
-        maxWidth: '100%',
-        maxHeight: '100%',
-        objectFit: 'contain',
-      }}
-    />
+    <div className="relative">
+      <canvas
+        ref={canvasRef}
+        style={{
+          width: '100%',
+          height: '100%',
+          maxWidth: `${ORIGINAL_SIZE}px`,
+          maxHeight: `${ORIGINAL_SIZE}px`,
+          objectFit: 'contain',
+        }}
+      />
+      <div className="absolute bottom-4 right-4 bg-black/70 text-white px-3 py-1.5 rounded-full text-sm font-medium">
+        {scale}%
+      </div>
+    </div>
   );
 };
 
