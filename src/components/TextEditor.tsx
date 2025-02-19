@@ -4,6 +4,7 @@ import TextInput from '@/components/TextInput';
 import SpacingControl from '@/components/SpacingControl';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import UrlInput from '@/components/UrlInput';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface TextEditorProps {
   text: string;
@@ -22,7 +23,6 @@ interface TextEditorProps {
   onSpacingChange: (spacing: number) => void;
   onTitleExtracted: (title: string) => void;
   onDescriptionExtracted: (description: string) => void;
-  onImageExtracted?: (image: string) => void;
   onTabChange: (value: string) => void;
   onLoadingChange: (loading: boolean) => void;
   disabled?: boolean;
@@ -45,16 +45,25 @@ const TextEditor: React.FC<TextEditorProps> = ({
   onSpacingChange,
   onTitleExtracted,
   onDescriptionExtracted,
-  onImageExtracted,
   onTabChange,
   onLoadingChange,
   disabled
 }) => {
   return (
     <Tabs defaultValue="manual" onValueChange={onTabChange}>
-      <TabsList className="grid w-full grid-cols-2">
+      <TabsList className="grid w-full grid-cols-3">
         <TabsTrigger value="manual" disabled={disabled}>Scrivi Testo</TabsTrigger>
         <TabsTrigger value="fetch" disabled={disabled}>Fetch da URL</TabsTrigger>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <TabsTrigger value="featured" disabled>Featured</TabsTrigger>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Soon</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </TabsList>
       <TabsContent value="manual" className="space-y-4">
         <TextInput 
@@ -91,7 +100,6 @@ const TextEditor: React.FC<TextEditorProps> = ({
         <UrlInput 
           onTitleExtracted={onTitleExtracted}
           onDescriptionExtracted={onDescriptionExtracted}
-          onImageExtracted={onImageExtracted}
           onTabChange={onTabChange}
           onLoadingChange={onLoadingChange}
         />
