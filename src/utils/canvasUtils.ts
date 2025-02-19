@@ -27,11 +27,11 @@ export function drawSafeZone(ctx: CanvasRenderingContext2D, width: number, heigh
   );
 }
 
-export function calculateLines(context: CanvasContext, text: string, size: number, isBold: boolean = false) {
+export function calculateLines(context: CanvasContext, text: string, size: number) {
   const { ctx, width, safeZoneMargin } = context;
   const maxWidth = width - (2 * safeZoneMargin);
   
-  ctx.font = `${isBold ? 'bold' : ''} ${size}px Inter`;
+  ctx.font = `bold ${size}px Inter`;
   const words = text.split(' ');
   const lines: string[] = [];
   let currentLine = '';
@@ -86,14 +86,13 @@ export function drawText(
     return;
   }
 
-  const isBold = type === 'description';
-  ctx.font = `${isBold ? 'bold' : ''} ${fontSize}px Inter`;
+  ctx.font = `bold ${fontSize}px Inter`;
   ctx.fillStyle = textColor;
   ctx.textAlign = textAlign;
   ctx.textBaseline = 'middle';
   ctx.setLineDash([]);
 
-  const lines = calculateLines(context, text, fontSize, isBold);
+  const lines = calculateLines(context, text, fontSize);
   const lineHeight = fontSize * 1.2;
   const totalHeight = lines.length * lineHeight;
   
