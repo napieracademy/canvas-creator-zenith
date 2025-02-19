@@ -60,7 +60,7 @@
   }
 
   .glass-panel {
-    @apply backdrop-blur-lg bg-white/90 shadow-lg border border-white/50;
+    @apply backdrop-blur-lg bg-white/90 shadow-lg border border-white/50 transition-all duration-300 hover:shadow-xl hover:bg-white/95;
   }
 }
 
@@ -92,19 +92,80 @@
 
 .controls-panel {
   @apply fixed left-6 top-6 p-6 rounded-2xl glass-panel w-[340px] space-y-6 animate-in z-50;
+  transform-origin: top left;
+  animation: slide-in 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .preview-container {
   @apply flex-1 p-8 ml-[380px] min-h-screen flex items-center justify-center;
+  animation: fade-in 0.6s ease-out;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .canvas-wrapper {
   @apply relative rounded-2xl overflow-hidden shadow-2xl bg-white/50;
-  width: 60%;  /* Ridotto al 60% */
+  width: 60%;
   max-width: 800px;
   aspect-ratio: 1080 / 1350;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto;  /* Centrato orizzontalmente */
+  margin: 0 auto;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.canvas-wrapper:hover {
+  @apply shadow-3xl;
+  transform: translateY(-2px);
+}
+
+/* Animazioni per i pulsanti e input */
+button, input, textarea {
+  @apply transition-all duration-200;
+}
+
+button:hover {
+  @apply transform scale-[1.02];
+}
+
+button:active {
+  @apply transform scale-[0.98];
+}
+
+input:focus, textarea:focus {
+  @apply ring-2 ring-violet-400 ring-opacity-50;
+  transform: translateY(-1px);
+}
+
+/* Animazione per il caricamento */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.loading {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
