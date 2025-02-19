@@ -42,13 +42,9 @@ const Index = () => {
     });
   }, []);
 
-  const handleColorSelect = (background: string, text: string, overlay?: string) => {
+  const handleColorSelect = (background: string, text: string) => {
     setBackgroundColor(background);
     setTextColor(text);
-    if (overlay) {
-      const overlayStyle = `linear-gradient(${overlay}, ${overlay})`;
-      setBackgroundColor(`${background}, ${overlayStyle}`);
-    }
   };
 
   const handleTitleExtracted = (extractedTitle: string) => {
