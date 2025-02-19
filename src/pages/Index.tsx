@@ -11,6 +11,7 @@ import { toast } from '@/components/ui/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from '@/components/ui/button';
 import { Square, RectangleHorizontal, Loader2 } from 'lucide-react';
+import { Slider } from "@/components/ui/slider";
 
 const Index = () => {
   const [text, setText] = useState('');
@@ -23,6 +24,7 @@ const Index = () => {
   const [effectiveFontSize, setEffectiveFontSize] = useState(64);
   const [textColor, setTextColor] = useState('#FFFFFF');
   const [showSafeZone, setShowSafeZone] = useState(false);
+  const [spacing, setSpacing] = useState(40);
   const [format, setFormat] = useState<'post' | 'story'>('post');
   const [activeTab, setActiveTab] = useState('manual');
   const [isLoading, setIsLoading] = useState(false);
@@ -148,6 +150,22 @@ const Index = () => {
               label="Titolo"
               disabled={isLoading}
             />
+            
+            <div className="space-y-2 bg-white/50 rounded-lg p-4">
+              <Label className="text-sm font-medium text-gray-700">Spazio tra titolo e descrizione</Label>
+              <div className="flex items-center gap-4">
+                <Slider
+                  value={[spacing]}
+                  onValueChange={(values) => setSpacing(values[0])}
+                  min={0}
+                  max={200}
+                  step={10}
+                  disabled={isLoading}
+                />
+                <span className="text-sm text-gray-500 min-w-[4ch]">{spacing}</span>
+              </div>
+            </div>
+
             <TextInput 
               value={description} 
               onChange={setDescription} 
@@ -201,6 +219,7 @@ const Index = () => {
             descriptionAlign={descriptionAlign}
             fontSize={fontSize}
             descriptionFontSize={descriptionFontSize}
+            spacing={spacing}
             textColor={textColor}
             onEffectiveFontSizeChange={setEffectiveFontSize}
             showSafeZone={showSafeZone}
