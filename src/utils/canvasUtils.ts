@@ -134,11 +134,13 @@ export function drawText(
   
   let startY;
   if (template === 'lucky') {
-    // Nel template Lucky, il testo inizia dopo l'immagine
+    const imageHeight = height / 3; // Altezza dell'immagine
+    const textStartY = imageHeight + SAFE_ZONE_MARGIN * 2; // Inizia dopo l'immagine con un margine
+    
     if (type === 'title') {
-      startY = height * 0.6; // Il titolo inizia al 60% dell'altezza
+      startY = textStartY;
     } else {
-      startY = height * 0.6 + totalHeight + spacing; // La descrizione segue il titolo
+      startY = textStartY + totalHeight + spacing;
     }
   } else {
     // Layout originale per Klaus
