@@ -4,8 +4,29 @@ import { CanvasContext } from '@/types/canvas';
 export const SAFE_ZONE_MARGIN = 120;
 
 export function drawBackground(ctx: CanvasRenderingContext2D, width: number, height: number, color: string) {
-  ctx.fillStyle = color;
-  ctx.fillRect(0, 0, width, height);
+  if (color.startsWith('url(')) {
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.max(width / img.width, height / img.height);
+      const x = (width - img.width * scale) / 2;
+      const y = (height - img.height * scale) / 2;
+      
+      ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+    };
+    img.src = color.slice(4, -1);
+  } else if (color.includes('gradient')) {
+    const gradient = ctx.createLinearGradient(0, 0, width, height);
+    const colors = color.match(/#[a-fA-F0-9]{6}/g);
+    if (colors && colors.length >= 2) {
+      gradient.addColorStop(0, colors[0]);
+      gradient.addColorStop(1, colors[1]);
+    }
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, width, height);
+  } else {
+    ctx.fillStyle = color;
+    ctx.fillRect(0, 0, width, height);
+  }
 }
 
 export function drawSafeZone(ctx: CanvasRenderingContext2D, width: number, height: number) {
@@ -25,6 +46,19 @@ export function drawSafeZone(ctx: CanvasRenderingContext2D, width: number, heigh
     width - (2 * SAFE_ZONE_MARGIN), 
     height - (2 * SAFE_ZONE_MARGIN)
   );
+}
+
+export function textFitsInSafeZone(context: CanvasContext, text: string, size: number, type: 'title' | 'description' = 'title') {
+  const { height, safeZoneMargin } = context;
+  const maxHeight = height - (2 * safeZoneMargin);
+  
+  const lines = calculateLines(context, text, size, type);
+  const totalHeight = lines.length * (size * 1.2);
+  
+  return totalHeight <= maxHeight && lines.every(line => {
+    const metrics = context.ctx.measureText(line);
+    return metrics.width <= (context.width - (2 * safeZoneMargin));
+  });
 }
 
 export function calculateLines(context: CanvasContext, text: string, size: number, type: 'title' | 'description' = 'title') {
@@ -50,19 +84,6 @@ export function calculateLines(context: CanvasContext, text: string, size: numbe
   if (currentLine) lines.push(currentLine);
   
   return lines;
-}
-
-export function textFitsInSafeZone(context: CanvasContext, text: string, size: number, type: 'title' | 'description' = 'title') {
-  const { height, safeZoneMargin } = context;
-  const maxHeight = height - (2 * safeZoneMargin);
-  
-  const lines = calculateLines(context, text, size, type);
-  const totalHeight = lines.length * (size * 1.2);
-  
-  return totalHeight <= maxHeight && lines.every(line => {
-    const metrics = context.ctx.measureText(line);
-    return metrics.width <= (context.width - (2 * safeZoneMargin));
-  });
 }
 
 export function drawText(
