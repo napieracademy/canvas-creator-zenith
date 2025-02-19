@@ -7,6 +7,7 @@ import DownloadButton from '@/components/DownloadButton';
 import TextAlignControl from '@/components/TextAlignControl';
 import FontSizeControl from '@/components/FontSizeControl';
 import TextColorPicker from '@/components/TextColorPicker';
+import UrlInput from '@/components/UrlInput';
 
 const Index = () => {
   const [text, setText] = useState('');
@@ -32,6 +33,7 @@ const Index = () => {
           <h1 className="text-xl font-semibold text-gray-900">Social Image Creator</h1>
           <p className="text-sm text-gray-500">Create beautiful social media images in seconds</p>
         </div>
+        <UrlInput onTitleExtracted={setText} />
         <TextInput value={text} onChange={setText} />
         <TextAlignControl value={textAlign} onChange={setTextAlign} />
         <FontSizeControl value={fontSize} onChange={setFontSize} />
