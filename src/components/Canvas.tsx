@@ -26,7 +26,7 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor }) => {
 
     // Draw text
     ctx.fillStyle = '#ffffff';
-    ctx.font = '48px Inter';
+    ctx.font = 'bold 64px Inter';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
@@ -39,7 +39,7 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor }) => {
       const testLine = currentLine ? `${currentLine} ${word}` : word;
       const metrics = ctx.measureText(testLine);
       
-      if (metrics.width > canvas.width - 100) {
+      if (metrics.width > canvas.width - 200) {
         lines.push(currentLine);
         currentLine = word;
       } else {
@@ -50,27 +50,31 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor }) => {
       lines.push(currentLine);
     }
 
-    // Draw lines
-    const lineHeight = 60;
+    // Draw lines with text shadow for better readability
+    const lineHeight = 80;
     const totalHeight = lines.length * lineHeight;
     const startY = (canvas.height - totalHeight) / 2;
 
     lines.forEach((line, index) => {
+      // Draw text shadow
+      ctx.fillStyle = 'rgba(0,0,0,0.3)';
+      ctx.fillText(line, canvas.width / 2 + 2, startY + index * lineHeight + 2);
+      
+      // Draw actual text
+      ctx.fillStyle = '#ffffff';
       ctx.fillText(line, canvas.width / 2, startY + index * lineHeight);
     });
   }, [text, backgroundColor]);
 
   return (
-    <div className="canvas-container">
-      <canvas
-        ref={canvasRef}
-        style={{
-          maxWidth: '100%',
-          maxHeight: '100%',
-          objectFit: 'contain',
-        }}
-      />
-    </div>
+    <canvas
+      ref={canvasRef}
+      style={{
+        maxWidth: '100%',
+        maxHeight: '100%',
+        objectFit: 'contain',
+      }}
+    />
   );
 };
 

@@ -11,12 +11,12 @@ interface TextInputProps {
 const TextInput: React.FC<TextInputProps> = ({ value, onChange }) => {
   return (
     <div className="space-y-2">
-      <Label>Text</Label>
+      <Label className="text-sm font-medium text-gray-700">Your Text</Label>
       <Textarea
-        placeholder="Enter your text here..."
+        placeholder="Type your message here..."
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="resize-none h-32"
+        className="resize-none h-32 bg-white/50 backdrop-blur-sm focus:bg-white transition-colors duration-200"
       />
     </div>
   );

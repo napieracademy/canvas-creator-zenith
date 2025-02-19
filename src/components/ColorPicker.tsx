@@ -12,15 +12,19 @@ interface ColorPickerProps {
 const ColorPicker: React.FC<ColorPickerProps> = ({ color, onChange }) => {
   return (
     <div className="space-y-2">
-      <Label>Background Color</Label>
+      <Label className="text-sm font-medium text-gray-700">Background Color</Label>
       <Popover>
         <PopoverTrigger asChild>
           <button
-            className="w-full h-10 rounded-md border border-input"
+            className="w-full h-12 rounded-lg border border-white/50 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden group"
             style={{ backgroundColor: color }}
-          />
+          >
+            <div className="w-full h-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-black/10 text-white text-sm font-medium">
+              Change Color
+            </div>
+          </button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0 border-none">
+        <PopoverContent className="w-auto p-3 border-none rounded-xl shadow-xl">
           <SketchPicker
             color={color}
             onChange={(color) => onChange(color.hex)}
