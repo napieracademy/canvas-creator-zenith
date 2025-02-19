@@ -4,7 +4,6 @@ import TextInput from '@/components/TextInput';
 import SpacingControl from '@/components/SpacingControl';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import UrlInput from '@/components/UrlInput';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface TextEditorProps {
   text: string;
@@ -51,19 +50,9 @@ const TextEditor: React.FC<TextEditorProps> = ({
 }) => {
   return (
     <Tabs defaultValue="manual" onValueChange={onTabChange}>
-      <TabsList className="grid w-full grid-cols-3">
+      <TabsList className="grid w-full grid-cols-2">
         <TabsTrigger value="manual" disabled={disabled}>Scrivi Testo</TabsTrigger>
         <TabsTrigger value="fetch" disabled={disabled}>Fetch da URL</TabsTrigger>
-        <TooltipProvider delayDuration={100}>
-          <Tooltip>
-            <TooltipTrigger className="w-full">
-              <TabsTrigger value="featured" disabled className="w-full">Featured</TabsTrigger>
-            </TooltipTrigger>
-            <TooltipContent side="bottom" align="center">
-              <p>Soon</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
       </TabsList>
       <TabsContent value="manual" className="space-y-4">
         <TextInput 
