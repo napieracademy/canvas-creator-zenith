@@ -2,7 +2,7 @@
 import React from 'react';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
-import { AlignLeft, AlignCenter, AlignRight, Type, Wand2 } from 'lucide-react';
+import { AlignLeft, AlignCenter, AlignRight, Type, Sparkles } from 'lucide-react';
 import { Button } from './ui/button';
 import { Slider } from './ui/slider';
 import { toast } from "@/components/ui/use-toast";
@@ -12,6 +12,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface TextInputProps {
   value: string;
@@ -82,16 +88,43 @@ const TextInput: React.FC<TextInputProps> = ({
     }
   };
 
+  const AlignIcon = {
+    left: AlignLeft,
+    center: AlignCenter,
+    right: AlignRight
+  }[textAlign];
+
   return (
     <div className="space-y-4">
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <Label className="text-sm font-medium text-gray-700">{label}</Label>
+      <div className="flex items-center justify-between mb-2">
+        <Label className="text-sm font-medium text-gray-700">{label}</Label>
+        <div className="flex items-center gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" disabled={disabled || isImproving}>
+                <AlignIcon className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => onTextAlignChange('left')}>
+                <AlignLeft className="h-4 w-4 mr-2" />
+                Sinistra
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onTextAlignChange('center')}>
+                <AlignCenter className="h-4 w-4 mr-2" />
+                Centro
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onTextAlignChange('right')}>
+                <AlignRight className="h-4 w-4 mr-2" />
+                Destra
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="gap-2" disabled={disabled || isImproving}>
+              <Button variant="outline" size="sm" disabled={disabled || isImproving}>
                 <Type className="h-4 w-4" />
-                {fontSize}px
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-80">
@@ -111,48 +144,15 @@ const TextInput: React.FC<TextInputProps> = ({
               </div>
             </PopoverContent>
           </Popover>
-        </div>
 
-        <div className="flex items-center gap-2">
-          <div className="flex rounded-md border border-input bg-transparent overflow-hidden">
-            <Button
-              variant="ghost"
-              size="sm"
-              className={`px-2.5 ${textAlign === 'left' ? 'bg-accent' : ''}`}
-              onClick={() => onTextAlignChange('left')}
-              disabled={disabled || isImproving}
-            >
-              <AlignLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className={`px-2.5 ${textAlign === 'center' ? 'bg-accent' : ''}`}
-              onClick={() => onTextAlignChange('center')}
-              disabled={disabled || isImproving}
-            >
-              <AlignCenter className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className={`px-2.5 ${textAlign === 'right' ? 'bg-accent' : ''}`}
-              onClick={() => onTextAlignChange('right')}
-              disabled={disabled || isImproving}
-            >
-              <AlignRight className="h-4 w-4" />
-            </Button>
-          </div>
-          
           <Button 
             variant="outline" 
-            size="sm" 
-            className="gap-2 flex-1" 
+            size="sm"
+            className="w-9 p-0"
             onClick={handleImproveText}
             disabled={disabled || isImproving}
           >
-            <Wand2 className="h-4 w-4" />
-            {isImproving ? 'Miglioramento...' : 'Migliora'}
+            <Sparkles className="h-4 w-4 text-yellow-500" />
           </Button>
         </div>
       </div>
