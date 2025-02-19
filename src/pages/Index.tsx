@@ -14,6 +14,7 @@ const Index = () => {
   const [backgroundColor, setBackgroundColor] = useState('#8B5CF6');
   const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right'>('center');
   const [fontSize, setFontSize] = useState(64);
+  const [effectiveFontSize, setEffectiveFontSize] = useState(64);
   const [textColor, setTextColor] = useState('#FFFFFF');
   const isMobile = useIsMobile();
 
@@ -62,7 +63,7 @@ const Index = () => {
         <UrlInput onTitleExtracted={handleTitleExtracted} />
         <TextInput value={text} onChange={setText} />
         <TextAlignControl value={textAlign} onChange={setTextAlign} />
-        <FontSizeControl value={fontSize} onChange={setFontSize} />
+        <FontSizeControl value={fontSize} onChange={setFontSize} effectiveSize={effectiveFontSize} />
         <ColorPresets 
           onSelectColors={handleColorSelect}
           currentBackground={backgroundColor}
@@ -79,6 +80,7 @@ const Index = () => {
             textAlign={textAlign}
             fontSize={fontSize}
             textColor={textColor}
+            onEffectiveFontSizeChange={setEffectiveFontSize}
           />
         </div>
       </div>

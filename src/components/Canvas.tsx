@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect, useState } from 'react';
 
 interface CanvasProps {
@@ -7,9 +6,17 @@ interface CanvasProps {
   textAlign: 'left' | 'center' | 'right';
   textColor: string;
   fontSize: number;
+  onEffectiveFontSizeChange?: (size: number) => void;
 }
 
-const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textColor, fontSize }) => {
+const Canvas: React.FC<CanvasProps> = ({ 
+  text, 
+  backgroundColor, 
+  textAlign, 
+  textColor, 
+  fontSize,
+  onEffectiveFontSizeChange 
+}) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [scale, setScale] = useState(100);
   const ORIGINAL_WIDTH = 1080;
@@ -60,7 +67,6 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
     ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Funzione per calcolare le linee di testo con una data dimensione del font
     const calculateLines = (size: number) => {
       ctx.font = `bold ${size}px Inter`;
       const words = text.split(' ');
@@ -83,29 +89,29 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
       return lines;
     };
 
-    // Funzione per verificare se il testo sta nella safe zone
     const textFitsInSafeZone = (size: number) => {
       const lines = calculateLines(size);
-      const totalHeight = lines.length * (size * 1.2); // 1.2 è il line height
+      const totalHeight = lines.length * (size * 1.2);
       return totalHeight <= MAX_HEIGHT && lines.every(line => {
         const metrics = ctx.measureText(line);
         return metrics.width <= MAX_WIDTH;
       });
     };
 
-    // Trova la dimensione del font ottimale
     let adjustedFontSize = fontSize;
     while (!textFitsInSafeZone(adjustedFontSize) && adjustedFontSize > 32) {
       adjustedFontSize -= 1;
     }
 
-    // Applica il font size finale
+    if (onEffectiveFontSizeChange) {
+      onEffectiveFontSizeChange(adjustedFontSize);
+    }
+
     ctx.font = `bold ${adjustedFontSize}px Inter`;
     ctx.fillStyle = textColor;
     ctx.textAlign = textAlign;
     ctx.textBaseline = 'middle';
 
-    // Disegna il testo con il font size corretto
     const lines = calculateLines(adjustedFontSize);
     const lineHeight = adjustedFontSize * 1.2;
     const totalHeight = lines.length * lineHeight;
@@ -119,12 +125,11 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
       ctx.fillText(line, x, startY + (index * lineHeight));
     });
 
-    // Debug: visualizza la safe zone
-    // ctx.strokeStyle = 'rgba(255, 0, 0, 0.3)';
-    // ctx.strokeRect(SAFE_ZONE_MARGIN, SAFE_ZONE_MARGIN, 
-    //                ORIGINAL_WIDTH - (2 * SAFE_ZONE_MARGIN), 
-    //                ORIGINAL_HEIGHT - (2 * SAFE_ZONE_MARGIN));
-  }, [text, backgroundColor, textAlign, textColor, fontSize]);
+    ctx.strokeStyle = 'rgba(255, 0, 0, 0.3)';
+    ctx.strokeRect(SAFE_ZONE_MARGIN, SAFE_ZONE_MARGIN, 
+                   ORIGINAL_WIDTH - (2 * SAFE_ZONE_MARGIN), 
+                   ORIGINAL_HEIGHT - (2 * SAFE_ZONE_MARGIN));
+  }, [text, backgroundColor, textAlign, textColor, fontSize, onEffectiveFontSizeChange]);
 
   return (
     <div className="relative w-full h-full bg-white/50 rounded-xl overflow-hidden">

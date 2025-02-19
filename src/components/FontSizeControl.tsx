@@ -1,21 +1,15 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Label } from './ui/label';
 import { Slider } from './ui/slider';
 
 interface FontSizeControlProps {
   value: number;
+  effectiveSize: number;
   onChange: (value: number) => void;
 }
 
-const FontSizeControl: React.FC<FontSizeControlProps> = ({ value, onChange }) => {
-  const [effectiveSize, setEffectiveSize] = useState(value);
-
-  useEffect(() => {
-    // Aggiorna la dimensione effettiva quando cambia il valore richiesto
-    setEffectiveSize(value);
-  }, [value]);
-
+const FontSizeControl: React.FC<FontSizeControlProps> = ({ value, effectiveSize, onChange }) => {
   return (
     <div className="space-y-2">
       <div className="flex justify-between items-center">
