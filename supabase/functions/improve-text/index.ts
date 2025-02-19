@@ -54,6 +54,7 @@ serve(async (req) => {
           { role: 'user', content: text }
         ],
         temperature: 0.7,
+        top_p: 0.9, // Aggiunto il parametro top_p
       }),
     });
 
