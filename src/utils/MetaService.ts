@@ -10,25 +10,34 @@ interface MetadataResult {
 export class MetaService {
   static async extractMetadata(url: string): Promise<MetadataResult> {
     try {
-      console.log('Attempting direct fetch for URL:', url);
+      console.log('Attempting to fetch metadata via proxy for URL:', url);
 
-      // Tentiamo il fetch diretto
-      const response = await fetch(url);
-      console.log('Direct fetch response status:', response.status);
+      // Usiamo un servizio proxy per evitare problemi CORS
+      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+      const response = await fetch(proxyUrl);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const text = await response.text();
-      console.log('Received HTML length:', text.length);
+      const data = await response.json();
+      const contents = data.contents;
 
       const parser = new DOMParser();
-      const doc = parser.parseFromString(text, 'text/html');
+      const doc = parser.parseFromString(contents, 'text/html');
 
-      const title = doc.querySelector('title')?.textContent || '';
-      const description = doc.querySelector('meta[name="description"]')?.getAttribute('content') || '';
-      const image = doc.querySelector('meta[property="og:image"]')?.getAttribute('content') || '';
+      // Priorità ai tag Open Graph
+      const title = 
+        doc.querySelector('meta[property="og:title"]')?.getAttribute('content') ||
+        doc.querySelector('title')?.textContent || '';
+
+      const description = 
+        doc.querySelector('meta[property="og:description"]')?.getAttribute('content') ||
+        doc.querySelector('meta[name="description"]')?.getAttribute('content') || '';
+
+      const image = 
+        doc.querySelector('meta[property="og:image"]')?.getAttribute('content') ||
+        doc.querySelector('meta[name="twitter:image"]')?.getAttribute('content') || '';
 
       console.log('Extracted metadata:', { title, description, image });
 
