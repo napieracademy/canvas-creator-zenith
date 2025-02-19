@@ -22,6 +22,7 @@ interface TextEditorProps {
   onSpacingChange: (spacing: number) => void;
   onTitleExtracted: (title: string) => void;
   onDescriptionExtracted: (description: string) => void;
+  onImageExtracted?: (image: string) => void;
   onTabChange: (value: string) => void;
   onLoadingChange: (loading: boolean) => void;
   disabled?: boolean;
@@ -44,6 +45,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
   onSpacingChange,
   onTitleExtracted,
   onDescriptionExtracted,
+  onImageExtracted,
   onTabChange,
   onLoadingChange,
   disabled
@@ -89,6 +91,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
         <UrlInput 
           onTitleExtracted={onTitleExtracted}
           onDescriptionExtracted={onDescriptionExtracted}
+          onImageExtracted={onImageExtracted}
           onTabChange={onTabChange}
           onLoadingChange={onLoadingChange}
         />

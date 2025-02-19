@@ -15,7 +15,7 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
     name: "Featured Image",
     background: `url(${featuredImage})`,
     text: "#FFFFFF",
-    category: 'featured',
+    category: 'featured' as const,
     overlay: "rgba(0, 0, 0, 0.5)"
   }] : [];
 
@@ -23,14 +23,14 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
     <div className="space-y-4">
       <Tabs defaultValue="classic" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="classic" className="text-sm">
-            Temi Classici
+          <TabsTrigger value="classic" className="text-xs px-1">
+            Classici
           </TabsTrigger>
-          <TabsTrigger value="cosmic" className="text-sm">
-            Temi Cosmici
+          <TabsTrigger value="cosmic" className="text-xs px-1">
+            Cosmici
           </TabsTrigger>
-          <TabsTrigger value="featured" className="text-sm" disabled={!featuredImage}>
-            Featured Image
+          <TabsTrigger value="featured" className="text-xs px-1" disabled={!featuredImage}>
+            Featured
           </TabsTrigger>
         </TabsList>
         <TabsContent value="classic" className="mt-4">
@@ -55,7 +55,7 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
               colors={featuredTheme}
               currentBackground={currentBackground}
               currentText={currentText}
-              onSelectColors={(bg, text, overlay) => onSelectColors(bg, text, overlay)}
+              onSelectColors={onSelectColors}
             />
           )}
         </TabsContent>
