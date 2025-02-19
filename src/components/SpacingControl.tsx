@@ -2,7 +2,7 @@
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, AlignVerticalSpaceBetween } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,25 +15,17 @@ interface SpacingIconProps {
 }
 
 const SpacingIcon: React.FC<SpacingIconProps> = ({ spacing }) => {
-  const heights = {
-    small: 'h-6',
-    medium: 'h-8',
-    large: 'h-10'
-  };
-
-  const getSpacing = () => {
-    switch (spacing) {
-      case 'small': return 'gap-1';
-      case 'medium': return 'gap-3';
-      case 'large': return 'gap-5';
-    }
+  const sizes = {
+    small: { size: 16, className: 'opacity-80' },
+    medium: { size: 18, className: 'opacity-90' },
+    large: { size: 20, className: 'opacity-100' }
   };
 
   return (
-    <div className={`flex flex-col items-center justify-between ${getSpacing()} ${heights[spacing]}`}>
-      <div className="w-5 h-[3px] bg-current rounded-sm" />
-      <div className="w-5 h-[3px] bg-current rounded-sm" />
-    </div>
+    <AlignVerticalSpaceBetween 
+      size={sizes[spacing].size}
+      className={sizes[spacing].className}
+    />
   );
 };
 
