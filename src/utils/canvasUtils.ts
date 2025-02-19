@@ -1,23 +1,12 @@
-
 import { CanvasContext } from '@/types/canvas';
 
 export const SAFE_ZONE_MARGIN = 120;
 
 // Precarica i font per il template Lucky
-const posterFont = new FontFace('Poster', 'url(/fonts/poster.ttf)');
-const decoFont = new FontFace('Deco', 'url(/fonts/deco.ttf)');
-
-// Carica i font nel documento
-Promise.all([
-  posterFont.load(),
-  decoFont.load()
-]).then(fonts => {
-  fonts.forEach(font => {
-    document.fonts.add(font);
-  });
-}).catch(error => {
-  console.error('Errore nel caricamento dei font:', error);
-});
+const link = document.createElement('link');
+link.href = 'https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Josefin+Sans:wght@400;700&display=swap';
+link.rel = 'stylesheet';
+document.head.appendChild(link);
 
 export function drawBackground(ctx: CanvasRenderingContext2D, width: number, height: number, color: string) {
   if (color.startsWith('url(')) {
@@ -104,8 +93,8 @@ export function calculateLines(context: CanvasContext, text: string, size: numbe
 function getFontStyle(type: 'title' | 'description', fontSize: number, template: 'klaus' | 'lucky' = 'klaus'): string {
   if (template === 'lucky') {
     return type === 'title' 
-      ? `${fontSize}px Poster` 
-      : `${fontSize}px Deco`;
+      ? `${fontSize}px 'Bebas Neue'` 
+      : `${fontSize}px 'Josefin Sans'`;
   }
   return `${type === 'title' ? 'bold' : ''} ${fontSize}px Inter`;
 }
