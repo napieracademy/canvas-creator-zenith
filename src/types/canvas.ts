@@ -15,6 +15,7 @@ export interface CanvasProps {
   overlay?: string;
   onSpacingChange?: (spacing: number) => void;
   imageUrl?: string | null;
+  template?: 'klaus' | 'lucky';
 }
 
 export interface CanvasSize {
@@ -27,4 +28,16 @@ export interface CanvasContext {
   width: number;
   height: number;
   safeZoneMargin: number;
+}
+
+export interface CanvasTemplate {
+  name: string;
+  id: 'klaus' | 'lucky';
+  backgroundColor: string;
+  textColor: string;
+  fontSize: number;
+  descriptionFontSize: number;
+  textAlign: 'left' | 'center' | 'right';
+  descriptionAlign: 'left' | 'center' | 'right';
+  spacing: number;
 }

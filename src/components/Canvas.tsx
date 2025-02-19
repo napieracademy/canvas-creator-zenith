@@ -26,7 +26,8 @@ const Canvas: React.FC<CanvasProps> = ({
   format = 'post',
   overlay,
   onSpacingChange,
-  imageUrl
+  imageUrl,
+  template = 'klaus'
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
