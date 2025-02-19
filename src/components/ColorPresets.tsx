@@ -71,6 +71,22 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
       name: "Cosmic Night",
       background: "#10002B",
       text: "#E0AAFF"
+    },
+    // Nuovi temi fluorescenti
+    {
+      name: "Neon Pulse",
+      background: "#8B5CF6",
+      text: "#F9FF21"
+    },
+    {
+      name: "Toxic Glow",
+      background: "#D946EF",
+      text: "#4ADE80"
+    },
+    {
+      name: "Plasma Fire",
+      background: "#F97316",
+      text: "#22D3EE"
     }
   ];
 
