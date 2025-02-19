@@ -10,13 +10,15 @@ import { Loader2 } from 'lucide-react';
 interface UrlInputProps {
   onTitleExtracted: (title: string) => void;
   onDescriptionExtracted: (description: string) => void;
+  onImageExtracted?: (image: string) => void;
   onTabChange?: (value: string) => void;
   onLoadingChange?: (loading: boolean) => void;
 }
 
 const UrlInput: React.FC<UrlInputProps> = ({ 
   onTitleExtracted, 
-  onDescriptionExtracted, 
+  onDescriptionExtracted,
+  onImageExtracted,
   onTabChange,
   onLoadingChange 
 }) => {
@@ -38,6 +40,13 @@ const UrlInput: React.FC<UrlInputProps> = ({
         }
         if (result.description) {
           onDescriptionExtracted(result.description);
+        }
+        if (result.image && onImageExtracted) {
+          onImageExtracted(result.image);
+          toast({
+            title: "Immagine estratta",
+            description: "L'immagine di anteprima è stata estratta e aggiunta come tema",
+          });
         }
         toast({
           title: "Contenuto estratto",

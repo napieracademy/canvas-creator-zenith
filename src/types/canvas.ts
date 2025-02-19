@@ -12,6 +12,7 @@ export interface CanvasProps {
   onEffectiveFontSizeChange?: (size: number) => void;
   showSafeZone?: boolean;
   format?: 'post' | 'story';
+  overlay?: string;
 }
 
 export interface CanvasSize {

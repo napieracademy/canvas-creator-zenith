@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect } from 'react';
 import { CanvasProps } from '@/types/canvas';
 import { useCanvasScale } from '@/hooks/useCanvasScale';
@@ -22,7 +21,8 @@ const Canvas: React.FC<CanvasProps> = ({
   spacing = 40,
   onEffectiveFontSizeChange,
   showSafeZone = false,
-  format = 'post'
+  format = 'post',
+  overlay
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ORIGINAL_WIDTH = 1080;
@@ -51,66 +51,60 @@ const Canvas: React.FC<CanvasProps> = ({
       safeZoneMargin: SAFE_ZONE_MARGIN
     };
 
-    // Create a temporary canvas for the gradient
-    const tempCanvas = document.createElement('canvas');
-    const tempCtx = tempCanvas.getContext('2d');
-    if (!tempCtx) return;
+    // Gestione sfondo
+    if (backgroundColor.startsWith('url(')) {
+      // Se è un'immagine di sfondo
+      const img = new Image();
+      img.onload = () => {
+        // Disegna l'immagine coprendo tutto il canvas
+        const scale = Math.max(canvas.width / img.width, canvas.height / img.height);
+        const x = (canvas.width - img.width * scale) / 2;
+        const y = (canvas.height - img.height * scale) / 2;
+        
+        ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
 
-    tempCanvas.width = ORIGINAL_WIDTH;
-    tempCanvas.height = ORIGINAL_HEIGHT;
+        // Applica l'overlay se specificato
+        if (overlay) {
+          ctx.fillStyle = overlay;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
 
-    if (backgroundColor.includes('gradient')) {
-      // Create gradient
-      const gradient = tempCtx.createLinearGradient(0, 0, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
-      
-      // Parse gradient colors
-      const colors = backgroundColor.match(/#[a-fA-F0-9]{6}/g);
-      if (colors && colors.length >= 2) {
-        gradient.addColorStop(0, colors[0]);
-        gradient.addColorStop(1, colors[1]);
-      }
-      
-      tempCtx.fillStyle = gradient;
-      tempCtx.fillRect(0, 0, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
-      
-      // Draw the gradient to the main canvas
-      ctx.drawImage(tempCanvas, 0, 0);
+        // Ridisegna il testo sopra l'immagine
+        if (showSafeZone) {
+          drawSafeZone(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
+        }
+
+        drawText(context, text, textAlign, textColor, fontSize, 'title', spacing);
+        if (description) {
+          drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', spacing);
+        }
+      };
+      img.src = backgroundColor.slice(4, -1);
     } else {
-      // For solid colors, use the original drawBackground function
-      drawBackground(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT, backgroundColor);
+      // Sfondo normale
+      if (backgroundColor.includes('gradient')) {
+        const gradient = ctx.createLinearGradient(0, 0, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
+        const colors = backgroundColor.match(/#[a-fA-F0-9]{6}/g);
+        if (colors && colors.length >= 2) {
+          gradient.addColorStop(0, colors[0]);
+          gradient.addColorStop(1, colors[1]);
+        }
+        ctx.fillStyle = gradient;
+      } else {
+        ctx.fillStyle = backgroundColor;
+      }
+      ctx.fillRect(0, 0, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
+
+      if (showSafeZone) {
+        drawSafeZone(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
+      }
+
+      drawText(context, text, textAlign, textColor, fontSize, 'title', spacing);
+      if (description) {
+        drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', spacing);
+      }
     }
-
-    // Draw safe zone if enabled
-    if (showSafeZone) {
-      drawSafeZone(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
-    }
-
-    // Calculate and adjust font size for main text
-    let adjustedFontSize = fontSize;
-    const maxSafeHeight = ORIGINAL_HEIGHT - (2 * SAFE_ZONE_MARGIN);
-    const totalContentHeight = description ? maxSafeHeight * 0.8 : maxSafeHeight;
-
-    while (!textFitsInSafeZone(context, text, adjustedFontSize) && adjustedFontSize > 32) {
-      adjustedFontSize -= 2;
-    }
-
-    while (!textFitsInSafeZone(context, text, adjustedFontSize) && adjustedFontSize > 12) {
-      adjustedFontSize -= 1;
-    }
-
-    if (onEffectiveFontSizeChange) {
-      onEffectiveFontSizeChange(adjustedFontSize);
-    }
-
-    // Draw main text
-    drawText(context, text, textAlign, textColor, adjustedFontSize, 'title', spacing);
-
-    // Draw description text if present
-    if (description) {
-      drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', spacing);
-    }
-
-  }, [text, description, backgroundColor, textAlign, descriptionAlign, textColor, fontSize, descriptionFontSize, spacing, onEffectiveFontSizeChange, showSafeZone, format]);
+  }, [text, description, backgroundColor, textAlign, descriptionAlign, textColor, fontSize, descriptionFontSize, spacing, onEffectiveFontSizeChange, showSafeZone, format, overlay]);
 
   return (
     <div className="flex flex-col w-full h-full">

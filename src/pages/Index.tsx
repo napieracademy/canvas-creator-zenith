@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from '@/components/ui/use-toast';
@@ -12,7 +11,6 @@ import CanvasPreview from '@/components/CanvasPreview';
 import { colorPairs } from '@/data/colorPairs';
 
 const Index = () => {
-  // Seleziona un tema random dai colorPairs
   const getRandomTheme = () => {
     const randomIndex = Math.floor(Math.random() * colorPairs.length);
     return colorPairs[randomIndex];
@@ -34,17 +32,17 @@ const Index = () => {
   const [format, setFormat] = useState<'post' | 'story'>('post');
   const [activeTab, setActiveTab] = useState('manual');
   const [isLoading, setIsLoading] = useState(false);
+  const [featuredImage, setFeaturedImage] = useState<string | undefined>();
   const isMobile = useIsMobile();
 
   useEffect(() => {
-    // Notifica l'utente del tema selezionato
     toast({
       title: "Tema selezionato",
       description: `Tema: ${randomTheme.name}`,
     });
   }, []);
 
-  const handleColorSelect = (background: string, text: string) => {
+  const handleColorSelect = (background: string, text: string, overlay?: string) => {
     setBackgroundColor(background);
     setTextColor(text);
   };
@@ -62,6 +60,14 @@ const Index = () => {
     toast({
       title: "Descrizione estratta",
       description: "Il testo secondario è stato aggiornato con la descrizione della pagina",
+    });
+  };
+
+  const handleImageExtracted = (image: string) => {
+    setFeaturedImage(image);
+    toast({
+      title: "Immagine estratta",
+      description: "L'immagine è stata aggiunta come tema disponibile",
     });
   };
 
@@ -145,6 +151,7 @@ const Index = () => {
           onSpacingChange={setSpacing}
           onTitleExtracted={handleTitleExtracted}
           onDescriptionExtracted={handleDescriptionExtracted}
+          onImageExtracted={handleImageExtracted}
           onTabChange={setActiveTab}
           onLoadingChange={setIsLoading}
           disabled={isLoading}
@@ -154,6 +161,7 @@ const Index = () => {
           onSelectColors={handleColorSelect}
           currentBackground={backgroundColor}
           currentText={textColor}
+          featuredImage={featuredImage}
         />
         
         <SafeZoneToggle 

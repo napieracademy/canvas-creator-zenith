@@ -8,17 +8,29 @@ import { ColorPaletteCarousel } from './ColorPaletteCarousel';
 const ColorPresets: React.FC<ColorPresetsProps> = ({ 
   onSelectColors, 
   currentBackground,
-  currentText 
+  currentText,
+  featuredImage 
 }) => {
+  const featuredTheme = featuredImage ? [{
+    name: "Featured Image",
+    background: `url(${featuredImage})`,
+    text: "#FFFFFF",
+    category: 'featured',
+    overlay: "rgba(0, 0, 0, 0.5)"
+  }] : [];
+
   return (
     <div className="space-y-4">
       <Tabs defaultValue="classic" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="classic" className="text-sm">
             Temi Classici
           </TabsTrigger>
           <TabsTrigger value="cosmic" className="text-sm">
             Temi Cosmici
+          </TabsTrigger>
+          <TabsTrigger value="featured" className="text-sm" disabled={!featuredImage}>
+            Featured Image
           </TabsTrigger>
         </TabsList>
         <TabsContent value="classic" className="mt-4">
@@ -36,6 +48,16 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
             currentText={currentText}
             onSelectColors={onSelectColors}
           />
+        </TabsContent>
+        <TabsContent value="featured" className="mt-4">
+          {featuredImage && (
+            <ColorPaletteCarousel 
+              colors={featuredTheme}
+              currentBackground={currentBackground}
+              currentText={currentText}
+              onSelectColors={(bg, text, overlay) => onSelectColors(bg, text, overlay)}
+            />
+          )}
         </TabsContent>
       </Tabs>
     </div>
