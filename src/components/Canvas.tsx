@@ -13,7 +13,6 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [scale, setScale] = useState(100);
   const ORIGINAL_SIZE = 1080;
-  const PADDING = 32; // Add padding to ensure visibility
 
   const updateScale = () => {
     const canvas = canvasRef.current;
@@ -21,12 +20,12 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
 
     const container = canvas.parentElement;
     if (container) {
-      const containerWidth = container.clientWidth - PADDING * 2;
-      const containerHeight = container.clientHeight - PADDING * 2;
+      const containerWidth = container.clientWidth;
+      const containerHeight = container.clientHeight;
       const scaleFactor = Math.min(
         containerWidth / ORIGINAL_SIZE,
         containerHeight / ORIGINAL_SIZE,
-        0.8 // Limit to 80% of the container size
+        1 // Never scale up beyond 100%
       );
       setScale(Math.round(scaleFactor * 100));
     }
@@ -34,7 +33,6 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
 
   useEffect(() => {
     window.addEventListener('resize', updateScale);
-    updateScale(); // Initial scale calculation
     return () => window.removeEventListener('resize', updateScale);
   }, []);
 
@@ -48,6 +46,9 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
     // Set actual canvas size
     canvas.width = ORIGINAL_SIZE;
     canvas.height = ORIGINAL_SIZE;
+
+    // Calculate initial scale
+    updateScale();
 
     ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -89,12 +90,12 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
   }, [text, backgroundColor, textAlign, textColor, fontSize]);
 
   return (
-    <div className="relative p-8">
+    <div className="relative">
       <canvas
         ref={canvasRef}
         style={{
-          width: `${scale}%`,
-          height: `${scale}%`,
+          width: '100%',
+          height: '100%',
           maxWidth: `${ORIGINAL_SIZE}px`,
           maxHeight: `${ORIGINAL_SIZE}px`,
           objectFit: 'contain',
