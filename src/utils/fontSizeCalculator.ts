@@ -2,27 +2,23 @@
 export const calculateOptimalSizes = (title: string, description: string, template: 'klaus' | 'lucky' = 'klaus') => {
   if (template === 'lucky') {
     // Calcola il font size del titolo per Lucky
-    let titleFontSize = 96; // Default size per Lucky
+    let titleFontSize = 70; // Default size per Lucky
     const titleLength = title.length;
     
     if (titleLength > 50) {
-      titleFontSize = 64;
+      titleFontSize = 56;
     } else if (titleLength > 30) {
-      titleFontSize = 72;
-    } else if (titleLength > 20) {
-      titleFontSize = 84;
+      titleFontSize = 64;
     }
 
     // Calcola il font size della descrizione per Lucky
-    let descriptionFontSize = 56; // Default size più piccolo per Lucky
+    let descriptionFontSize = 50; // Default size per Lucky
     const descriptionLength = description.length;
     
     if (descriptionLength > 200) {
       descriptionFontSize = 36;
     } else if (descriptionLength > 100) {
       descriptionFontSize = 42;
-    } else if (descriptionLength > 50) {
-      descriptionFontSize = 48;
     }
 
     // Calcola lo spacing ottimale per Lucky
