@@ -48,6 +48,11 @@ const TextInput: React.FC<TextInputProps> = ({
 
     setIsImproving(true);
     try {
+      console.log('Calling improve-text function with:', {
+        text: value,
+        type: label.toLowerCase() === 'titolo' ? 'title' : 'description'
+      });
+
       const { data, error } = await supabase.functions.invoke('improve-text', {
         body: {
           text: value,
@@ -55,7 +60,10 @@ const TextInput: React.FC<TextInputProps> = ({
         }
       });
 
+      console.log('Function response:', { data, error });
+
       if (error) throw error;
+      if (!data?.improvedText) throw new Error('Nessun testo migliorato ricevuto');
 
       onChange(data.improvedText);
       toast({
@@ -66,7 +74,7 @@ const TextInput: React.FC<TextInputProps> = ({
       console.error('Error improving text:', error);
       toast({
         title: "Errore",
-        description: "Si è verificato un errore durante il miglioramento del testo",
+        description: error.message || "Si è verificato un errore durante il miglioramento del testo",
         variant: "destructive"
       });
     } finally {
@@ -160,4 +168,3 @@ const TextInput: React.FC<TextInputProps> = ({
 };
 
 export default TextInput;
-
