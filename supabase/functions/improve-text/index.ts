@@ -10,8 +10,8 @@ const corsHeaders = {
 };
 
 const MAX_TOKENS = {
-  title: 50,    // Circa 10-12 parole
-  description: 150  // Circa 30-35 parole
+  title: 30,    // Ridotto a circa 6-8 parole
+  description: 150  // Mantenuto uguale per le descrizioni
 };
 
 serve(async (req) => {
@@ -60,7 +60,7 @@ serve(async (req) => {
           messages: [
             { 
               role: 'system', 
-              content: 'Sei un traduttore professionale. Traduci il testo in italiano mantenendo lo stesso tono e stile.' 
+              content: 'Sei un traduttore professionale. Traduci il testo in italiano mantenendolo conciso e d\'impatto.' 
             },
             { role: 'user', content: text }
           ],
@@ -77,7 +77,7 @@ serve(async (req) => {
     let systemPrompt = "Sei un esperto copywriter che ottimizza testi per i social media. ";
     
     if (type === 'title') {
-      systemPrompt += `Migliora questo titolo mantenendolo conciso, accattivante e d'impatto. Il testo non deve superare ${MAX_TOKENS.title} token. `;
+      systemPrompt += `Migliora questo titolo mantenendolo MOLTO conciso e d'impatto. Il testo DEVE essere breve e NON superare ${MAX_TOKENS.title} token. Rimuovi parole non essenziali e mantieni solo il messaggio chiave. `;
     } else {
       systemPrompt += `Migliora questa descrizione mantenendola chiara, coinvolgente e persuasiva. Il testo non deve superare ${MAX_TOKENS.description} token. `;
     }
@@ -87,14 +87,22 @@ serve(async (req) => {
     }
 
     if (length === 'shorter') {
-      systemPrompt += "Il testo risultante deve essere più corto dell'originale, ma mantenere tutti i concetti chiave. ";
+      systemPrompt += type === 'title' 
+        ? "Riduci ulteriormente il testo mantenendo solo l'essenziale. "
+        : "Il testo risultante deve essere più corto dell'originale, ma mantenere tutti i concetti chiave. ";
     } else if (length === 'longer') {
-      systemPrompt += `Espandi il testo aggiungendo più dettagli e sfumature, ma senza superare il limite massimo di token. `;
+      systemPrompt += type === 'title'
+        ? "Anche se richiesto più lungo, mantieni comunque il titolo molto conciso e d'impatto. "
+        : `Espandi il testo aggiungendo più dettagli e sfumature, ma senza superare il limite massimo di token. `;
     } else {
-      systemPrompt += "Mantieni approssimativamente la stessa lunghezza del testo originale. ";
+      systemPrompt += type === 'title'
+        ? "Mantieni il titolo conciso e d'impatto. "
+        : "Mantieni approssimativamente la stessa lunghezza del testo originale. ";
     }
 
-    systemPrompt += "Rendi il testo più efficace e memorabile, mantenendolo sempre adatto al formato social.";
+    systemPrompt += type === 'title'
+      ? "Il titolo deve essere breve, memorabile e catturare l'attenzione immediatamente."
+      : "Rendi il testo più efficace e memorabile, mantenendolo sempre adatto al formato social.";
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -108,8 +116,8 @@ serve(async (req) => {
           { role: 'system', content: systemPrompt },
           { role: 'user', content: textToImprove }
         ],
-        temperature: 0.7,
-        top_p: 0.9,
+        temperature: type === 'title' ? 0.5 : 0.7, // Temperature più bassa per i titoli
+        top_p: type === 'title' ? 0.7 : 0.9, // Top P più basso per i titoli
         max_tokens: type === 'title' ? MAX_TOKENS.title : MAX_TOKENS.description
       }),
     });
@@ -121,7 +129,6 @@ serve(async (req) => {
     const data = await response.json();
     const improvedText = data.choices[0].message.content;
 
-    // Aggiungiamo un flag per indicare se il testo è stato tradotto
     return new Response(
       JSON.stringify({ 
         improvedText,
