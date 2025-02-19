@@ -21,49 +21,49 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
 }) => {
   const colorPairs: ColorPresetPair[] = [
     {
-      name: "Vivid Purple",
-      background: "#8B5CF6",
-      text: "#FFFFFF"
+      name: "Cyber Purple",
+      background: "#7209B7",
+      text: "#4CC9F0"
     },
     {
-      name: "Ocean Blue",
-      background: "#0EA5E9",
-      text: "#F2FCE2"
+      name: "Neon Dreams",
+      background: "#03071E",
+      text: "#48BFE3"
     },
     {
-      name: "Magenta Impact",
-      background: "#D946EF",
-      text: "#FFFFFF"
+      name: "Electric Coral",
+      background: "#F72585",
+      text: "#CAF0F8"
     },
     {
-      name: "Dark Mode",
-      background: "#1A1F2C",
-      text: "#F2FCE2"
+      name: "Sunset Vibes",
+      background: "#FF6B6B",
+      text: "#FFE66D"
     },
     {
-      name: "Orange Energy",
-      background: "#F97316",
-      text: "#FFFFFF"
+      name: "Deep Ocean",
+      background: "#14213D",
+      text: "#00F5D4"
     },
     {
-      name: "Classic Red",
-      background: "#ea384c",
-      text: "#FFFFFF"
+      name: "Future Pink",
+      background: "#231942",
+      text: "#FF6B6B"
     },
     {
-      name: "Royal Purple",
-      background: "#7E69AB",
-      text: "#FEF7CD"
+      name: "Retro Wave",
+      background: "#240046",
+      text: "#F72585"
     },
     {
-      name: "Electric Blue",
-      background: "#1EAEDB",
-      text: "#FFFFFF"
+      name: "Digital Green",
+      background: "#2B2D42",
+      text: "#7BF1A8"
     },
     {
-      name: "Modern Dark",
-      background: "#403E43",
-      text: "#9b87f5"
+      name: "Cosmic Night",
+      background: "#10002B",
+      text: "#E0AAFF"
     }
   ];
 
@@ -75,25 +75,40 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
           <Button
             key={pair.name}
             variant="outline"
-            className={`h-20 w-full p-2 overflow-hidden flex flex-col items-center justify-center gap-1 transition-all duration-200 ${
+            className={`h-24 w-full p-2 overflow-hidden flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:scale-105 ${
               currentBackground === pair.background && currentText === pair.text
-                ? 'ring-2 ring-primary'
+                ? 'ring-2 ring-primary shadow-lg'
                 : ''
             }`}
             onClick={() => onSelectColors(pair.background, pair.text)}
-            style={{ backgroundColor: pair.background }}
+            style={{ 
+              backgroundColor: pair.background,
+              border: `1px solid ${pair.text}40`
+            }}
           >
-            <span className="text-xs font-medium" style={{ color: pair.text }}>
+            <span 
+              className="text-sm font-medium tracking-wide" 
+              style={{ 
+                color: pair.text,
+                textShadow: '0 2px 4px rgba(0,0,0,0.3)'
+              }}
+            >
               {pair.name}
             </span>
-            <div className="flex gap-1">
+            <div className="flex gap-2">
               <div
-                className="w-3 h-3 rounded-full border border-white/30"
-                style={{ backgroundColor: pair.background }}
+                className="w-4 h-4 rounded-full shadow-inner"
+                style={{ 
+                  backgroundColor: pair.background,
+                  border: `2px solid ${pair.text}80`
+                }}
               />
               <div
-                className="w-3 h-3 rounded-full border border-white/30"
-                style={{ backgroundColor: pair.text }}
+                className="w-4 h-4 rounded-full shadow-inner"
+                style={{ 
+                  backgroundColor: pair.text,
+                  border: `2px solid ${pair.text}80`
+                }}
               />
             </div>
           </Button>
