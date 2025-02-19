@@ -91,13 +91,14 @@
 }
 
 .controls-panel {
-  @apply fixed left-6 top-6 p-6 rounded-2xl glass-panel w-[340px] space-y-6 animate-in z-50;
-  @apply md:relative md:left-0 md:top-0;
+  @apply fixed left-0 top-0 right-0 p-6 glass-panel space-y-6 animate-in z-50;
+  @apply md:fixed md:left-6 md:top-6 md:w-[340px] md:right-auto;
 }
 
 .preview-container {
-  @apply flex-1 p-8 md:ml-[380px] min-h-screen flex items-center justify-center;
-  @apply mt-[520px] md:mt-0; /* Aggiunge spazio sopra il canvas su mobile */
+  @apply flex-1 p-4 min-h-screen flex items-center justify-center;
+  @apply pt-[600px] pb-8; /* Spazio per il pannello di controllo fisso */
+  @apply md:p-8 md:pt-8 md:ml-[380px];
 }
 
 .canvas-wrapper {
