@@ -1,12 +1,11 @@
 
 import React, { useState } from 'react';
 import TextInput from '@/components/TextInput';
-import ColorPicker from '@/components/ColorPicker';
 import Canvas from '@/components/Canvas';
 import DownloadButton from '@/components/DownloadButton';
 import TextAlignControl from '@/components/TextAlignControl';
 import FontSizeControl from '@/components/FontSizeControl';
-import TextColorPicker from '@/components/TextColorPicker';
+import ColorPresets from '@/components/ColorPresets';
 import UrlInput from '@/components/UrlInput';
 
 const Index = () => {
@@ -15,6 +14,11 @@ const Index = () => {
   const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right'>('center');
   const [fontSize, setFontSize] = useState(64);
   const [textColor, setTextColor] = useState('#FFFFFF');
+
+  const handleColorSelect = (background: string, text: string) => {
+    setBackgroundColor(background);
+    setTextColor(text);
+  };
 
   const handleDownload = () => {
     const canvas = document.querySelector('canvas');
@@ -37,8 +41,11 @@ const Index = () => {
         <TextInput value={text} onChange={setText} />
         <TextAlignControl value={textAlign} onChange={setTextAlign} />
         <FontSizeControl value={fontSize} onChange={setFontSize} />
-        <TextColorPicker color={textColor} onChange={setTextColor} />
-        <ColorPicker color={backgroundColor} onChange={setBackgroundColor} />
+        <ColorPresets 
+          onSelectColors={handleColorSelect}
+          currentBackground={backgroundColor}
+          currentText={textColor}
+        />
         <DownloadButton onDownload={handleDownload} />
       </div>
       
