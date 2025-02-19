@@ -187,8 +187,13 @@ const Canvas: React.FC<CanvasProps> = ({
           objectFit: 'contain',
         }}
       />
-      <div className="absolute bottom-4 right-4 bg-black/70 text-white px-3 py-1.5 rounded-full text-sm font-medium">
-        {scale}%
+      <div className="absolute bottom-4 right-4 flex gap-2">
+        <div className="bg-black/70 text-white px-3 py-1.5 rounded-full text-sm font-medium">
+          {scale}%
+        </div>
+        <div className="bg-black/70 text-white px-3 py-1.5 rounded-full text-sm font-medium">
+          1080 × 1350 px
+        </div>
       </div>
     </div>
   );
