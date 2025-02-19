@@ -34,6 +34,9 @@ const Canvas: React.FC<CanvasProps> = ({
   const lastYRef = useRef(0);
   const [showSpacingControl, setShowSpacingControl] = useState(false);
   const [localSpacing, setLocalSpacing] = useState(spacing);
+  const [imagePosition, setImagePosition] = useState(0.4); // 40% dell'altezza
+  const [showImageControl, setShowImageControl] = useState(false);
+  const isImageDraggingRef = useRef(false);
   
   const ORIGINAL_WIDTH = 1080;
   const ORIGINAL_HEIGHT = format === 'post' ? 1350 : 1920;
@@ -65,10 +68,8 @@ const Canvas: React.FC<CanvasProps> = ({
       safeZoneMargin: SAFE_ZONE_MARGIN
     };
 
-    // Disegna lo sfondo
     drawBackground(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT, backgroundColor);
 
-    // Gestisci l'immagine solo per il template Lucky
     if (template === 'lucky' && imageUrl) {
       const img = new Image();
       img.onload = () => {
@@ -85,7 +86,7 @@ const Canvas: React.FC<CanvasProps> = ({
         }
         
         const x = (ORIGINAL_WIDTH - targetWidth) / 2;
-        const y = SAFE_ZONE_MARGIN;
+        const y = ORIGINAL_HEIGHT * imagePosition;
 
         ctx.drawImage(img, x, y, targetWidth, targetHeight);
 
@@ -100,7 +101,6 @@ const Canvas: React.FC<CanvasProps> = ({
       };
       img.src = imageUrl;
     } else {
-      // Per Klaus o Lucky senza immagine
       if (showSafeZone) {
         drawSafeZone(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
       }
@@ -110,7 +110,7 @@ const Canvas: React.FC<CanvasProps> = ({
         drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', localSpacing, template);
       }
     }
-  }, [text, description, backgroundColor, textAlign, descriptionAlign, textColor, fontSize, descriptionFontSize, localSpacing, onEffectiveFontSizeChange, showSafeZone, format, overlay, imageUrl, template]);
+  }, [text, description, backgroundColor, textAlign, descriptionAlign, textColor, fontSize, descriptionFontSize, localSpacing, onEffectiveFontSizeChange, showSafeZone, format, overlay, imageUrl, template, imagePosition]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!containerRef.current) return;
@@ -123,17 +123,33 @@ const Canvas: React.FC<CanvasProps> = ({
     setShowSpacingControl(true);
   };
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDraggingRef.current || !containerRef.current) return;
+  const handleImageMouseDown = (e: React.MouseEvent) => {
+    if (!containerRef.current) return;
     
     const rect = containerRef.current.getBoundingClientRect();
     const y = e.clientY - rect.top;
-    const delta = (y - lastYRef.current) * 2;
     
-    const newSpacing = Math.max(0, Math.min(200, localSpacing + delta));
-    setLocalSpacing(newSpacing);
-    if (onSpacingChange) {
-      onSpacingChange(newSpacing);
+    isImageDraggingRef.current = true;
+    lastYRef.current = y;
+    setShowImageControl(true);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!containerRef.current) return;
+    
+    const rect = containerRef.current.getBoundingClientRect();
+    const y = e.clientY - rect.top;
+    const delta = (y - lastYRef.current) / rect.height;
+    
+    if (isDraggingRef.current) {
+      const newSpacing = Math.max(0, Math.min(200, localSpacing + delta * 200));
+      setLocalSpacing(newSpacing);
+      if (onSpacingChange) {
+        onSpacingChange(newSpacing);
+      }
+    } else if (isImageDraggingRef.current) {
+      const newPosition = Math.max(0.1, Math.min(0.6, imagePosition + delta));
+      setImagePosition(newPosition);
     }
     
     lastYRef.current = y;
@@ -141,7 +157,11 @@ const Canvas: React.FC<CanvasProps> = ({
 
   const handleMouseUp = () => {
     isDraggingRef.current = false;
-    setTimeout(() => setShowSpacingControl(false), 1500);
+    isImageDraggingRef.current = false;
+    setTimeout(() => {
+      setShowSpacingControl(false);
+      setShowImageControl(false);
+    }, 1500);
   };
 
   return (
@@ -175,6 +195,22 @@ const Canvas: React.FC<CanvasProps> = ({
             <div className="bg-black/50 backdrop-blur-sm text-white px-2 py-1 rounded-full flex items-center gap-2 select-none">
               <GripVertical className="h-4 w-4" />
               <span className="text-sm">{Math.round(localSpacing)}px</span>
+            </div>
+          </div>
+        )}
+        {template === 'lucky' && imageUrl && (
+          <div 
+            className={`absolute left-1/2 -translate-x-1/2 cursor-ns-resize transition-opacity duration-300 ${showImageControl ? 'opacity-100' : 'opacity-0'}`}
+            style={{ 
+              top: `${imagePosition * 100}%`,
+              transform: 'translateX(-50%)',
+              zIndex: 10 
+            }}
+            onMouseDown={handleImageMouseDown}
+          >
+            <div className="bg-black/50 backdrop-blur-sm text-white px-2 py-1 rounded-full flex items-center gap-2 select-none">
+              <GripVertical className="h-4 w-4" />
+              <span className="text-sm">{Math.round(imagePosition * 100)}%</span>
             </div>
           </div>
         )}
