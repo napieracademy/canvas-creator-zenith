@@ -19,6 +19,7 @@ const Index = () => {
   const [backgroundColor, setBackgroundColor] = useState('#8B5CF6');
   const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right'>('center');
   const [fontSize, setFontSize] = useState(64);
+  const [descriptionFontSize, setDescriptionFontSize] = useState(32);
   const [effectiveFontSize, setEffectiveFontSize] = useState(64);
   const [textColor, setTextColor] = useState('#FFFFFF');
   const [showSafeZone, setShowSafeZone] = useState(false);
@@ -136,8 +137,8 @@ const Index = () => {
                 onChange={setDescription} 
                 textAlign={textAlign}
                 onTextAlignChange={setTextAlign}
-                fontSize={Math.max(32, fontSize * 0.6)}
-                onFontSizeChange={(size) => setFontSize(size / 0.6)}
+                fontSize={descriptionFontSize}
+                onFontSizeChange={setDescriptionFontSize}
                 label="Descrizione"
               />
             </div>
@@ -176,6 +177,7 @@ const Index = () => {
             backgroundColor={backgroundColor} 
             textAlign={textAlign}
             fontSize={fontSize}
+            descriptionFontSize={descriptionFontSize}
             textColor={textColor}
             onEffectiveFontSizeChange={setEffectiveFontSize}
             showSafeZone={showSafeZone}
