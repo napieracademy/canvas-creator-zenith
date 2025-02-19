@@ -2,12 +2,18 @@
 export class MetaService {
   static async extractMetadata(url: string): Promise<{ success: boolean; error?: string; title?: string }> {
     try {
-      const response = await fetch(url);
-      const html = await response.text();
+      // Utilizziamo un proxy CORS per aggirare le restrizioni
+      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+      const response = await fetch(proxyUrl);
+      const data = await response.json();
       
+      if (!data.contents) {
+        throw new Error('Failed to fetch URL contents');
+      }
+
       // Creiamo un DOM parser
       const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
+      const doc = parser.parseFromString(data.contents, 'text/html');
       
       // Cerchiamo il titolo in ordine di priorità:
       // 1. Meta title
