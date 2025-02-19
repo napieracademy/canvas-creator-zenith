@@ -14,6 +14,7 @@ export interface CanvasProps {
   format?: 'post' | 'story';
   overlay?: string;
   onSpacingChange?: (spacing: number) => void;
+  imageUrl?: string | null;
 }
 
 export interface CanvasSize {
