@@ -133,36 +133,61 @@ export function drawText(
   const totalHeight = lines.length * lineHeight;
   
   let startY;
+
+  // Layout completamente separati per Klaus e Lucky
   if (template === 'lucky') {
-    const imageHeight = height * 0.4; // Aumentato da 1/3 a 0.4
+    // Lucky template - sempre con immagine e layout verticale
+    const imageHeight = height * 0.4;
+    const contentStartY = imageHeight + (safeZoneMargin * 1.5);
     
     if (type === 'title') {
-      // Posiziona il titolo sotto l'immagine con un margine
-      startY = imageHeight + (safeZoneMargin * 1.5);
+      startY = contentStartY;
     } else {
-      // Per la descrizione, calcoliamo lo spazio dopo il titolo
-      const titleFont = getFontStyle('title', fontSize, template);
-      ctx.font = titleFont;
-      const titleMetrics = ctx.measureText(text);
-      const titleHeight = titleMetrics.actualBoundingBoxAscent + titleMetrics.actualBoundingBoxDescent;
+      // Per la descrizione, calcoliamo prima l'altezza del titolo
+      const prevFont = ctx.font;
+      ctx.font = getFontStyle('title', fontSize, template);
+      const titleLines = calculateLines(context, text, fontSize, 'title');
+      const titleHeight = titleLines.length * (fontSize * 1.2);
+      ctx.font = prevFont;
       
-      // La descrizione inizia dopo il titolo con uno spacing appropriato
-      startY = imageHeight + (safeZoneMargin * 1.5) + titleHeight + spacing;
-    }
-
-    // Verifica che il testo rimanga all'interno dei margini di sicurezza
-    const bottomMargin = height - safeZoneMargin;
-    if (startY + totalHeight > bottomMargin) {
-      const maxAllowedY = bottomMargin - totalHeight;
-      startY = Math.min(startY, maxAllowedY);
+      startY = contentStartY + titleHeight + spacing;
     }
   } else {
-    // Layout originale per Klaus
+    // Klaus template - layout centrato verticalmente senza immagine
+    const totalContentHeight = (() => {
+      if (type === 'title') {
+        const descFont = ctx.font;
+        ctx.font = getFontStyle('description', fontSize, template);
+        const descLines = calculateLines(context, text, fontSize, 'description');
+        const descHeight = descLines.length * (fontSize * 1.2);
+        ctx.font = descFont;
+        return totalHeight + spacing + descHeight;
+      }
+      return totalHeight;
+    })();
+
+    const centerY = height / 2;
+    
     if (type === 'title') {
-      startY = (height / 2) - (spacing / 2) - totalHeight;
+      startY = centerY - (totalContentHeight / 2);
     } else {
-      startY = (height / 2) + (spacing / 2);
+      const titleFont = ctx.font;
+      ctx.font = getFontStyle('title', fontSize, template);
+      const titleLines = calculateLines(context, text, fontSize, 'title');
+      const titleHeight = titleLines.length * (fontSize * 1.2);
+      ctx.font = titleFont;
+      
+      startY = centerY + (totalContentHeight / 2) - totalHeight;
     }
+  }
+
+  // Assicuriamoci che il testo rimanga all'interno dei margini di sicurezza
+  const bottomMargin = height - safeZoneMargin;
+  if (startY + totalHeight > bottomMargin) {
+    startY = bottomMargin - totalHeight;
+  }
+  if (startY < safeZoneMargin) {
+    startY = safeZoneMargin;
   }
 
   const x = textAlign === 'left' ? safeZoneMargin : 

@@ -68,34 +68,27 @@ const Canvas: React.FC<CanvasProps> = ({
     // Disegna lo sfondo
     drawBackground(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT, backgroundColor);
 
-    // Se c'è un'immagine, caricala e disegnala
-    if (imageUrl) {
+    // Gestisci l'immagine solo per il template Lucky
+    if (template === 'lucky' && imageUrl) {
       const img = new Image();
       img.onload = () => {
-        // Usa il 40% dell'altezza del canvas per l'immagine
-        const maxHeight = ORIGINAL_HEIGHT * 0.4; // Aumentato da 1/3 a 0.4
+        const maxHeight = ORIGINAL_HEIGHT * 0.4;
         const maxWidth = ORIGINAL_WIDTH - (2 * SAFE_ZONE_MARGIN);
         
-        // Calcola le dimensioni mantenendo l'aspect ratio
         const imgAspectRatio = img.width / img.height;
         let targetWidth = maxWidth;
         let targetHeight = targetWidth / imgAspectRatio;
         
-        // Se l'altezza risultante è maggiore di maxHeight,
-        // ricalcola le dimensioni basandosi sull'altezza massima
         if (targetHeight > maxHeight) {
           targetHeight = maxHeight;
           targetWidth = targetHeight * imgAspectRatio;
         }
         
-        // Centra l'immagine orizzontalmente
         const x = (ORIGINAL_WIDTH - targetWidth) / 2;
         const y = SAFE_ZONE_MARGIN;
 
-        // Disegna l'immagine
         ctx.drawImage(img, x, y, targetWidth, targetHeight);
 
-        // Ridisegna il resto del contenuto
         if (showSafeZone) {
           drawSafeZone(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
         }
@@ -107,7 +100,7 @@ const Canvas: React.FC<CanvasProps> = ({
       };
       img.src = imageUrl;
     } else {
-      // Se non c'è un'immagine, procedi con il rendering normale
+      // Per Klaus o Lucky senza immagine
       if (showSafeZone) {
         drawSafeZone(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
       }
