@@ -81,7 +81,7 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
         <CarouselContent className="-ml-2 md:-ml-4">
           {colorPairs.map((pair) => (
             <CarouselItem key={pair.name} className="pl-2 md:pl-4 basis-1/4">
-              <div className="relative pt-[100%]">
+              <div className="relative w-12 h-12 mx-auto">
                 <Button
                   variant="outline"
                   className={`absolute inset-0 p-0 overflow-hidden border-0 hover:opacity-90 transition-all duration-300 ${
