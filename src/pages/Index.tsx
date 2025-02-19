@@ -7,6 +7,7 @@ import TextAlignControl from '@/components/TextAlignControl';
 import FontSizeControl from '@/components/FontSizeControl';
 import ColorPresets from '@/components/ColorPresets';
 import UrlInput from '@/components/UrlInput';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Index = () => {
   const [text, setText] = useState('');
@@ -14,6 +15,7 @@ const Index = () => {
   const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right'>('center');
   const [fontSize, setFontSize] = useState(64);
   const [textColor, setTextColor] = useState('#FFFFFF');
+  const isMobile = useIsMobile();
 
   const handleColorSelect = (background: string, text: string) => {
     setBackgroundColor(background);
@@ -21,7 +23,6 @@ const Index = () => {
   };
 
   const handleTitleExtracted = (extractedTitle: string) => {
-    // Aggiorna direttamente il testo con il titolo estratto
     setText(extractedTitle);
   };
 
@@ -34,6 +35,22 @@ const Index = () => {
     link.href = canvas.toDataURL('image/png');
     link.click();
   };
+
+  if (isMobile) {
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-6">
+        <div className="glass-panel p-8 rounded-2xl max-w-md text-center space-y-4">
+          <h1 className="text-2xl font-bold text-gray-900">Versione Desktop Raccomandata</h1>
+          <p className="text-gray-600">
+            Questa app è ottimizzata per l'utilizzo su desktop. Per la migliore esperienza, ti preghiamo di accedere da un computer.
+          </p>
+          <div className="text-sm text-gray-500">
+            💻 Torna a visitarci dal tuo computer!
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen w-full">
