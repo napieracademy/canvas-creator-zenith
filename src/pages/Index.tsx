@@ -20,6 +20,11 @@ const Index = () => {
     setTextColor(text);
   };
 
+  const handleTitleExtracted = (extractedTitle: string) => {
+    // Aggiorna direttamente il testo con il titolo estratto
+    setText(extractedTitle);
+  };
+
   const handleDownload = () => {
     const canvas = document.querySelector('canvas');
     if (!canvas) return;
@@ -37,7 +42,7 @@ const Index = () => {
           <h1 className="text-xl font-semibold text-gray-900">Social Image Creator</h1>
           <p className="text-sm text-gray-500">Create beautiful social media images in seconds</p>
         </div>
-        <UrlInput onTitleExtracted={setText} />
+        <UrlInput onTitleExtracted={handleTitleExtracted} />
         <TextInput value={text} onChange={setText} />
         <TextAlignControl value={textAlign} onChange={setTextAlign} />
         <FontSizeControl value={fontSize} onChange={setFontSize} />
