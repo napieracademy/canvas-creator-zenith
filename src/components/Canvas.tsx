@@ -14,28 +14,6 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
   const [scale, setScale] = useState(100);
   const ORIGINAL_SIZE = 1080;
 
-  const updateScale = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const container = canvas.parentElement;
-    if (container) {
-      const containerWidth = container.clientWidth;
-      const containerHeight = container.clientHeight;
-      const scaleFactor = Math.min(
-        containerWidth / ORIGINAL_SIZE,
-        containerHeight / ORIGINAL_SIZE,
-        1 // Never scale up beyond 100%
-      );
-      setScale(Math.round(scaleFactor * 100));
-    }
-  };
-
-  useEffect(() => {
-    window.addEventListener('resize', updateScale);
-    return () => window.removeEventListener('resize', updateScale);
-  }, []);
-
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -47,8 +25,18 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
     canvas.width = ORIGINAL_SIZE;
     canvas.height = ORIGINAL_SIZE;
 
-    // Calculate initial scale
-    updateScale();
+    // Calculate container width and scale
+    const container = canvas.parentElement;
+    if (container) {
+      const containerWidth = container.clientWidth;
+      const containerHeight = container.clientHeight;
+      const scaleFactor = Math.min(
+        containerWidth / ORIGINAL_SIZE,
+        containerHeight / ORIGINAL_SIZE,
+        1 // Never scale up beyond 100%
+      );
+      setScale(Math.round(scaleFactor * 100));
+    }
 
     ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
