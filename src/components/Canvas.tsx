@@ -18,6 +18,7 @@ const Canvas: React.FC<CanvasProps> = ({
   textColor, 
   fontSize,
   descriptionFontSize = 32,
+  spacing = 40,
   onEffectiveFontSizeChange,
   showSafeZone = false,
   format = 'post'
@@ -76,14 +77,14 @@ const Canvas: React.FC<CanvasProps> = ({
     }
 
     // Draw main text
-    drawText(context, text, textAlign, textColor, adjustedFontSize, 'title');
+    drawText(context, text, textAlign, textColor, adjustedFontSize, 'title', spacing);
 
     // Draw description text if present
     if (description) {
-      drawText(context, description, textAlign, textColor, descriptionFontSize, 'description');
+      drawText(context, description, textAlign, textColor, descriptionFontSize, 'description', spacing);
     }
 
-  }, [text, description, backgroundColor, textAlign, textColor, fontSize, descriptionFontSize, onEffectiveFontSizeChange, showSafeZone, format]);
+  }, [text, description, backgroundColor, textAlign, textColor, fontSize, descriptionFontSize, spacing, onEffectiveFontSizeChange, showSafeZone, format]);
 
   return (
     <div className="flex flex-col w-full h-full">
