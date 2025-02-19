@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect, useState } from 'react';
 import { CanvasProps } from '@/types/canvas';
 import { useCanvasScale } from '@/hooks/useCanvasScale';
@@ -6,7 +7,6 @@ import {
   SAFE_ZONE_MARGIN,
   drawBackground,
   drawSafeZone,
-  textFitsInSafeZone,
   drawText
 } from '@/utils/canvasUtils';
 
