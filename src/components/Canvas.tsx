@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect, useState } from 'react';
 
 interface CanvasProps {
@@ -175,22 +176,24 @@ const Canvas: React.FC<CanvasProps> = ({
   }, [text, backgroundColor, textAlign, textColor, fontSize, onEffectiveFontSizeChange, showSafeZone]);
 
   return (
-    <div className="space-y-2">
-      <div className="relative w-full h-full bg-white/50 rounded-xl overflow-hidden">
-        <canvas
-          ref={canvasRef}
-          style={{
-            width: '100%',
-            height: '100%',
-            maxWidth: `${ORIGINAL_WIDTH}px`,
-            maxHeight: `${ORIGINAL_HEIGHT}px`,
-            objectFit: 'contain',
-          }}
-        />
-      </div>
-      <div className="flex justify-end gap-2 text-sm text-gray-500">
-        <div>{scale}%</div>
-        <div>1080 × 1350 px</div>
+    <div className="relative w-full h-full bg-white/50 rounded-xl overflow-hidden">
+      <canvas
+        ref={canvasRef}
+        style={{
+          width: '100%',
+          height: '100%',
+          maxWidth: `${ORIGINAL_WIDTH}px`,
+          maxHeight: `${ORIGINAL_HEIGHT}px`,
+          objectFit: 'contain',
+        }}
+      />
+      <div className="absolute bottom-4 right-4 flex gap-2">
+        <div className="bg-black/20 text-white px-3 py-1.5 rounded-full text-sm font-medium backdrop-blur-sm">
+          {scale}%
+        </div>
+        <div className="bg-black/20 text-white px-3 py-1.5 rounded-full text-sm font-medium backdrop-blur-sm">
+          1080 × 1350 px
+        </div>
       </div>
     </div>
   );
