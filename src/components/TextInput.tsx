@@ -31,6 +31,8 @@ interface TextInputProps {
   disabled?: boolean;
 }
 
+type ToneType = 'professionale' | 'casual' | 'energico' | 'empatico' | 'autorevole';
+
 const TextInput: React.FC<TextInputProps> = ({ 
   value, 
   onChange, 
@@ -42,6 +44,7 @@ const TextInput: React.FC<TextInputProps> = ({
   disabled
 }) => {
   const [isImproving, setIsImproving] = React.useState(false);
+  const [selectedTone, setSelectedTone] = React.useState<ToneType>('professionale');
 
   const handleImproveText = async () => {
     if (!value.trim()) {
@@ -57,13 +60,15 @@ const TextInput: React.FC<TextInputProps> = ({
     try {
       console.log('Chiamata a improve-text con:', {
         text: value,
-        type: label.toLowerCase() === 'titolo' ? 'title' : 'description'
+        type: label.toLowerCase() === 'titolo' ? 'title' : 'description',
+        tone: selectedTone
       });
 
       const { data, error } = await supabase.functions.invoke('improve-text', {
         body: {
           text: value,
-          type: label.toLowerCase() === 'titolo' ? 'title' : 'description'
+          type: label.toLowerCase() === 'titolo' ? 'title' : 'description',
+          tone: selectedTone
         }
       });
 
@@ -75,7 +80,7 @@ const TextInput: React.FC<TextInputProps> = ({
       onChange(data.improvedText);
       toast({
         title: "Testo migliorato",
-        description: "Il testo è stato ottimizzato con successo"
+        description: `Il testo è stato ottimizzato con tono ${selectedTone}`
       });
     } catch (error) {
       console.error('Errore nel miglioramento del testo:', error);
@@ -167,16 +172,42 @@ const TextInput: React.FC<TextInputProps> = ({
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  className="w-9 p-0"
-                  onClick={handleImproveText}
-                  disabled={disabled || isImproving}
-                  aria-label="Migliora automaticamente il testo"
-                >
-                  <Sparkles className="h-4 w-4 text-yellow-500" />
-                </Button>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="w-9 p-0"
+                      disabled={disabled || isImproving}
+                      aria-label="Migliora automaticamente il testo"
+                    >
+                      <Sparkles className="h-4 w-4 text-yellow-500" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-56">
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <Label>Tono del testo</Label>
+                      </div>
+                      <div className="grid gap-1">
+                        {(['professionale', 'casual', 'energico', 'empatico', 'autorevole'] as ToneType[]).map((tone) => (
+                          <Button
+                            key={tone}
+                            variant={selectedTone === tone ? "default" : "ghost"}
+                            className="w-full justify-start"
+                            onClick={() => {
+                              setSelectedTone(tone);
+                              handleImproveText();
+                            }}
+                            disabled={disabled || isImproving}
+                          >
+                            {tone.charAt(0).toUpperCase() + tone.slice(1)}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  </PopoverContent>
+                </Popover>
               </TooltipTrigger>
               <TooltipContent>
                 <p>Migliora automaticamente il testo</p>
