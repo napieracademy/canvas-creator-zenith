@@ -125,14 +125,14 @@ const TextEditor: React.FC<TextEditorProps> = ({
               <TooltipTrigger asChild>
                 <TabsTrigger 
                   value="fetch" 
-                  disabled={true}
+                  disabled={disabled}
                   aria-label="Estrai testo da un URL"
                 >
                   Fetch da URL
                 </TabsTrigger>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Funzionalità temporaneamente disabilitata</p>
+                <p>Estrai automaticamente i contenuti da un URL</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -141,8 +141,14 @@ const TextEditor: React.FC<TextEditorProps> = ({
           {renderTextControls()}
         </TabsContent>
         <TabsContent value="fetch">
-          <div className="p-4 text-center text-gray-500">
-            Questa funzionalità è temporaneamente disabilitata
+          <div className="space-y-4">
+            <UrlInput
+              onTitleExtracted={onTitleExtracted}
+              onDescriptionExtracted={onDescriptionExtracted}
+              onImageExtracted={onImageExtracted}
+              onTabChange={onTabChange}
+              onLoadingChange={onLoadingChange}
+            />
           </div>
         </TabsContent>
       </Tabs>
