@@ -94,7 +94,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
         textAlign={textAlign}
         onTextAlignChange={onTextAlignChange}
         fontSize={fontSize}
-        onFontSizeChange={onFontSizeChange}
+        onFontSizeChange={onFontSize
         label="Titolo"
         disabled={disabled}
       />
@@ -140,8 +140,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
         </TabsContent>
       </Tabs>
 
-      {/* Mostra sempre i controlli quando c'è del testo, indipendentemente dalla tab selezionata */}
-      {(text || description) && <div className="pt-4 border-t">{renderTextControls()}</div>}
+      {/* Rimuoviamo la duplicazione dei controlli qui */}
     </div>
   );
 };
