@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect, useState } from 'react';
 
 interface CanvasProps {
@@ -7,6 +8,7 @@ interface CanvasProps {
   textColor: string;
   fontSize: number;
   onEffectiveFontSizeChange?: (size: number) => void;
+  showSafeZone?: boolean;
 }
 
 const Canvas: React.FC<CanvasProps> = ({ 
@@ -15,7 +17,8 @@ const Canvas: React.FC<CanvasProps> = ({
   textAlign, 
   textColor, 
   fontSize,
-  onEffectiveFontSizeChange 
+  onEffectiveFontSizeChange,
+  showSafeZone = false
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [scale, setScale] = useState(100);
@@ -64,9 +67,23 @@ const Canvas: React.FC<CanvasProps> = ({
     
     updateScale();
 
+    // Sfondo
     ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+    // Safe zone
+    if (showSafeZone) {
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+      ctx.setLineDash([5, 5]);
+      ctx.strokeRect(
+        SAFE_ZONE_MARGIN, 
+        SAFE_ZONE_MARGIN, 
+        ORIGINAL_WIDTH - (2 * SAFE_ZONE_MARGIN), 
+        ORIGINAL_HEIGHT - (2 * SAFE_ZONE_MARGIN)
+      );
+    }
+
+    // Calcolo delle linee e dimensione del testo
     const calculateLines = (size: number) => {
       ctx.font = `bold ${size}px Inter`;
       const words = text.split(' ');
@@ -107,29 +124,36 @@ const Canvas: React.FC<CanvasProps> = ({
       onEffectiveFontSizeChange(adjustedFontSize);
     }
 
-    ctx.font = `bold ${adjustedFontSize}px Inter`;
-    ctx.fillStyle = textColor;
-    ctx.textAlign = textAlign;
-    ctx.textBaseline = 'middle';
+    // Rendering del testo
+    if (text.trim()) {
+      ctx.font = `bold ${adjustedFontSize}px Inter`;
+      ctx.fillStyle = textColor;
+      ctx.textAlign = textAlign;
+      ctx.textBaseline = 'middle';
+      ctx.setLineDash([]); // Reset line dash
 
-    const lines = calculateLines(adjustedFontSize);
-    const lineHeight = adjustedFontSize * 1.2;
-    const totalHeight = lines.length * lineHeight;
-    const startY = (ORIGINAL_HEIGHT - totalHeight) / 2;
+      const lines = calculateLines(adjustedFontSize);
+      const lineHeight = adjustedFontSize * 1.2;
+      const totalHeight = lines.length * lineHeight;
+      const startY = (ORIGINAL_HEIGHT - totalHeight) / 2;
 
-    const x = textAlign === 'left' ? SAFE_ZONE_MARGIN : 
-             textAlign === 'right' ? ORIGINAL_WIDTH - SAFE_ZONE_MARGIN : 
-             ORIGINAL_WIDTH / 2;
+      const x = textAlign === 'left' ? SAFE_ZONE_MARGIN : 
+               textAlign === 'right' ? ORIGINAL_WIDTH - SAFE_ZONE_MARGIN : 
+               ORIGINAL_WIDTH / 2;
 
-    lines.forEach((line, index) => {
-      ctx.fillText(line, x, startY + (index * lineHeight));
-    });
+      lines.forEach((line, index) => {
+        ctx.fillText(line, x, startY + (index * lineHeight));
+      });
+    } else {
+      // Placeholder quando non c'è testo
+      ctx.font = '32px Inter';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('Inserisci il tuo testo...', ORIGINAL_WIDTH / 2, ORIGINAL_HEIGHT / 2);
+    }
 
-    ctx.strokeStyle = 'rgba(255, 0, 0, 0.3)';
-    ctx.strokeRect(SAFE_ZONE_MARGIN, SAFE_ZONE_MARGIN, 
-                   ORIGINAL_WIDTH - (2 * SAFE_ZONE_MARGIN), 
-                   ORIGINAL_HEIGHT - (2 * SAFE_ZONE_MARGIN));
-  }, [text, backgroundColor, textAlign, textColor, fontSize, onEffectiveFontSizeChange]);
+  }, [text, backgroundColor, textAlign, textColor, fontSize, onEffectiveFontSizeChange, showSafeZone]);
 
   return (
     <div className="relative w-full h-full bg-white/50 rounded-xl overflow-hidden">

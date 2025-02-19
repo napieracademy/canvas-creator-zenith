@@ -8,6 +8,9 @@ import FontSizeControl from '@/components/FontSizeControl';
 import ColorPresets from '@/components/ColorPresets';
 import UrlInput from '@/components/UrlInput';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { toast } from '@/components/ui/use-toast';
 
 const Index = () => {
   const [text, setText] = useState('');
@@ -16,6 +19,7 @@ const Index = () => {
   const [fontSize, setFontSize] = useState(64);
   const [effectiveFontSize, setEffectiveFontSize] = useState(64);
   const [textColor, setTextColor] = useState('#FFFFFF');
+  const [showSafeZone, setShowSafeZone] = useState(false);
   const isMobile = useIsMobile();
 
   const handleColorSelect = (background: string, text: string) => {
@@ -25,6 +29,10 @@ const Index = () => {
 
   const handleTitleExtracted = (extractedTitle: string) => {
     setText(extractedTitle);
+    toast({
+      title: "Titolo estratto",
+      description: "Il testo è stato aggiornato con il titolo della pagina",
+    });
   };
 
   const handleDownload = () => {
@@ -35,6 +43,11 @@ const Index = () => {
     link.download = 'social-image.png';
     link.href = canvas.toDataURL('image/png');
     link.click();
+
+    toast({
+      title: "Immagine scaricata",
+      description: "L'immagine è stata salvata correttamente",
+    });
   };
 
   if (isMobile) {
@@ -69,6 +82,14 @@ const Index = () => {
           currentBackground={backgroundColor}
           currentText={textColor}
         />
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="safe-zone"
+            checked={showSafeZone}
+            onCheckedChange={setShowSafeZone}
+          />
+          <Label htmlFor="safe-zone">Mostra margini di sicurezza</Label>
+        </div>
         <DownloadButton onDownload={handleDownload} />
       </div>
       
@@ -81,6 +102,7 @@ const Index = () => {
             fontSize={fontSize}
             textColor={textColor}
             onEffectiveFontSizeChange={setEffectiveFontSize}
+            showSafeZone={showSafeZone}
           />
         </div>
       </div>
