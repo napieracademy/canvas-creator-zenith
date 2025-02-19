@@ -11,10 +11,11 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({ onDownload }) => {
   return (
     <Button 
       onClick={onDownload}
-      className="w-full bg-gradient-to-r from-violet-500 to-violet-600 hover:from-violet-600 hover:to-violet-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 font-medium"
+      size="icon"
+      variant="ghost"
+      className="absolute top-3 right-3 bg-white/80 hover:bg-white/90 backdrop-blur-sm transition-all duration-200"
     >
-      <Download className="mr-2 h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-      Download Image
+      <Download className="h-4 w-4" />
     </Button>
   );
 };

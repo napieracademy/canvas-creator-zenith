@@ -160,27 +160,28 @@ const Index = () => {
             onShowSafeZoneChange={setShowSafeZone}
             disabled={isLoading}
           />
-          
-          <DownloadButton onDownload={handleDownload} />
         </div>
       </div>
       
       <div className="h-screen p-6">
-        <CanvasPreview 
-          text={text}
-          description={description}
-          backgroundColor={backgroundColor}
-          textAlign={textAlign}
-          descriptionAlign={descriptionAlign}
-          textColor={textColor}
-          fontSize={fontSize}
-          descriptionFontSize={descriptionFontSize}
-          spacing={spacing}
-          onEffectiveFontSizeChange={setEffectiveFontSize}
-          showSafeZone={showSafeZone}
-          format={format}
-          onSpacingChange={setSpacing}
-        />
+        <div className="relative">
+          <CanvasPreview 
+            text={text}
+            description={description}
+            backgroundColor={backgroundColor}
+            textAlign={textAlign}
+            descriptionAlign={descriptionAlign}
+            textColor={textColor}
+            fontSize={fontSize}
+            descriptionFontSize={descriptionFontSize}
+            spacing={spacing}
+            onEffectiveFontSizeChange={setEffectiveFontSize}
+            showSafeZone={showSafeZone}
+            format={format}
+            onSpacingChange={setSpacing}
+          />
+          <DownloadButton onDownload={handleDownload} />
+        </div>
       </div>
     </div>
   );
