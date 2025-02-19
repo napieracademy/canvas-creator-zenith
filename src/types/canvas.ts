@@ -13,6 +13,7 @@ export interface CanvasProps {
   showSafeZone?: boolean;
   format?: 'post' | 'story';
   overlay?: string;
+  onSpacingChange?: (spacing: number) => void;
 }
 
 export interface CanvasSize {
