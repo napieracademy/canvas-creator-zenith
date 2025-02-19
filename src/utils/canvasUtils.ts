@@ -3,6 +3,22 @@ import { CanvasContext } from '@/types/canvas';
 
 export const SAFE_ZONE_MARGIN = 120;
 
+// Precarica i font per il template Lucky
+const posterFont = new FontFace('Poster', 'url(/fonts/poster.ttf)');
+const decoFont = new FontFace('Deco', 'url(/fonts/deco.ttf)');
+
+// Carica i font nel documento
+Promise.all([
+  posterFont.load(),
+  decoFont.load()
+]).then(fonts => {
+  fonts.forEach(font => {
+    document.fonts.add(font);
+  });
+}).catch(error => {
+  console.error('Errore nel caricamento dei font:', error);
+});
+
 export function drawBackground(ctx: CanvasRenderingContext2D, width: number, height: number, color: string) {
   if (color.startsWith('url(')) {
     const img = new Image();
@@ -64,7 +80,7 @@ export function calculateLines(context: CanvasContext, text: string, size: numbe
   const { ctx, width, safeZoneMargin } = context;
   const maxWidth = width - (2 * safeZoneMargin);
   
-  ctx.font = `${type === 'title' ? 'bold' : ''} ${size}px Inter`;
+  ctx.font = `${getFontStyle(type, size)}`;
   const words = text.split(' ');
   const lines: string[] = [];
   let currentLine = '';
@@ -85,6 +101,15 @@ export function calculateLines(context: CanvasContext, text: string, size: numbe
   return lines;
 }
 
+function getFontStyle(type: 'title' | 'description', fontSize: number, template: 'klaus' | 'lucky' = 'klaus'): string {
+  if (template === 'lucky') {
+    return type === 'title' 
+      ? `${fontSize}px Poster` 
+      : `${fontSize}px Deco`;
+  }
+  return `${type === 'title' ? 'bold' : ''} ${fontSize}px Inter`;
+}
+
 export function drawText(
   context: CanvasContext,
   text: string,
@@ -99,7 +124,7 @@ export function drawText(
   
   if (!text.trim()) {
     if (type === 'title') {
-      ctx.font = 'bold 32px Inter';
+      ctx.font = getFontStyle('title', 32, template);
       ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -108,7 +133,7 @@ export function drawText(
     return;
   }
 
-  ctx.font = `${type === 'title' ? 'bold' : ''} ${fontSize}px Inter`;
+  ctx.font = getFontStyle(type, fontSize, template);
   ctx.fillStyle = textColor;
   ctx.textAlign = textAlign;
   ctx.textBaseline = 'middle';
