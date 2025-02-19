@@ -5,7 +5,7 @@ import { Button } from './ui/button';
 import { Label } from './ui/label';
 import { useToast } from './ui/use-toast';
 import { MetaService } from '@/utils/MetaService';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Image as ImageIcon } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
 interface UrlInputProps {
@@ -25,7 +25,19 @@ const UrlInput: React.FC<UrlInputProps> = ({
 }) => {
   const [url, setUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isImageUrl, setIsImageUrl] = useState(false);
   const { toast } = useToast();
+
+  const isValidImageUrl = (url: string) => {
+    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+    return imageExtensions.some(ext => url.toLowerCase().endsWith(ext));
+  };
+
+  const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newUrl = e.target.value;
+    setUrl(newUrl);
+    setIsImageUrl(isValidImageUrl(newUrl));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,50 +45,73 @@ const UrlInput: React.FC<UrlInputProps> = ({
     onLoadingChange?.(true);
 
     try {
-      const result = await MetaService.extractMetadata(url);
-      
-      if (result.success) {
-        let extracted = false;
-
-        if (result.title) {
-          onTitleExtracted(result.title);
-          extracted = true;
-        }
-        if (result.description) {
-          onDescriptionExtracted(result.description);
-          extracted = true;
-        }
-        if (result.image && onImageExtracted) {
-          onImageExtracted(result.image);
+      if (isImageUrl) {
+        // Test if the image URL is valid
+        const img = new Image();
+        img.onload = () => {
+          if (onImageExtracted) {
+            onImageExtracted(url);
+            toast({
+              title: "Immagine caricata",
+              description: "L'immagine è stata aggiunta correttamente",
+            });
+          }
+        };
+        img.onerror = () => {
           toast({
-            title: "Immagine estratta",
-            description: "L'immagine di anteprima è stata estratta e aggiunta come tema",
+            title: "Errore",
+            description: "L'URL dell'immagine non è valido o l'immagine non è accessibile",
+            variant: "destructive",
           });
-          extracted = true;
-        }
+        };
+        img.src = url;
+      } else {
+        // Se non è un'immagine, estraiamo i metadati come prima
+        const result = await MetaService.extractMetadata(url);
+        
+        if (result.success) {
+          let extracted = false;
 
-        if (extracted) {
-          toast({
-            title: "Contenuto estratto",
-            description: "Il contenuto è stato estratto con successo",
-          });
-          
-          if (onTabChange) {
-            onTabChange('manual');
+          if (result.title) {
+            onTitleExtracted(result.title);
+            extracted = true;
+          }
+          if (result.description) {
+            onDescriptionExtracted(result.description);
+            extracted = true;
+          }
+          if (result.image && onImageExtracted) {
+            onImageExtracted(result.image);
+            toast({
+              title: "Immagine estratta",
+              description: "L'immagine è stata estratta dall'articolo",
+            });
+            extracted = true;
+          }
+
+          if (extracted) {
+            toast({
+              title: "Contenuto estratto",
+              description: "Il contenuto è stato estratto con successo",
+            });
+            
+            if (onTabChange) {
+              onTabChange('manual');
+            }
+          } else {
+            toast({
+              title: "Nessun contenuto",
+              description: "Nessun contenuto è stato trovato nell'URL specificato",
+              variant: "destructive",
+            });
           }
         } else {
           toast({
-            title: "Nessun contenuto",
-            description: "Nessun contenuto è stato trovato nell'URL specificato",
+            title: "Errore",
+            description: result.error || "Impossibile estrarre i contenuti dall'URL",
             variant: "destructive",
           });
         }
-      } else {
-        toast({
-          title: "Errore",
-          description: result.error || "Impossibile estrarre i contenuti dall'URL",
-          variant: "destructive",
-        });
       }
     } catch (error) {
       console.error('Error in URL submission:', error);
@@ -93,13 +128,15 @@ const UrlInput: React.FC<UrlInputProps> = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-2">
-      <Label className="text-sm font-medium text-gray-700">URL dell'articolo</Label>
+      <Label className="text-sm font-medium text-gray-700">
+        {isImageUrl ? "URL dell'immagine" : "URL dell'articolo"}
+      </Label>
       <div className="flex gap-2">
         <Input
           type="url"
           value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          placeholder="https://example.com/article"
+          onChange={handleUrlChange}
+          placeholder={isImageUrl ? "https://example.com/image.jpg" : "https://example.com/article"}
           className="flex-1"
           required
           disabled={isLoading}
@@ -114,12 +151,25 @@ const UrlInput: React.FC<UrlInputProps> = ({
                     Caricamento...
                   </>
                 ) : (
-                  "Estrai contenuti"
+                  <>
+                    {isImageUrl ? (
+                      <>
+                        <ImageIcon className="mr-2 h-4 w-4" />
+                        Carica immagine
+                      </>
+                    ) : (
+                      "Estrai contenuti"
+                    )}
+                  </>
                 )}
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Estrai automaticamente titolo e descrizione dall'URL</p>
+              <p>
+                {isImageUrl 
+                  ? "Carica un'immagine da URL" 
+                  : "Estrai automaticamente titolo e descrizione dall'URL"}
+              </p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
