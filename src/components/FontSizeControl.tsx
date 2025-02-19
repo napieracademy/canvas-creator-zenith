@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Label } from './ui/label';
 import { Slider } from './ui/slider';
 
@@ -9,11 +9,25 @@ interface FontSizeControlProps {
 }
 
 const FontSizeControl: React.FC<FontSizeControlProps> = ({ value, onChange }) => {
+  const [effectiveSize, setEffectiveSize] = useState(value);
+
+  useEffect(() => {
+    // Aggiorna la dimensione effettiva quando cambia il valore richiesto
+    setEffectiveSize(value);
+  }, [value]);
+
   return (
     <div className="space-y-2">
       <div className="flex justify-between items-center">
-        <Label className="text-sm font-medium text-gray-700">Font Size</Label>
-        <span className="text-sm text-gray-500">{value}px</span>
+        <Label className="text-sm font-medium text-gray-700">Dimensione Testo</Label>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-500">Target: {value}px</span>
+          {effectiveSize !== value && (
+            <span className="text-sm text-orange-500">
+              (Adattato: {effectiveSize}px)
+            </span>
+          )}
+        </div>
       </div>
       <Slider
         value={[value]}
@@ -23,6 +37,9 @@ const FontSizeControl: React.FC<FontSizeControlProps> = ({ value, onChange }) =>
         step={1}
         className="w-full"
       />
+      <p className="text-xs text-gray-500 mt-1">
+        La dimensione effettiva del testo potrebbe essere adattata automaticamente per rimanere all'interno dei margini
+      </p>
     </div>
   );
 };
