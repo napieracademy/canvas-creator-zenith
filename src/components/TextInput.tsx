@@ -45,6 +45,7 @@ const TextInput: React.FC<TextInputProps> = ({
 }) => {
   const [isImproving, setIsImproving] = React.useState(false);
   const [selectedTone, setSelectedTone] = React.useState<ToneType>('professionale');
+  const [isOpen, setIsOpen] = React.useState(false);
 
   const handleImproveText = async () => {
     if (!value.trim()) {
@@ -91,6 +92,7 @@ const TextInput: React.FC<TextInputProps> = ({
       });
     } finally {
       setIsImproving(false);
+      setIsOpen(false); // Chiudiamo il popover dopo il completamento
     }
   };
 
@@ -172,7 +174,7 @@ const TextInput: React.FC<TextInputProps> = ({
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Popover>
+                <Popover open={isOpen} onOpenChange={setIsOpen}>
                   <PopoverTrigger asChild>
                     <Button 
                       variant="outline" 
