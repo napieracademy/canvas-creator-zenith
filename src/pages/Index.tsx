@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import TextInput from '@/components/TextInput';
 import Canvas from '@/components/Canvas';
@@ -93,9 +92,12 @@ const Index = () => {
     <div className="min-h-screen w-full relative">
       {isLoading && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg p-6 flex flex-col items-center gap-4">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <p className="text-gray-700">Estrazione contenuti in corso...</p>
+          <div className="bg-white rounded-lg p-8 flex flex-col items-center gap-6">
+            <div className="pixel-loader"></div>
+            <div className="flex flex-col items-center gap-2">
+              <p className="text-gray-700 pixel-text">LOADING...</p>
+              <p className="text-sm text-gray-500">Estrazione contenuti in corso</p>
+            </div>
           </div>
         </div>
       )}
