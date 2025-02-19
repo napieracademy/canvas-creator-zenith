@@ -10,33 +10,54 @@ import SafeZoneToggle from '@/components/SafeZoneToggle';
 import TextEditor from '@/components/TextEditor';
 import CanvasPreview from '@/components/CanvasPreview';
 import MagicButton from '@/components/MagicButton';
+import TemplateSelector from '@/components/TemplateSelector';
 import { colorPairs } from '@/data/colorPairs';
 import { calculateOptimalSizes } from '@/utils/fontSizeCalculator';
+import { getTemplate } from '@/data/templates';
 
 const Index = () => {
+  const [template, setTemplate] = useState<'klaus' | 'lucky'>('klaus');
   const getRandomTheme = () => {
     const randomIndex = Math.floor(Math.random() * colorPairs.length);
     return colorPairs[randomIndex];
   };
 
   const randomTheme = getRandomTheme();
+  const currentTemplate = getTemplate(template);
 
   const [text, setText] = useState('Social Image Creator');
   const [description, setDescription] = useState('Crea bellissime immagini per i social media in pochi secondi. Personalizza colori, font e layout per ottenere il massimo impatto visivo.');
-  const [backgroundColor, setBackgroundColor] = useState(randomTheme.background);
-  const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right'>('left');
-  const [descriptionAlign, setDescriptionAlign] = useState<'left' | 'center' | 'right'>('left');
-  const [fontSize, setFontSize] = useState(111);
-  const [descriptionFontSize, setDescriptionFontSize] = useState(56);
-  const [spacing, setSpacing] = useState(100);
-  const [effectiveFontSize, setEffectiveFontSize] = useState(111);
-  const [textColor, setTextColor] = useState(randomTheme.text);
+  const [backgroundColor, setBackgroundColor] = useState(currentTemplate.backgroundColor);
+  const [textAlign, setTextAlign] = useState(currentTemplate.textAlign);
+  const [descriptionAlign, setDescriptionAlign] = useState(currentTemplate.descriptionAlign);
+  const [fontSize, setFontSize] = useState(currentTemplate.fontSize);
+  const [descriptionFontSize, setDescriptionFontSize] = useState(currentTemplate.descriptionFontSize);
+  const [spacing, setSpacing] = useState(currentTemplate.spacing);
+  const [effectiveFontSize, setEffectiveFontSize] = useState(currentTemplate.fontSize);
+  const [textColor, setTextColor] = useState(currentTemplate.textColor);
   const [showSafeZone, setShowSafeZone] = useState(false);
   const [format, setFormat] = useState<'post' | 'story'>('post');
   const [activeTab, setActiveTab] = useState('manual');
   const [isLoading, setIsLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const isMobile = useIsMobile();
+
+  const handleTemplateChange = (newTemplate: 'klaus' | 'lucky') => {
+    const template = getTemplate(newTemplate);
+    setTemplate(newTemplate);
+    setBackgroundColor(template.backgroundColor);
+    setTextAlign(template.textAlign);
+    setDescriptionAlign(template.descriptionAlign);
+    setFontSize(template.fontSize);
+    setDescriptionFontSize(template.descriptionFontSize);
+    setSpacing(template.spacing);
+    setTextColor(template.textColor);
+
+    toast({
+      title: "Template cambiato",
+      description: `Template: ${template.name}`,
+    });
+  };
 
   useEffect(() => {
     toast({
@@ -156,6 +177,11 @@ const Index = () => {
             disabled={isLoading}
           />
 
+          <TemplateSelector
+            currentTemplate={template}
+            onTemplateChange={handleTemplateChange}
+          />
+
           <TextEditor 
             text={text}
             description={description}
@@ -204,6 +230,7 @@ const Index = () => {
             format={format}
             onSpacingChange={setSpacing}
             imageUrl={imageUrl}
+            template={template}
           />
           <div className="absolute top-3 right-3 flex gap-2">
             <MagicButton onMagicOptimization={handleMagicOptimization} disabled={isLoading} />
