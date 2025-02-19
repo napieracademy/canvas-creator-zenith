@@ -20,14 +20,14 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen w-full relative bg-gray-50">
+    <div className="min-h-screen w-full bg-gray-50 flex">
       <div className="controls-panel">
         <TextInput value={text} onChange={setText} />
         <ColorPicker color={backgroundColor} onChange={setBackgroundColor} />
         <DownloadButton onDownload={handleDownload} />
       </div>
       
-      <div className="w-full h-screen">
+      <div className="flex-1 p-4">
         <Canvas text={text} backgroundColor={backgroundColor} />
       </div>
     </div>
