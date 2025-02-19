@@ -10,8 +10,8 @@ const corsHeaders = {
 };
 
 const MAX_TOKENS = {
-  title: 30,    // Ridotto a circa 6-8 parole
-  description: 150  // Mantenuto uguale per le descrizioni
+  title: 30,    
+  description: 150  
 };
 
 serve(async (req) => {
@@ -76,16 +76,16 @@ serve(async (req) => {
     }
 
     // Ora procediamo con il miglioramento del testo
-    let systemPrompt = "Sei un esperto copywriter che ottimizza testi per i social media. ";
+    let systemPrompt = "Sei un esperto copywriter cinematografico che scrive testi autentici e naturali. ";
     
     if (type === 'title') {
       systemPrompt += `Migliora questo titolo mantenendolo MOLTO conciso e d'impatto. Il testo DEVE essere breve e NON superare ${MAX_TOKENS.title} token. Rimuovi parole non essenziali e mantieni solo il messaggio chiave. `;
     } else {
-      systemPrompt += `Migliora questa descrizione mantenendola chiara, coinvolgente e persuasiva. Il testo non deve superare ${MAX_TOKENS.description} token. `;
+      systemPrompt += `Migliora questa descrizione mantenendola informativa e coinvolgente. Il testo non deve superare ${MAX_TOKENS.description} token. EVITA ASSOLUTAMENTE frasi come "Non perdere l'occasione" o "Da non perdere" o simili inviti all'azione generici. Concentrati invece sui dettagli unici e specifici del film. `;
     }
 
     if (tone) {
-      systemPrompt += `Usa un tono ${tone}. `;
+      systemPrompt += `Usa un tono ${tone}, ma mantienilo naturale e non eccessivamente promozionale. `;
     }
 
     if (length === 'shorter') {
@@ -95,7 +95,7 @@ serve(async (req) => {
     } else if (length === 'longer') {
       systemPrompt += type === 'title'
         ? "Anche se richiesto più lungo, mantieni comunque il titolo molto conciso e d'impatto. "
-        : `Espandi il testo aggiungendo più dettagli e sfumature, ma senza superare il limite massimo di token. `;
+        : `Espandi il testo aggiungendo più dettagli specifici e rilevanti sul film, evitando frasi fatte o generiche. `;
     } else {
       systemPrompt += type === 'title'
         ? "Mantieni il titolo conciso e d'impatto. "
@@ -103,8 +103,8 @@ serve(async (req) => {
     }
 
     systemPrompt += type === 'title'
-      ? "Il titolo deve essere breve, memorabile e catturare l'attenzione immediatamente."
-      : "Rendi il testo più efficace e memorabile, mantenendolo sempre adatto al formato social.";
+      ? "Il titolo deve essere memorabile ma senza esagerazioni o sensazionalismi."
+      : "IMPORTANTE: Concludi il testo in modo naturale, senza call-to-action o frasi ad effetto. Concentrati sui dettagli distintivi del film e lascia che siano questi a suscitare interesse.";
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
