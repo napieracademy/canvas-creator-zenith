@@ -14,7 +14,8 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
   const [scale, setScale] = useState(100);
   const ORIGINAL_WIDTH = 1080;
   const ORIGINAL_HEIGHT = 1350;
-  const MARGIN_X = 100; // Margine laterale fisso
+  const SAFE_ZONE_MARGIN = 120; // Margine di sicurezza aumentato per la safe zone
+  const MAX_WIDTH = ORIGINAL_WIDTH - (2 * SAFE_ZONE_MARGIN); // Larghezza massima disponibile per il testo
 
   const updateScale = () => {
     const canvas = canvasRef.current;
@@ -56,24 +57,27 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
     // Calculate initial scale
     updateScale();
 
+    // Disegna il background
     ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+    // Imposta lo stile del testo
     ctx.fillStyle = textColor;
     ctx.font = `bold ${fontSize}px Inter`;
     ctx.textAlign = textAlign;
     ctx.textBaseline = 'middle';
 
+    // Dividi il testo in parole
     const words = text.split(' ');
     const lines: string[] = [];
     let currentLine = '';
 
+    // Gestisci il wrapping del testo rispettando la safe zone
     words.forEach(word => {
       const testLine = currentLine ? `${currentLine} ${word}` : word;
       const metrics = ctx.measureText(testLine);
       
-      // Usa ORIGINAL_WIDTH - (2 * MARGIN_X) per il wrapping del testo
-      if (metrics.width > ORIGINAL_WIDTH - (2 * MARGIN_X)) {
+      if (metrics.width > MAX_WIDTH) {
         lines.push(currentLine);
         currentLine = word;
       } else {
@@ -84,16 +88,26 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
       lines.push(currentLine);
     }
 
+    // Calcola la posizione verticale del testo
     const lineHeight = fontSize * 1.2;
     const totalHeight = lines.length * lineHeight;
     const startY = (ORIGINAL_HEIGHT - totalHeight) / 2;
-    const x = textAlign === 'left' ? MARGIN_X : 
-             textAlign === 'right' ? ORIGINAL_WIDTH - MARGIN_X : 
+
+    // Calcola la posizione orizzontale in base all'allineamento
+    const x = textAlign === 'left' ? SAFE_ZONE_MARGIN : 
+             textAlign === 'right' ? ORIGINAL_WIDTH - SAFE_ZONE_MARGIN : 
              ORIGINAL_WIDTH / 2;
 
+    // Disegna le linee di testo
     lines.forEach((line, index) => {
       ctx.fillText(line, x, startY + index * lineHeight);
     });
+
+    // Debug: visualizza la safe zone (commentato in produzione)
+    // ctx.strokeStyle = 'rgba(255, 0, 0, 0.3)';
+    // ctx.strokeRect(SAFE_ZONE_MARGIN, SAFE_ZONE_MARGIN, 
+    //                ORIGINAL_WIDTH - (2 * SAFE_ZONE_MARGIN), 
+    //                ORIGINAL_HEIGHT - (2 * SAFE_ZONE_MARGIN));
   }, [text, backgroundColor, textAlign, textColor, fontSize]);
 
   return (
