@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from '@/components/ui/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from '@/components/ui/button';
-import { Square, Rectangle } from 'lucide-react';
+import { Square, LayoutTemplate } from 'lucide-react';
 
 const Index = () => {
   const [text, setText] = useState('');
@@ -92,7 +92,7 @@ const Index = () => {
             onClick={() => setFormat('story')}
             className="gap-2"
           >
-            <Rectangle className="h-4 w-4" />
+            <LayoutTemplate className="h-4 w-4" />
             Story
           </Button>
         </div>
