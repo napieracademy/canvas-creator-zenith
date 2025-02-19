@@ -30,7 +30,6 @@ export function drawBackground(ctx: CanvasRenderingContext2D, width: number, hei
 }
 
 export function drawSafeZone(ctx: CanvasRenderingContext2D, width: number, height: number) {
-  // Overlay semi-trasparente fuori dalla safe zone
   ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
   ctx.fillRect(0, 0, width, SAFE_ZONE_MARGIN);
   ctx.fillRect(0, height - SAFE_ZONE_MARGIN, width, SAFE_ZONE_MARGIN);
@@ -93,7 +92,8 @@ export function drawText(
   textColor: string,
   fontSize: number,
   type: 'title' | 'description' = 'title',
-  spacing: number = 40
+  spacing: number = 40,
+  template: 'klaus' | 'lucky' = 'klaus'
 ) {
   const { ctx, width, height } = context;
   
@@ -118,12 +118,21 @@ export function drawText(
   const lineHeight = fontSize * 1.2;
   const totalHeight = lines.length * lineHeight;
   
-  // Calcola la posizione verticale in base al tipo di testo e allo spacing
   let startY;
-  if (type === 'title') {
-    startY = (height / 2) - (spacing / 2) - totalHeight; // Posiziona il titolo sopra il centro
+  if (template === 'lucky') {
+    // Nel template Lucky, il testo inizia dopo l'immagine
+    if (type === 'title') {
+      startY = height * 0.6; // Il titolo inizia al 60% dell'altezza
+    } else {
+      startY = height * 0.6 + totalHeight + spacing; // La descrizione segue il titolo
+    }
   } else {
-    startY = (height / 2) + (spacing / 2); // Posiziona la descrizione sotto il centro
+    // Layout originale per Klaus
+    if (type === 'title') {
+      startY = (height / 2) - (spacing / 2) - totalHeight;
+    } else {
+      startY = (height / 2) + (spacing / 2);
+    }
   }
 
   const x = textAlign === 'left' ? SAFE_ZONE_MARGIN : 
