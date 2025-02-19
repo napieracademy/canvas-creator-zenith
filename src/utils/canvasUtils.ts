@@ -128,7 +128,6 @@ export function drawText(
   ctx.textBaseline = 'middle';
   ctx.setLineDash([]);
 
-  // Calcola le linee per il testo corrente
   const currentLines = calculateLines(context, text, fontSize, type);
   const lineHeight = fontSize * 1.2;
   const currentTextHeight = currentLines.length * lineHeight;
@@ -137,13 +136,11 @@ export function drawText(
 
   if (template === 'lucky') {
     const imageHeight = height * 0.4;
-    const contentStartY = imageHeight + (safeZoneMargin * 1.5);
+    const contentStartY = imageHeight + (safeZoneMargin / 2); // Ridotto il margine dopo l'immagine
     
     if (type === 'title') {
-      // Per il titolo, posiziona direttamente sotto l'immagine
       startY = contentStartY;
     } else {
-      // Per la descrizione, usa il testo effettivo del titolo per calcolare lo spazio
       const prevFont = ctx.font;
       ctx.font = getFontStyle('title', fontSize, template);
       const actualTitleLines = calculateLines(context, text, fontSize, 'title');
@@ -152,12 +149,17 @@ export function drawText(
       
       startY = contentStartY + titleHeight + spacing;
     }
+
+    // Per Lucky, verifichiamo solo il margine inferiore
+    const bottomMargin = height - (safeZoneMargin / 2); // Ridotto il margine inferiore
+    if (startY + currentTextHeight > bottomMargin) {
+      startY = bottomMargin - currentTextHeight;
+    }
   } else {
-    // Klaus template - layout centrato verticalmente
+    // Klaus template mantiene il layout centrato con i margini di sicurezza completi
     let totalContentHeight = currentTextHeight;
     
     if (type === 'title' && text.trim()) {
-      // Se c'è una descrizione, aggiungi il suo spazio al calcolo
       const descFont = ctx.font;
       ctx.font = getFontStyle('description', fontSize, template);
       const descLines = calculateLines(context, text, fontSize, 'description');
@@ -173,22 +175,21 @@ export function drawText(
     } else {
       startY = centerY + (totalContentHeight / 2) - currentTextHeight;
     }
-  }
 
-  // Verifica che il testo rimanga all'interno dei margini di sicurezza
-  const bottomMargin = height - safeZoneMargin;
-  if (startY + currentTextHeight > bottomMargin) {
-    startY = bottomMargin - currentTextHeight;
-  }
-  if (startY < safeZoneMargin) {
-    startY = safeZoneMargin;
+    // Per Klaus, manteniamo i controlli completi della safe zone
+    const bottomMargin = height - safeZoneMargin;
+    if (startY + currentTextHeight > bottomMargin) {
+      startY = bottomMargin - currentTextHeight;
+    }
+    if (startY < safeZoneMargin) {
+      startY = safeZoneMargin;
+    }
   }
 
   const x = textAlign === 'left' ? safeZoneMargin : 
            textAlign === 'right' ? width - safeZoneMargin : 
            width / 2;
 
-  // Disegna ogni linea del testo
   currentLines.forEach((line, index) => {
     const y = startY + (index * lineHeight) + (lineHeight / 2);
     ctx.fillText(line, x, y);
