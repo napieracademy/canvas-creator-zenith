@@ -85,7 +85,33 @@ const TextInput: React.FC<TextInputProps> = ({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <Label className="text-sm font-medium text-gray-700">{label}</Label>
+        <div className="flex items-center gap-2">
+          <Label className="text-sm font-medium text-gray-700">{label}</Label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className="gap-2" disabled={disabled || isImproving}>
+                <Type className="h-4 w-4" />
+                {fontSize}px
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80">
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <Label>Dimensione testo</Label>
+                  <span className="text-sm text-muted-foreground">{fontSize}px</span>
+                </div>
+                <Slider
+                  value={[fontSize]}
+                  onValueChange={(values) => onFontSizeChange(values[0])}
+                  min={32}
+                  max={120}
+                  step={1}
+                  disabled={disabled || isImproving}
+                />
+              </div>
+            </PopoverContent>
+          </Popover>
+        </div>
         <div className="flex gap-2">
           <div className="flex rounded-md border border-input bg-transparent overflow-hidden">
             <Button
@@ -127,31 +153,6 @@ const TextInput: React.FC<TextInputProps> = ({
             <Wand2 className="h-4 w-4" />
             {isImproving ? 'Miglioramento...' : 'Migliora'}
           </Button>
-
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="gap-2" disabled={disabled || isImproving}>
-                <Type className="h-4 w-4" />
-                {fontSize}px
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-80">
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <Label>Dimensione testo</Label>
-                  <span className="text-sm text-muted-foreground">{fontSize}px</span>
-                </div>
-                <Slider
-                  value={[fontSize]}
-                  onValueChange={(values) => onFontSizeChange(values[0])}
-                  min={32}
-                  max={120}
-                  step={1}
-                  disabled={disabled || isImproving}
-                />
-              </div>
-            </PopoverContent>
-          </Popover>
         </div>
       </div>
       
