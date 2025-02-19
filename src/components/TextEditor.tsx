@@ -116,6 +116,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
         className="absolute top-3 right-25 bg-white/80 hover:bg-white/90 backdrop-blur-sm transition-all duration-200" 
         onClick={handleMagicOptimization}
         disabled={disabled}
+        aria-label="Ottimizza layout automaticamente"
       >
         <Wand2 className="h-4 w-4" />
       </Button>
