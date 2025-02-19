@@ -75,13 +75,21 @@ serve(async (req) => {
       textToImprove = translationData.choices[0].message.content;
     }
 
+    // Calcola la lunghezza attuale del testo (in parole)
+    const currentWordCount = textToImprove.split(/\s+/).length;
+    const targetWordCount = length === 'shorter' 
+      ? Math.max(Math.floor(currentWordCount * 0.7), type === 'title' ? 3 : 10)  // Riduci del 30% ma mantieni un minimo
+      : length === 'longer' 
+        ? Math.min(Math.ceil(currentWordCount * 1.3), type === 'title' ? 8 : 50)  // Aumenta del 30% ma mantieni un massimo
+        : currentWordCount;  // Mantieni la lunghezza attuale
+
     // Ora procediamo con il miglioramento del testo
     let systemPrompt = "Sei un esperto copywriter cinematografico che scrive testi autentici e naturali. ";
     
     if (type === 'title') {
-      systemPrompt += `Migliora questo titolo mantenendolo MOLTO conciso e d'impatto. Il testo DEVE essere breve e NON superare ${MAX_TOKENS.title} token. Rimuovi parole non essenziali e mantieni solo il messaggio chiave. `;
+      systemPrompt += `Migliora questo titolo mantenendolo MOLTO conciso e d'impatto. Il testo finale DEVE contenere circa ${targetWordCount} parole. Rimuovi parole non essenziali e mantieni solo il messaggio chiave. `;
     } else {
-      systemPrompt += `Migliora questa descrizione mantenendola informativa e coinvolgente. Il testo non deve superare ${MAX_TOKENS.description} token. EVITA ASSOLUTAMENTE frasi come "Non perdere l'occasione" o "Da non perdere" o simili inviti all'azione generici. Concentrati invece sui dettagli unici e specifici del film. `;
+      systemPrompt += `Migliora questa descrizione mantenendola informativa e coinvolgente. Il testo finale DEVE contenere circa ${targetWordCount} parole. EVITA ASSOLUTAMENTE frasi come "Non perdere l'occasione" o "Da non perdere" o simili inviti all'azione generici. Concentrati invece sui dettagli unici e specifici del film. `;
     }
 
     if (tone) {
@@ -89,17 +97,9 @@ serve(async (req) => {
     }
 
     if (length === 'shorter') {
-      systemPrompt += type === 'title' 
-        ? "Riduci ulteriormente il testo mantenendo solo l'essenziale. "
-        : "Il testo risultante deve essere più corto dell'originale, ma mantenere tutti i concetti chiave. ";
+      systemPrompt += "IMPORTANTE: Il testo risultante DEVE essere PIÙ CORTO dell'originale. ";
     } else if (length === 'longer') {
-      systemPrompt += type === 'title'
-        ? "Anche se richiesto più lungo, mantieni comunque il titolo molto conciso e d'impatto. "
-        : `Espandi il testo aggiungendo più dettagli specifici e rilevanti sul film, evitando frasi fatte o generiche. `;
-    } else {
-      systemPrompt += type === 'title'
-        ? "Mantieni il titolo conciso e d'impatto. "
-        : "Mantieni approssimativamente la stessa lunghezza del testo originale. ";
+      systemPrompt += "IMPORTANTE: Evita di allungare il testo con frasi fatte o ripetizioni. Aggiungi solo dettagli rilevanti e specifici. ";
     }
 
     systemPrompt += type === 'title'
@@ -116,7 +116,10 @@ serve(async (req) => {
         model: 'gpt-4o-mini',
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: textToImprove }
+          { 
+            role: 'user', 
+            content: `Testo originale: ${text}\nTesto da migliorare: ${textToImprove}\nLunghezza desiderata: ${targetWordCount} parole` 
+          }
         ],
         temperature: type === 'title' ? 0.5 : 0.7,
         top_p: type === 'title' ? 0.7 : 0.9,
