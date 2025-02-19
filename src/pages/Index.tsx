@@ -51,7 +51,7 @@ const Index = () => {
     tempCanvas.height = format === 'post' ? 1350 : 1920;
 
     // Copiamo l'immagine dal canvas originale a quello temporaneo
-    ctx.drawImage(canvas, 0, 0, tempCanvas.width, tempCanvas.height);
+    ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, tempCanvas.width, tempCanvas.height);
 
     const link = document.createElement('a');
     link.download = `social-image-${format}.png`;
