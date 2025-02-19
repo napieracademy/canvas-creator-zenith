@@ -15,6 +15,12 @@ interface SpacingIconProps {
 }
 
 const SpacingIcon: React.FC<SpacingIconProps> = ({ spacing }) => {
+  const heights = {
+    small: 'h-6',
+    medium: 'h-8',
+    large: 'h-10'
+  };
+
   const getSpacing = () => {
     switch (spacing) {
       case 'small': return 'gap-1';
@@ -24,7 +30,7 @@ const SpacingIcon: React.FC<SpacingIconProps> = ({ spacing }) => {
   };
 
   return (
-    <div className={`flex flex-col items-center ${getSpacing()} h-5`}>
+    <div className={`flex flex-col items-center justify-between ${getSpacing()} ${heights[spacing]}`}>
       <div className="w-5 h-[3px] bg-current rounded-sm" />
       <div className="w-5 h-[3px] bg-current rounded-sm" />
     </div>
