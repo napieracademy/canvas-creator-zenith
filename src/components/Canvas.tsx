@@ -15,7 +15,7 @@ const Canvas: React.FC<CanvasProps> = ({
   description,
   backgroundColor, 
   textAlign, 
-  descriptionAlign = textAlign, // Usa l'allineamento del titolo come default
+  descriptionAlign = textAlign,
   textColor, 
   fontSize,
   descriptionFontSize = 32,
@@ -51,8 +51,34 @@ const Canvas: React.FC<CanvasProps> = ({
       safeZoneMargin: SAFE_ZONE_MARGIN
     };
 
-    // Draw background
-    drawBackground(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT, backgroundColor);
+    // Create a temporary canvas for the gradient
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+    if (!tempCtx) return;
+
+    tempCanvas.width = ORIGINAL_WIDTH;
+    tempCanvas.height = ORIGINAL_HEIGHT;
+
+    if (backgroundColor.includes('gradient')) {
+      // Create gradient
+      const gradient = tempCtx.createLinearGradient(0, 0, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
+      
+      // Parse gradient colors
+      const colors = backgroundColor.match(/#[a-fA-F0-9]{6}/g);
+      if (colors && colors.length >= 2) {
+        gradient.addColorStop(0, colors[0]);
+        gradient.addColorStop(1, colors[1]);
+      }
+      
+      tempCtx.fillStyle = gradient;
+      tempCtx.fillRect(0, 0, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
+      
+      // Draw the gradient to the main canvas
+      ctx.drawImage(tempCanvas, 0, 0);
+    } else {
+      // For solid colors, use the original drawBackground function
+      drawBackground(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT, backgroundColor);
+    }
 
     // Draw safe zone if enabled
     if (showSafeZone) {
