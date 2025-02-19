@@ -16,9 +16,9 @@ interface SpacingIconProps {
 
 const SpacingIcon: React.FC<SpacingIconProps> = ({ spacing }) => {
   const sizes = {
-    small: { size: 16, className: 'opacity-80' },
-    medium: { size: 18, className: 'opacity-90' },
-    large: { size: 20, className: 'opacity-100' }
+    small: { size: 14, className: 'opacity-80' },
+    medium: { size: 20, className: 'opacity-90' },
+    large: { size: 24, className: 'opacity-100' }
   };
 
   return (
