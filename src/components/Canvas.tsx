@@ -15,6 +15,7 @@ const Canvas: React.FC<CanvasProps> = ({
   description,
   backgroundColor, 
   textAlign, 
+  descriptionAlign = textAlign, // Usa l'allineamento del titolo come default
   textColor, 
   fontSize,
   descriptionFontSize = 32,
@@ -63,7 +64,6 @@ const Canvas: React.FC<CanvasProps> = ({
     const maxSafeHeight = ORIGINAL_HEIGHT - (2 * SAFE_ZONE_MARGIN);
     const totalContentHeight = description ? maxSafeHeight * 0.8 : maxSafeHeight;
 
-    // Riduci il font size se il testo non entra nello spazio disponibile
     while (!textFitsInSafeZone(context, text, adjustedFontSize) && adjustedFontSize > 32) {
       adjustedFontSize -= 2;
     }
@@ -81,10 +81,10 @@ const Canvas: React.FC<CanvasProps> = ({
 
     // Draw description text if present
     if (description) {
-      drawText(context, description, textAlign, textColor, descriptionFontSize, 'description', spacing);
+      drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', spacing);
     }
 
-  }, [text, description, backgroundColor, textAlign, textColor, fontSize, descriptionFontSize, spacing, onEffectiveFontSizeChange, showSafeZone, format]);
+  }, [text, description, backgroundColor, textAlign, descriptionAlign, textColor, fontSize, descriptionFontSize, spacing, onEffectiveFontSizeChange, showSafeZone, format]);
 
   return (
     <div className="flex flex-col w-full h-full">
