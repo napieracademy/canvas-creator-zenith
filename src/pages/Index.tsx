@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from '@/components/ui/use-toast';
 import { Loader2 } from 'lucide-react';
@@ -45,38 +46,6 @@ const Index = () => {
     setBackgroundColor(background);
     setTextColor(text);
   };
-
-  const handleImageUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    // Verifica il tipo di file
-    if (!file.type.startsWith('image/')) {
-      toast({
-        title: "Errore",
-        description: "Per favore, carica solo file immagine",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const imageUrl = e.target?.result as string;
-      if (imageUrl) {
-        // Applica l'overlay grigio sull'immagine
-        const overlay = 'rgba(0, 0, 0, 0.5)';
-        setBackgroundColor(`linear-gradient(${overlay}, ${overlay}), url(${imageUrl})`);
-        setTextColor('#FFFFFF'); // Imposta il testo in bianco per maggiore leggibilità
-        setActiveTab('manual'); // Torna alla tab manual dopo il caricamento
-        toast({
-          title: "Immagine caricata",
-          description: "L'immagine è stata impostata come sfondo. Ora puoi personalizzare il testo!",
-        });
-      }
-    };
-    reader.readAsDataURL(file);
-  }, []);
 
   const handleTitleExtracted = (extractedTitle: string) => {
     setText(extractedTitle);
@@ -174,7 +143,6 @@ const Index = () => {
           onSpacingChange={setSpacing}
           onTitleExtracted={handleTitleExtracted}
           onDescriptionExtracted={handleDescriptionExtracted}
-          onImageUpload={handleImageUpload}
           onTabChange={setActiveTab}
           onLoadingChange={setIsLoading}
           disabled={isLoading}
