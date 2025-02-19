@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import FontSizeControl from './FontSizeControl';
@@ -26,6 +26,8 @@ const TextInput: React.FC<TextInputProps> = ({
   label,
   disabled
 }) => {
+  const [effectiveSize, setEffectiveSize] = useState(fontSize);
+
   return (
     <div className="space-y-2">
       <Label className="text-sm font-medium text-gray-700">{label}</Label>
@@ -38,7 +40,12 @@ const TextInput: React.FC<TextInputProps> = ({
           disabled={disabled}
         />
         <TextAlignControl value={textAlign} onChange={onTextAlignChange} disabled={disabled} />
-        <FontSizeControl value={fontSize} onChange={onFontSizeChange} disabled={disabled} />
+        <FontSizeControl 
+          value={fontSize} 
+          effectiveSize={effectiveSize} 
+          onChange={onFontSizeChange} 
+          disabled={disabled} 
+        />
       </div>
     </div>
   );
