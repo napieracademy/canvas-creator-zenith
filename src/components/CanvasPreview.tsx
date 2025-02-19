@@ -7,13 +7,14 @@ interface CanvasPreviewProps {
   description: string;
   backgroundColor: string;
   textAlign: 'left' | 'center' | 'right';
+  descriptionAlign?: 'left' | 'center' | 'right';
+  textColor: string;
   fontSize: number;
   descriptionFontSize: number;
   spacing: number;
-  textColor: string;
-  onEffectiveFontSizeChange: (size: number) => void;
-  showSafeZone: boolean;
-  format: 'post' | 'story';
+  onEffectiveFontSizeChange?: (size: number) => void;
+  showSafeZone?: boolean;
+  format?: 'post' | 'story';
 }
 
 const CanvasPreview: React.FC<CanvasPreviewProps> = ({
@@ -21,31 +22,31 @@ const CanvasPreview: React.FC<CanvasPreviewProps> = ({
   description,
   backgroundColor,
   textAlign,
+  descriptionAlign,
+  textColor,
   fontSize,
   descriptionFontSize,
   spacing,
-  textColor,
   onEffectiveFontSizeChange,
   showSafeZone,
   format
 }) => {
   return (
-    <div className="preview-container">
-      <div className="canvas-wrapper" style={{ aspectRatio: format === 'post' ? '1080/1350' : '1080/1920' }}>
-        <Canvas 
-          text={text}
-          description={description}
-          backgroundColor={backgroundColor} 
-          textAlign={textAlign}
-          fontSize={fontSize}
-          descriptionFontSize={descriptionFontSize}
-          spacing={spacing}
-          textColor={textColor}
-          onEffectiveFontSizeChange={onEffectiveFontSizeChange}
-          showSafeZone={showSafeZone}
-          format={format}
-        />
-      </div>
+    <div className="preview-panel">
+      <Canvas
+        text={text}
+        description={description}
+        backgroundColor={backgroundColor}
+        textAlign={textAlign}
+        descriptionAlign={descriptionAlign}
+        textColor={textColor}
+        fontSize={fontSize}
+        descriptionFontSize={descriptionFontSize}
+        spacing={spacing}
+        onEffectiveFontSizeChange={onEffectiveFontSizeChange}
+        showSafeZone={showSafeZone}
+        format={format}
+      />
     </div>
   );
 };
