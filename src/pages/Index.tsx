@@ -42,8 +42,12 @@ const Index = () => {
     });
   }, []);
 
-  const handleColorSelect = (background: string, text: string) => {
-    setBackgroundColor(background);
+  const handleColorSelect = (background: string, text: string, overlay?: string) => {
+    if (overlay) {
+      setBackgroundColor(`${background}, linear-gradient(${overlay}, ${overlay})`);
+    } else {
+      setBackgroundColor(background);
+    }
     setTextColor(text);
   };
 
@@ -65,9 +69,7 @@ const Index = () => {
 
   const handleImageExtracted = (image: string) => {
     setFeaturedImage(image);
-    const overlayStyle = "linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5))";
-    setBackgroundColor(`url(${image}), ${overlayStyle}`);
-    setTextColor('#ffffff');
+    handleColorSelect(`url(${image})`, '#FFFFFF', 'rgba(0, 0, 0, 0.5)');
     setActiveTab('featured');
     toast({
       title: "Immagine estratta",

@@ -47,8 +47,7 @@ export const ColorPaletteCarousel: React.FC<ColorPaletteCarouselProps> = ({
                 }}
                 onClick={() => {
                   if (isUrl && pair.overlay) {
-                    const overlayStyle = `linear-gradient(${pair.overlay}, ${pair.overlay})`;
-                    onSelectColors(`url(${imageUrl}), ${overlayStyle}`, pair.text);
+                    onSelectColors(`url(${imageUrl})`, pair.text, pair.overlay);
                   } else {
                     onSelectColors(pair.background, pair.text);
                   }
@@ -58,9 +57,9 @@ export const ColorPaletteCarousel: React.FC<ColorPaletteCarouselProps> = ({
                   <div 
                     className="absolute inset-0" 
                     style={{ 
-                      backgroundImage: isUrl ? `url(${imageUrl})` : 'none',
-                      background: !isUrl ? (isGradient ? pair.background : 'none') : 'none',
-                      backgroundColor: (!isUrl && !isGradient) ? pair.background : 'transparent',
+                      backgroundImage: isUrl ? `url(${imageUrl})` : undefined,
+                      background: !isUrl ? (isGradient ? pair.background : undefined) : undefined,
+                      backgroundColor: (!isUrl && !isGradient) ? pair.background : undefined,
                       backgroundSize: 'cover',
                       backgroundPosition: 'center',
                       borderRadius: '50%'
@@ -83,7 +82,7 @@ export const ColorPaletteCarousel: React.FC<ColorPaletteCarouselProps> = ({
                       <div 
                         className="absolute inset-0"
                         style={{
-                          background: pair.overlay,
+                          backgroundColor: pair.overlay,
                           mixBlendMode: 'multiply'
                         }}
                       />
