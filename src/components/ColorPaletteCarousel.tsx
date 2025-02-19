@@ -46,16 +46,14 @@ export const ColorPaletteCarousel: React.FC<ColorPaletteCarouselProps> = ({
                 <div 
                   className="absolute inset-0" 
                   style={{ 
-                    background: pair.background.startsWith('url') 
-                      ? pair.background
-                      : typeof pair.background === 'string' && pair.background.includes('gradient')
-                        ? pair.background
-                        : `linear-gradient(135deg, 
-                            ${pair.background} 0%, 
-                            ${pair.background} 50%, 
-                            ${pair.text} 50%, 
-                            ${pair.text} 100%
-                          )`,
+                    backgroundImage: pair.background.startsWith('url') 
+                      ? pair.background.replace('url(', '').replace(')', '')
+                      : 'none',
+                    backgroundColor: !pair.background.startsWith('url') 
+                      ? pair.background 
+                      : 'transparent',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
                     borderRadius: '50%'
                   }}
                 >

@@ -45,6 +45,10 @@ const Index = () => {
   const handleColorSelect = (background: string, text: string, overlay?: string) => {
     setBackgroundColor(background);
     setTextColor(text);
+    if (overlay) {
+      const overlayStyle = `linear-gradient(${overlay}, ${overlay})`;
+      setBackgroundColor(`${background}, ${overlayStyle}`);
+    }
   };
 
   const handleTitleExtracted = (extractedTitle: string) => {
@@ -65,7 +69,8 @@ const Index = () => {
 
   const handleImageExtracted = (image: string) => {
     setFeaturedImage(image);
-    setBackgroundColor(`url(${image})`);
+    const overlayStyle = "linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5))";
+    setBackgroundColor(`url(${image}), ${overlayStyle}`);
     setTextColor('#ffffff');
     setActiveTab('featured');
     toast({
