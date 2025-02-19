@@ -27,11 +27,11 @@ export function drawSafeZone(ctx: CanvasRenderingContext2D, width: number, heigh
   );
 }
 
-export function calculateLines(context: CanvasContext, text: string, size: number) {
+export function calculateLines(context: CanvasContext, text: string, size: number, type: 'title' | 'description' = 'title') {
   const { ctx, width, safeZoneMargin } = context;
   const maxWidth = width - (2 * safeZoneMargin);
   
-  ctx.font = `${size}px Inter`;
+  ctx.font = `${type === 'title' ? 'bold' : ''} ${size}px Inter`;
   const words = text.split(' ');
   const lines: string[] = [];
   let currentLine = '';
@@ -52,11 +52,11 @@ export function calculateLines(context: CanvasContext, text: string, size: numbe
   return lines;
 }
 
-export function textFitsInSafeZone(context: CanvasContext, text: string, size: number) {
+export function textFitsInSafeZone(context: CanvasContext, text: string, size: number, type: 'title' | 'description' = 'title') {
   const { height, safeZoneMargin } = context;
   const maxHeight = height - (2 * safeZoneMargin);
   
-  const lines = calculateLines(context, text, size);
+  const lines = calculateLines(context, text, size, type);
   const totalHeight = lines.length * (size * 1.2);
   
   return totalHeight <= maxHeight && lines.every(line => {
@@ -77,7 +77,7 @@ export function drawText(
   
   if (!text.trim()) {
     if (type === 'title') {
-      ctx.font = '32px Inter';
+      ctx.font = 'bold 32px Inter';
       ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -86,13 +86,13 @@ export function drawText(
     return;
   }
 
-  ctx.font = `${fontSize}px Inter`;
+  ctx.font = `${type === 'title' ? 'bold' : ''} ${fontSize}px Inter`;
   ctx.fillStyle = textColor;
   ctx.textAlign = textAlign;
   ctx.textBaseline = 'middle';
   ctx.setLineDash([]);
 
-  const lines = calculateLines(context, text, fontSize);
+  const lines = calculateLines(context, text, fontSize, type);
   const lineHeight = fontSize * 1.2;
   const totalHeight = lines.length * lineHeight;
   
