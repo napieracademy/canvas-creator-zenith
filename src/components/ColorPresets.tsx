@@ -81,29 +81,31 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
         <CarouselContent className="-ml-2 md:-ml-4">
           {colorPairs.map((pair) => (
             <CarouselItem key={pair.name} className="pl-2 md:pl-4 basis-1/4">
-              <Button
-                variant="outline"
-                className={`w-full aspect-square p-0 overflow-hidden border-0 hover:opacity-90 transition-all duration-300 ${
-                  currentBackground === pair.background && currentText === pair.text
-                    ? 'ring-2 ring-primary' 
-                    : ''
-                }`}
-                onClick={() => onSelectColors(pair.background, pair.text)}
-              >
-                <div className="w-full h-full rounded-full overflow-hidden relative">
-                  <div 
-                    className="absolute inset-0" 
-                    style={{ 
-                      background: `linear-gradient(135deg, 
-                        ${pair.background} 0%, 
-                        ${pair.background} 50%, 
-                        ${pair.text} 50%, 
-                        ${pair.text} 100%
-                      )`
-                    }}
-                  />
-                </div>
-              </Button>
+              <div className="relative pt-[100%]">
+                <Button
+                  variant="outline"
+                  className={`absolute inset-0 p-0 overflow-hidden border-0 hover:opacity-90 transition-all duration-300 ${
+                    currentBackground === pair.background && currentText === pair.text
+                      ? 'ring-2 ring-primary' 
+                      : ''
+                  }`}
+                  onClick={() => onSelectColors(pair.background, pair.text)}
+                >
+                  <div className="w-full h-full rounded-full overflow-hidden">
+                    <div 
+                      className="absolute inset-0" 
+                      style={{ 
+                        background: `linear-gradient(135deg, 
+                          ${pair.background} 0%, 
+                          ${pair.background} 50%, 
+                          ${pair.text} 50%, 
+                          ${pair.text} 100%
+                        )`
+                      }}
+                    />
+                  </div>
+                </Button>
+              </div>
             </CarouselItem>
           ))}
         </CarouselContent>
