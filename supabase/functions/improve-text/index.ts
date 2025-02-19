@@ -22,7 +22,58 @@ serve(async (req) => {
   try {
     const { text, tone, type, length } = await req.json();
 
-    // Costruiamo il prompt in base al tipo di testo, al tono e alla lunghezza richiesta
+    // Prima verifichiamo se il testo è in italiano
+    const languageCheckResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { 
+            role: 'system', 
+            content: 'Sei un esperto linguista. Rispondi solo "true" se il testo è in italiano, "false" altrimenti.' 
+          },
+          { role: 'user', content: text }
+        ],
+        temperature: 0,
+        max_tokens: 10
+      }),
+    });
+
+    const languageData = await languageCheckResponse.json();
+    const isItalian = languageData.choices[0].message.content.toLowerCase().includes('true');
+
+    // Se non è in italiano, prima lo traduciamo
+    let textToImprove = text;
+    if (!isItalian) {
+      const translationResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${openAIApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            { 
+              role: 'system', 
+              content: 'Sei un traduttore professionale. Traduci il testo in italiano mantenendo lo stesso tono e stile.' 
+            },
+            { role: 'user', content: text }
+          ],
+          temperature: 0.3,
+          max_tokens: type === 'title' ? MAX_TOKENS.title : MAX_TOKENS.description
+        }),
+      });
+
+      const translationData = await translationResponse.json();
+      textToImprove = translationData.choices[0].message.content;
+    }
+
+    // Ora procediamo con il miglioramento del testo
     let systemPrompt = "Sei un esperto copywriter che ottimizza testi per i social media. ";
     
     if (type === 'title') {
@@ -35,7 +86,6 @@ serve(async (req) => {
       systemPrompt += `Usa un tono ${tone}. `;
     }
 
-    // Aggiungiamo istruzioni per la lunghezza, ma sempre rispettando i limiti massimi
     if (length === 'shorter') {
       systemPrompt += "Il testo risultante deve essere più corto dell'originale, ma mantenere tutti i concetti chiave. ";
     } else if (length === 'longer') {
@@ -56,11 +106,11 @@ serve(async (req) => {
         model: 'gpt-4o-mini',
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: text }
+          { role: 'user', content: textToImprove }
         ],
         temperature: 0.7,
         top_p: 0.9,
-        max_tokens: type === 'title' ? MAX_TOKENS.title : MAX_TOKENS.description  // Limite massimo di token
+        max_tokens: type === 'title' ? MAX_TOKENS.title : MAX_TOKENS.description
       }),
     });
 
@@ -71,8 +121,12 @@ serve(async (req) => {
     const data = await response.json();
     const improvedText = data.choices[0].message.content;
 
+    // Aggiungiamo un flag per indicare se il testo è stato tradotto
     return new Response(
-      JSON.stringify({ improvedText }),
+      JSON.stringify({ 
+        improvedText,
+        wasTranslated: !isItalian 
+      }),
       { 
         headers: { 
           ...corsHeaders,

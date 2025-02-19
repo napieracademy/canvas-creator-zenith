@@ -84,7 +84,7 @@ const TextImproveControl: React.FC<TextImproveControlProps> = ({
       onChange(data.improvedText);
       toast({
         title: "Testo migliorato",
-        description: `Il testo è stato ottimizzato con tono ${selectedTone} e lunghezza ${getLengthLabel(selectedLength).toLowerCase()}`
+        description: `${data.wasTranslated ? "Testo tradotto in italiano e migliorato" : "Testo migliorato"} con tono ${selectedTone} e lunghezza ${getLengthLabel(selectedLength).toLowerCase()}`
       });
     } catch (error) {
       console.error('Errore nel miglioramento del testo:', error);
