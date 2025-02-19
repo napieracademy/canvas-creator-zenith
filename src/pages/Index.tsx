@@ -104,7 +104,7 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen w-full relative">
+    <div className="min-h-screen w-full grid grid-cols-[400px_1fr] bg-gray-50/50">
       {isLoading && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
           <div className="bg-white rounded-lg p-6 flex flex-col items-center gap-4">
@@ -114,69 +114,74 @@ const Index = () => {
         </div>
       )}
       
-      <div className="controls-panel">
-        <div className="space-y-1.5">
-          <h1 className="text-xl font-semibold text-gray-900">Social Image Creator</h1>
-          <p className="text-sm text-gray-500">Create beautiful social media images in seconds</p>
+      <div className="h-screen p-6 border-r bg-white overflow-y-auto">
+        <div className="space-y-6">
+          <div className="space-y-1.5">
+            <h1 className="text-xl font-semibold text-gray-900">Social Image Creator</h1>
+            <p className="text-sm text-gray-500">Create beautiful social media images in seconds</p>
+          </div>
+
+          <FormatSelector 
+            format={format}
+            onFormatChange={setFormat}
+            disabled={isLoading}
+          />
+
+          <TextEditor 
+            text={text}
+            description={description}
+            textAlign={textAlign}
+            descriptionAlign={descriptionAlign}
+            fontSize={fontSize}
+            descriptionFontSize={descriptionFontSize}
+            spacing={spacing}
+            onTextChange={setText}
+            onDescriptionChange={setDescription}
+            onTextAlignChange={setTextAlign}
+            onDescriptionAlignChange={setDescriptionAlign}
+            onFontSizeChange={setFontSize}
+            onDescriptionFontSizeChange={setDescriptionFontSize}
+            onSpacingChange={setSpacing}
+            onTitleExtracted={handleTitleExtracted}
+            onDescriptionExtracted={handleDescriptionExtracted}
+            onTabChange={setActiveTab}
+            onLoadingChange={setIsLoading}
+            disabled={isLoading}
+          />
+
+          <ColorPresets 
+            onSelectColors={handleColorSelect}
+            currentBackground={backgroundColor}
+            currentText={textColor}
+          />
+          
+          <SafeZoneToggle 
+            showSafeZone={showSafeZone}
+            onShowSafeZoneChange={setShowSafeZone}
+            disabled={isLoading}
+          />
+          
+          <DownloadButton onDownload={handleDownload} />
         </div>
-
-        <FormatSelector 
-          format={format}
-          onFormatChange={setFormat}
-          disabled={isLoading}
-        />
-
-        <TextEditor 
+      </div>
+      
+      <div className="h-screen p-6">
+        <CanvasPreview 
           text={text}
           description={description}
+          backgroundColor={backgroundColor}
           textAlign={textAlign}
           descriptionAlign={descriptionAlign}
+          textColor={textColor}
           fontSize={fontSize}
           descriptionFontSize={descriptionFontSize}
           spacing={spacing}
-          onTextChange={setText}
-          onDescriptionChange={setDescription}
-          onTextAlignChange={setTextAlign}
-          onDescriptionAlignChange={setDescriptionAlign}
-          onFontSizeChange={setFontSize}
-          onDescriptionFontSizeChange={setDescriptionFontSize}
-          onSpacingChange={setSpacing}
-          onTitleExtracted={handleTitleExtracted}
-          onDescriptionExtracted={handleDescriptionExtracted}
-          onTabChange={setActiveTab}
-          onLoadingChange={setIsLoading}
-          disabled={isLoading}
-        />
-
-        <ColorPresets 
-          onSelectColors={handleColorSelect}
-          currentBackground={backgroundColor}
-          currentText={textColor}
-        />
-        
-        <SafeZoneToggle 
+          onEffectiveFontSizeChange={setEffectiveFontSize}
           showSafeZone={showSafeZone}
-          onShowSafeZoneChange={setShowSafeZone}
-          disabled={isLoading}
+          format={format}
+          onSpacingChange={setSpacing}
         />
-        
-        <DownloadButton onDownload={handleDownload} />
       </div>
-      
-      <CanvasPreview 
-        text={text}
-        description={description}
-        backgroundColor={backgroundColor}
-        textAlign={textAlign}
-        descriptionAlign={descriptionAlign}
-        textColor={textColor}
-        fontSize={fontSize}
-        descriptionFontSize={descriptionFontSize}
-        spacing={spacing}
-        onEffectiveFontSizeChange={setEffectiveFontSize}
-        showSafeZone={showSafeZone}
-        format={format}
-      />
     </div>
   );
 };
