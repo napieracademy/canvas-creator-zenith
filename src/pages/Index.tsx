@@ -153,10 +153,11 @@ const Index = () => {
         description={description}
         backgroundColor={backgroundColor}
         textAlign={textAlign}
+        descriptionAlign={descriptionAlign}
+        textColor={textColor}
         fontSize={fontSize}
         descriptionFontSize={descriptionFontSize}
         spacing={spacing}
-        textColor={textColor}
         onEffectiveFontSizeChange={setEffectiveFontSize}
         showSafeZone={showSafeZone}
         format={format}

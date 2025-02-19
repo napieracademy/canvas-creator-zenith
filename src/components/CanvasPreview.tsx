@@ -32,21 +32,23 @@ const CanvasPreview: React.FC<CanvasPreviewProps> = ({
   format
 }) => {
   return (
-    <div className="preview-panel">
-      <Canvas
-        text={text}
-        description={description}
-        backgroundColor={backgroundColor}
-        textAlign={textAlign}
-        descriptionAlign={descriptionAlign}
-        textColor={textColor}
-        fontSize={fontSize}
-        descriptionFontSize={descriptionFontSize}
-        spacing={spacing}
-        onEffectiveFontSizeChange={onEffectiveFontSizeChange}
-        showSafeZone={showSafeZone}
-        format={format}
-      />
+    <div className="preview-container">
+      <div className="canvas-wrapper" style={{ aspectRatio: format === 'post' ? '1080/1350' : '1080/1920' }}>
+        <Canvas
+          text={text}
+          description={description}
+          backgroundColor={backgroundColor}
+          textAlign={textAlign}
+          descriptionAlign={descriptionAlign}
+          textColor={textColor}
+          fontSize={fontSize}
+          descriptionFontSize={descriptionFontSize}
+          spacing={spacing}
+          onEffectiveFontSizeChange={onEffectiveFontSizeChange}
+          showSafeZone={showSafeZone}
+          format={format}
+        />
+      </div>
     </div>
   );
 };
