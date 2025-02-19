@@ -71,8 +71,7 @@ export function drawText(
   textAlign: 'left' | 'center' | 'right',
   textColor: string,
   fontSize: number,
-  type: 'title' | 'description' = 'title',
-  spacing: number = 40
+  type: 'title' | 'description' = 'title'
 ) {
   const { ctx, width, height } = context;
   
@@ -97,11 +96,12 @@ export function drawText(
   const lineHeight = fontSize * 1.2;
   const totalHeight = lines.length * lineHeight;
   
+  // Calcola la posizione verticale in base al tipo di testo
   let startY;
   if (type === 'title') {
-    startY = (height / 2) - (spacing / 2) - totalHeight; // Aggiusta la posizione del titolo in base allo spacing
+    startY = (height / 2) - totalHeight; // Posiziona il titolo più in alto
   } else {
-    startY = (height / 2) + (spacing / 2); // Aggiusta la posizione della descrizione in base allo spacing
+    startY = (height / 2) + (fontSize * 0.5); // Mantiene la descrizione sotto con un margine fisso
   }
 
   const x = textAlign === 'left' ? SAFE_ZONE_MARGIN : 

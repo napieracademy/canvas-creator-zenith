@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import TextInput from '@/components/TextInput';
 import Canvas from '@/components/Canvas';
@@ -11,20 +12,17 @@ import { toast } from '@/components/ui/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from '@/components/ui/button';
 import { Square, RectangleHorizontal, Loader2 } from 'lucide-react';
-import { Slider } from "@/components/ui/slider";
 
 const Index = () => {
   const [text, setText] = useState('');
   const [description, setDescription] = useState('');
   const [backgroundColor, setBackgroundColor] = useState('#8B5CF6');
-  const [titleAlign, setTitleAlign] = useState<'left' | 'center' | 'right'>('center');
-  const [descriptionAlign, setDescriptionAlign] = useState<'left' | 'center' | 'right'>('center');
+  const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right'>('center');
   const [fontSize, setFontSize] = useState(64);
   const [descriptionFontSize, setDescriptionFontSize] = useState(32);
   const [effectiveFontSize, setEffectiveFontSize] = useState(64);
   const [textColor, setTextColor] = useState('#FFFFFF');
   const [showSafeZone, setShowSafeZone] = useState(false);
-  const [spacing, setSpacing] = useState(40);
   const [format, setFormat] = useState<'post' | 'story'>('post');
   const [activeTab, setActiveTab] = useState('manual');
   const [isLoading, setIsLoading] = useState(false);
@@ -95,23 +93,20 @@ const Index = () => {
     <div className="min-h-screen w-full relative">
       {isLoading && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg p-8 flex flex-col items-center gap-6">
-            <div className="pixel-loader"></div>
-            <div className="flex flex-col items-center gap-2">
-              <p className="text-gray-700 pixel-text">LOADING...</p>
-              <p className="text-sm text-gray-500">Estrazione contenuti in corso</p>
-            </div>
+          <div className="bg-white rounded-lg p-6 flex flex-col items-center gap-4">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="text-gray-700">Estrazione contenuti in corso...</p>
           </div>
         </div>
       )}
       
       <div className="controls-panel">
-        <div className="space-y-1.5 mb-6">
+        <div className="space-y-1.5">
           <h1 className="text-xl font-semibold text-gray-900">Social Image Creator</h1>
-          <p className="text-sm text-gray-500">Crea immagini per i social media in pochi secondi</p>
+          <p className="text-sm text-gray-500">Create beautiful social media images in seconds</p>
         </div>
 
-        <div className="flex gap-2 p-1 rounded-lg bg-muted w-fit mb-6">
+        <div className="flex gap-2 p-1 rounded-lg bg-muted w-fit">
           <Button
             variant={format === 'post' ? 'default' : 'ghost'}
             size="sm"
@@ -119,7 +114,7 @@ const Index = () => {
             className="gap-2"
             disabled={isLoading}
           >
-            <Square className="h-4 w-4" />
+            <Square className="h-4.5 w-4.5" />
             Post
           </Button>
           <Button
@@ -129,53 +124,39 @@ const Index = () => {
             className="gap-2"
             disabled={isLoading}
           >
-            <RectangleHorizontal className="h-4 w-4 rotate-90" />
+            <RectangleHorizontal className="h-4.5 w-4.5 rotate-90" />
             Story
           </Button>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mb-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="manual" disabled={isLoading}>Scrivi Testo</TabsTrigger>
             <TabsTrigger value="fetch" disabled={isLoading}>Fetch da URL</TabsTrigger>
           </TabsList>
-          <TabsContent value="manual" className="space-y-6">
-            <TextInput 
-              value={text} 
-              onChange={setText} 
-              textAlign={titleAlign}
-              onTextAlignChange={setTitleAlign}
-              fontSize={fontSize}
-              onFontSizeChange={setFontSize}
-              label="Titolo"
-              disabled={isLoading}
-            />
-            
-            <div className="space-y-2 bg-white/50 rounded-lg p-4">
-              <Label className="text-sm font-medium text-gray-700">Spazio tra titolo e descrizione</Label>
-              <div className="flex items-center gap-4">
-                <Slider
-                  value={[spacing]}
-                  onValueChange={(values) => setSpacing(values[0])}
-                  min={0}
-                  max={200}
-                  step={10}
-                  disabled={isLoading}
-                />
-                <span className="text-sm text-gray-500 min-w-[4ch]">{spacing}</span>
-              </div>
+          <TabsContent value="manual">
+            <div className="space-y-4">
+              <TextInput 
+                value={text} 
+                onChange={setText} 
+                textAlign={textAlign}
+                onTextAlignChange={setTextAlign}
+                fontSize={fontSize}
+                onFontSizeChange={setFontSize}
+                label="Titolo"
+                disabled={isLoading}
+              />
+              <TextInput 
+                value={description} 
+                onChange={setDescription} 
+                textAlign={textAlign}
+                onTextAlignChange={setTextAlign}
+                fontSize={descriptionFontSize}
+                onFontSizeChange={setDescriptionFontSize}
+                label="Descrizione"
+                disabled={isLoading}
+              />
             </div>
-
-            <TextInput 
-              value={description} 
-              onChange={setDescription} 
-              textAlign={descriptionAlign}
-              onTextAlignChange={setDescriptionAlign}
-              fontSize={descriptionFontSize}
-              onFontSizeChange={setDescriptionFontSize}
-              label="Descrizione"
-              disabled={isLoading}
-            />
           </TabsContent>
           <TabsContent value="fetch">
             <UrlInput 
@@ -187,26 +168,24 @@ const Index = () => {
           </TabsContent>
         </Tabs>
 
-        <div className="space-y-6">
-          <ColorPresets 
-            onSelectColors={handleColorSelect}
-            currentBackground={backgroundColor}
-            currentText={textColor}
+        <ColorPresets 
+          onSelectColors={handleColorSelect}
+          currentBackground={backgroundColor}
+          currentText={textColor}
+          disabled={isLoading}
+        />
+        
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="safe-zone"
+            checked={showSafeZone}
+            onCheckedChange={setShowSafeZone}
             disabled={isLoading}
           />
-          
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="safe-zone"
-              checked={showSafeZone}
-              onCheckedChange={setShowSafeZone}
-              disabled={isLoading}
-            />
-            <Label htmlFor="safe-zone">Mostra margini di sicurezza</Label>
-          </div>
-          
-          <DownloadButton onDownload={handleDownload} disabled={isLoading} />
+          <Label htmlFor="safe-zone">Mostra margini di sicurezza</Label>
         </div>
+        
+        <DownloadButton onDownload={handleDownload} disabled={isLoading} />
       </div>
       
       <div className="preview-container">
@@ -215,11 +194,9 @@ const Index = () => {
             text={text}
             description={description}
             backgroundColor={backgroundColor} 
-            textAlign={titleAlign}
-            descriptionAlign={descriptionAlign}
+            textAlign={textAlign}
             fontSize={fontSize}
             descriptionFontSize={descriptionFontSize}
-            spacing={spacing}
             textColor={textColor}
             onEffectiveFontSizeChange={setEffectiveFontSize}
             showSafeZone={showSafeZone}
