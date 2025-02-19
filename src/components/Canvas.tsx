@@ -57,10 +57,6 @@ const Canvas: React.FC<CanvasProps> = ({ text, backgroundColor, textAlign, textC
              canvas.width / 2;
 
     lines.forEach((line, index) => {
-      ctx.fillStyle = 'rgba(0,0,0,0.3)';
-      ctx.fillText(line, x + 2, startY + index * lineHeight + 2);
-      
-      ctx.fillStyle = textColor;
       ctx.fillText(line, x, startY + index * lineHeight);
     });
   }, [text, backgroundColor, textAlign, textColor, fontSize]);
