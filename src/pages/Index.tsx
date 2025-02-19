@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from '@/components/ui/use-toast';
@@ -34,6 +35,7 @@ const Index = () => {
   const [format, setFormat] = useState<'post' | 'story'>('post');
   const [activeTab, setActiveTab] = useState('manual');
   const [isLoading, setIsLoading] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -62,6 +64,10 @@ const Index = () => {
       title: "Descrizione estratta",
       description: "Il testo secondario è stato aggiornato con la descrizione della pagina",
     });
+  };
+
+  const handleImageExtracted = (imageUrl: string) => {
+    setImageUrl(imageUrl);
   };
 
   const handleDownload = () => {
@@ -167,6 +173,7 @@ const Index = () => {
             onSpacingChange={setSpacing}
             onTitleExtracted={handleTitleExtracted}
             onDescriptionExtracted={handleDescriptionExtracted}
+            onImageExtracted={handleImageExtracted}
             onTabChange={setActiveTab}
             onLoadingChange={setIsLoading}
             disabled={isLoading}
@@ -196,6 +203,7 @@ const Index = () => {
             showSafeZone={showSafeZone}
             format={format}
             onSpacingChange={setSpacing}
+            imageUrl={imageUrl}
           />
           <div className="absolute top-3 right-3 flex gap-2">
             <MagicButton onMagicOptimization={handleMagicOptimization} disabled={isLoading} />
