@@ -133,26 +133,14 @@ export function drawText(
   const currentTextHeight = currentLines.length * lineHeight;
   
   let startY;
-  let effectiveSpacing = spacing;
 
   if (template === 'lucky') {
     // Calcola l'area disponibile dopo l'immagine con margini di sicurezza
     const imageHeight = height * 0.4;
     const contentStartY = imageHeight + (safeZoneMargin * 0.75);
-    const availableHeight = height - contentStartY - (safeZoneMargin * 1.25);
     
     if (type === 'title') {
       startY = contentStartY;
-      
-      // Verifica e adatta lo spazio per titolo e descrizione
-      const descFont = ctx.font;
-      ctx.font = getFontStyle('description', fontSize, template);
-      const descLines = calculateLines(context, text, fontSize, 'description');
-      const descHeight = descLines.length * lineHeight;
-      ctx.font = descFont;
-      
-      // Mantiene lo spacing originale il più possibile
-      startY = contentStartY + (effectiveSpacing * 0.5);
     } else {
       const titleFont = ctx.font;
       ctx.font = getFontStyle('title', fontSize, template);
@@ -160,16 +148,13 @@ export function drawText(
       const titleHeight = titleLines.length * lineHeight;
       ctx.font = titleFont;
       
-      // Applica lo spacing originale per la descrizione
-      startY = contentStartY + titleHeight + effectiveSpacing;
+      // Applica lo spacing solo tra i blocchi di testo
+      startY = contentStartY + titleHeight + spacing;
       
-      // Solo se il testo supera i limiti, adatta lo spacing
+      // Se il testo supera i limiti, lo riporta dentro la safe zone
       const bottomLimit = height - (safeZoneMargin * 1.25);
       if (startY + currentTextHeight > bottomLimit) {
-        const maxStartY = bottomLimit - currentTextHeight;
-        const minSpacing = Math.min(effectiveSpacing, 40);
-        effectiveSpacing = Math.max(minSpacing, maxStartY - (contentStartY + titleHeight));
-        startY = contentStartY + titleHeight + effectiveSpacing;
+        startY = bottomLimit - currentTextHeight;
       }
     }
   } else {
@@ -182,7 +167,7 @@ export function drawText(
       const descLines = calculateLines(context, text, fontSize, 'description');
       const descHeight = descLines.length * lineHeight;
       ctx.font = descFont;
-      totalContentHeight += effectiveSpacing + descHeight;
+      totalContentHeight += spacing + descHeight;
     }
 
     const centerY = height / 2;
