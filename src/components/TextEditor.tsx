@@ -6,6 +6,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import UrlInput from '@/components/UrlInput';
 import { toast } from "@/components/ui/use-toast";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
 
 interface TextEditorProps {
   text: string;
@@ -64,6 +66,17 @@ const TextEditor: React.FC<TextEditorProps> = ({
         label="Titolo"
         disabled={disabled}
       />
+
+      <div className="space-y-2">
+        <Label htmlFor="featured-image">Immagine Featured</Label>
+        <Input
+          id="featured-image"
+          type="url"
+          placeholder="https://example.com/image.jpg"
+          onChange={(e) => onImageExtracted?.(e.target.value)}
+          disabled={disabled}
+        />
+      </div>
       
       {description && (
         <SpacingControl
@@ -112,14 +125,14 @@ const TextEditor: React.FC<TextEditorProps> = ({
               <TooltipTrigger asChild>
                 <TabsTrigger 
                   value="fetch" 
-                  disabled={disabled}
+                  disabled={true}
                   aria-label="Estrai testo da un URL"
                 >
                   Fetch da URL
                 </TabsTrigger>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Estrai automaticamente il testo da un URL</p>
+                <p>Funzionalità temporaneamente disabilitata</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -128,13 +141,9 @@ const TextEditor: React.FC<TextEditorProps> = ({
           {renderTextControls()}
         </TabsContent>
         <TabsContent value="fetch">
-          <UrlInput 
-            onTitleExtracted={onTitleExtracted}
-            onDescriptionExtracted={onDescriptionExtracted}
-            onImageExtracted={onImageExtracted}
-            onTabChange={onTabChange}
-            onLoadingChange={onLoadingChange}
-          />
+          <div className="p-4 text-center text-gray-500">
+            Questa funzionalità è temporaneamente disabilitata
+          </div>
         </TabsContent>
       </Tabs>
     </div>
