@@ -18,6 +18,7 @@ interface TextInputProps {
   onTextAlignChange: (value: 'left' | 'center' | 'right') => void;
   fontSize: number;
   onFontSizeChange: (value: number) => void;
+  label: string;
 }
 
 const TextInput: React.FC<TextInputProps> = ({ 
@@ -26,12 +27,13 @@ const TextInput: React.FC<TextInputProps> = ({
   textAlign, 
   onTextAlignChange,
   fontSize,
-  onFontSizeChange
+  onFontSizeChange,
+  label
 }) => {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <Label className="text-sm font-medium text-gray-700">Il tuo testo</Label>
+        <Label className="text-sm font-medium text-gray-700">{label}</Label>
         <div className="flex gap-2">
           <div className="flex rounded-md border border-input bg-transparent overflow-hidden">
             <Button
@@ -87,7 +89,7 @@ const TextInput: React.FC<TextInputProps> = ({
       </div>
       
       <Textarea
-        placeholder="Scrivi il tuo testo qui..."
+        placeholder={`Scrivi il tuo ${label.toLowerCase()} qui...`}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="resize-none h-32 bg-white/50 backdrop-blur-sm focus:bg-white transition-colors duration-200"

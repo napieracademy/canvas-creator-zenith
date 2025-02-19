@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import TextInput from '@/components/TextInput';
 import Canvas from '@/components/Canvas';
@@ -14,6 +15,7 @@ import { Square, RectangleHorizontal } from 'lucide-react';
 
 const Index = () => {
   const [text, setText] = useState('');
+  const [description, setDescription] = useState('');
   const [backgroundColor, setBackgroundColor] = useState('#8B5CF6');
   const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right'>('center');
   const [fontSize, setFontSize] = useState(64);
@@ -33,6 +35,14 @@ const Index = () => {
     toast({
       title: "Titolo estratto",
       description: "Il testo è stato aggiornato con il titolo della pagina",
+    });
+  };
+
+  const handleDescriptionExtracted = (extractedDescription: string) => {
+    setDescription(extractedDescription);
+    toast({
+      title: "Descrizione estratta",
+      description: "Il testo secondario è stato aggiornato con la descrizione della pagina",
     });
   };
 
@@ -111,17 +121,32 @@ const Index = () => {
             <TabsTrigger value="fetch">Fetch da URL</TabsTrigger>
           </TabsList>
           <TabsContent value="manual">
-            <TextInput 
-              value={text} 
-              onChange={setText} 
-              textAlign={textAlign}
-              onTextAlignChange={setTextAlign}
-              fontSize={fontSize}
-              onFontSizeChange={setFontSize}
-            />
+            <div className="space-y-4">
+              <TextInput 
+                value={text} 
+                onChange={setText} 
+                textAlign={textAlign}
+                onTextAlignChange={setTextAlign}
+                fontSize={fontSize}
+                onFontSizeChange={setFontSize}
+                label="Titolo"
+              />
+              <TextInput 
+                value={description} 
+                onChange={setDescription} 
+                textAlign={textAlign}
+                onTextAlignChange={setTextAlign}
+                fontSize={Math.max(32, fontSize * 0.6)}
+                onFontSizeChange={(size) => setFontSize(size / 0.6)}
+                label="Descrizione"
+              />
+            </div>
           </TabsContent>
           <TabsContent value="fetch">
-            <UrlInput onTitleExtracted={handleTitleExtracted} />
+            <UrlInput 
+              onTitleExtracted={handleTitleExtracted}
+              onDescriptionExtracted={handleDescriptionExtracted}
+            />
           </TabsContent>
         </Tabs>
 
@@ -146,7 +171,8 @@ const Index = () => {
       <div className="preview-container">
         <div className="canvas-wrapper" style={{ aspectRatio: format === 'post' ? '1080/1350' : '1080/1920' }}>
           <Canvas 
-            text={text} 
+            text={text}
+            description={description}
             backgroundColor={backgroundColor} 
             textAlign={textAlign}
             fontSize={fontSize}
