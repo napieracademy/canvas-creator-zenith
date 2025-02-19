@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from './ui/button';
 import {
@@ -115,7 +116,7 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
                       className="absolute inset-0" 
                       style={{ 
                         background: typeof pair.background === 'string' && pair.background.includes('gradient')
-                          ? `${pair.background}`
+                          ? pair.background
                           : `linear-gradient(135deg, 
                               ${pair.background} 0%, 
                               ${pair.background} 50%, 
@@ -124,7 +125,18 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
                             )`,
                         borderRadius: '50%'
                       }}
-                    />
+                    >
+                      {/* Overlay per il testo nei temi con gradiente */}
+                      {typeof pair.background === 'string' && pair.background.includes('gradient') && (
+                        <div 
+                          className="absolute right-0 bottom-0 w-1/2 h-1/2"
+                          style={{
+                            background: pair.text,
+                            borderTopLeftRadius: '50%'
+                          }}
+                        />
+                      )}
+                    </div>
                   </div>
                 </Button>
               </div>
