@@ -83,9 +83,9 @@ const TextInput: React.FC<TextInputProps> = ({
   };
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
           <Label className="text-sm font-medium text-gray-700">{label}</Label>
           <Popover>
             <PopoverTrigger asChild>
@@ -112,7 +112,8 @@ const TextInput: React.FC<TextInputProps> = ({
             </PopoverContent>
           </Popover>
         </div>
-        <div className="flex gap-2">
+
+        <div className="flex items-center gap-2">
           <div className="flex rounded-md border border-input bg-transparent overflow-hidden">
             <Button
               variant="ghost"
@@ -146,7 +147,7 @@ const TextInput: React.FC<TextInputProps> = ({
           <Button 
             variant="outline" 
             size="sm" 
-            className="gap-2" 
+            className="gap-2 flex-1" 
             onClick={handleImproveText}
             disabled={disabled || isImproving}
           >
