@@ -1,3 +1,4 @@
+
 import { CanvasContext } from '@/types/canvas';
 
 export const SAFE_ZONE_MARGIN = 120;
@@ -52,24 +53,20 @@ export function drawSafeZone(ctx: CanvasRenderingContext2D, width: number, heigh
   );
 }
 
-export function textFitsInSafeZone(context: CanvasContext, text: string, size: number, type: 'title' | 'description' = 'title') {
-  const { height, safeZoneMargin } = context;
-  const maxHeight = height - (2 * safeZoneMargin);
-  
-  const lines = calculateLines(context, text, size, type);
-  const totalHeight = lines.length * (size * 1.2);
-  
-  return totalHeight <= maxHeight && lines.every(line => {
-    const metrics = context.ctx.measureText(line);
-    return metrics.width <= (context.width - (2 * safeZoneMargin));
-  });
+function getFontStyle(type: 'title' | 'description', fontSize: number, template: 'klaus' | 'lucky' = 'klaus'): string {
+  if (template === 'lucky') {
+    return type === 'title' 
+      ? `${fontSize}px 'Bebas Neue'` 
+      : `${fontSize}px 'Josefin Sans'`;
+  }
+  return `${type === 'title' ? 'bold' : ''} ${fontSize}px Inter`;
 }
 
 export function calculateLines(context: CanvasContext, text: string, size: number, type: 'title' | 'description' = 'title') {
   const { ctx, width, safeZoneMargin } = context;
   const maxWidth = width - (2 * safeZoneMargin);
   
-  ctx.font = `${getFontStyle(type, size)}`;
+  ctx.font = getFontStyle(type, size);
   const words = text.split(' ');
   const lines: string[] = [];
   let currentLine = '';
@@ -88,15 +85,6 @@ export function calculateLines(context: CanvasContext, text: string, size: numbe
   if (currentLine) lines.push(currentLine);
   
   return lines;
-}
-
-function getFontStyle(type: 'title' | 'description', fontSize: number, template: 'klaus' | 'lucky' = 'klaus'): string {
-  if (template === 'lucky') {
-    return type === 'title' 
-      ? `${fontSize}px 'Bebas Neue'` 
-      : `${fontSize}px 'Josefin Sans'`;
-  }
-  return `${type === 'title' ? 'bold' : ''} ${fontSize}px Inter`;
 }
 
 export function drawText(
@@ -128,77 +116,31 @@ export function drawText(
   ctx.textBaseline = 'middle';
   ctx.setLineDash([]);
 
-  const currentLines = calculateLines(context, text, fontSize, type);
+  const lines = calculateLines(context, text, fontSize, type);
   const lineHeight = fontSize * 1.2;
-  const currentTextHeight = currentLines.length * lineHeight;
-  
+  const textHeight = lines.length * lineHeight;
   let startY;
 
   if (template === 'lucky') {
-    // Area dopo l'immagine
     const imageHeight = height * 0.4;
-    const contentStartY = imageHeight + (safeZoneMargin * 0.75);
-    const bottomLimit = height - (safeZoneMargin * 1.25);
-    
     if (type === 'title') {
-      startY = contentStartY;
+      startY = imageHeight + safeZoneMargin;
     } else {
-      // Calcola l'altezza del titolo
-      const titleFont = ctx.font;
-      ctx.font = getFontStyle('title', fontSize, template);
-      const titleLines = calculateLines(context, text, fontSize, 'title');
-      const titleHeight = titleLines.length * lineHeight;
-      ctx.font = titleFont;
-      
-      // Calcola lo spazio totale disponibile
-      const totalAvailableSpace = bottomLimit - contentStartY;
-      // Calcola lo spazio necessario per i testi
-      const requiredSpace = titleHeight + currentTextHeight;
-      // Calcola lo spazio rimanente per lo spacing
-      const remainingSpace = totalAvailableSpace - requiredSpace;
-      
-      // Determina lo spacing effettivo
-      const effectiveSpacing = Math.max(20, Math.min(spacing, remainingSpace));
-      
-      startY = contentStartY + titleHeight + effectiveSpacing;
+      startY = imageHeight + safeZoneMargin + fontSize * 2 + spacing;
     }
   } else {
-    // Klaus template mantiene il layout centrato
-    let totalContentHeight = currentTextHeight;
-    
-    if (type === 'title' && text.trim()) {
-      const descFont = ctx.font;
-      ctx.font = getFontStyle('description', fontSize, template);
-      const descLines = calculateLines(context, text, fontSize, 'description');
-      const descHeight = descLines.length * lineHeight;
-      ctx.font = descFont;
-      totalContentHeight += spacing + descHeight;
-    }
-
     const centerY = height / 2;
-    
-    if (type === 'title') {
-      startY = centerY - (totalContentHeight / 2);
-    } else {
-      startY = centerY + (totalContentHeight / 2) - currentTextHeight;
-    }
-
-    // Controlli safe zone per Klaus
-    const bottomMargin = height - safeZoneMargin;
-    if (startY + currentTextHeight > bottomMargin) {
-      startY = bottomMargin - currentTextHeight;
-    }
-    if (startY < safeZoneMargin) {
-      startY = safeZoneMargin;
-    }
+    startY = type === 'title' 
+      ? centerY - textHeight - spacing/2
+      : centerY + spacing/2;
   }
 
   const x = textAlign === 'left' ? safeZoneMargin : 
            textAlign === 'right' ? width - safeZoneMargin : 
            width / 2;
 
-  currentLines.forEach((line, index) => {
-    const y = startY + (index * lineHeight) + (lineHeight / 2);
+  lines.forEach((line, index) => {
+    const y = startY + (index * lineHeight);
     ctx.fillText(line, x, y);
   });
 }
