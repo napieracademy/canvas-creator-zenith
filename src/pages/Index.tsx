@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from '@/components/ui/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from '@/components/ui/button';
-import { Square, RectangleHorizontal } from 'lucide-react';
+import { Square, RectangleHorizontal, Loader2 } from 'lucide-react';
 
 const Index = () => {
   const [text, setText] = useState('');
@@ -25,6 +25,7 @@ const Index = () => {
   const [showSafeZone, setShowSafeZone] = useState(false);
   const [format, setFormat] = useState<'post' | 'story'>('post');
   const [activeTab, setActiveTab] = useState('manual');
+  const [isLoading, setIsLoading] = useState(false);
   const isMobile = useIsMobile();
 
   const handleColorSelect = (background: string, text: string) => {
@@ -89,7 +90,16 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen w-full">
+    <div className="min-h-screen w-full relative">
+      {isLoading && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg p-6 flex flex-col items-center gap-4">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="text-gray-700">Estrazione contenuti in corso...</p>
+          </div>
+        </div>
+      )}
+      
       <div className="controls-panel">
         <div className="space-y-1.5">
           <h1 className="text-xl font-semibold text-gray-900">Social Image Creator</h1>
@@ -102,6 +112,7 @@ const Index = () => {
             size="sm"
             onClick={() => setFormat('post')}
             className="gap-2"
+            disabled={isLoading}
           >
             <Square className="h-4.5 w-4.5" />
             Post
@@ -111,6 +122,7 @@ const Index = () => {
             size="sm"
             onClick={() => setFormat('story')}
             className="gap-2"
+            disabled={isLoading}
           >
             <RectangleHorizontal className="h-4.5 w-4.5 rotate-90" />
             Story
@@ -119,8 +131,8 @@ const Index = () => {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="manual">Scrivi Testo</TabsTrigger>
-            <TabsTrigger value="fetch">Fetch da URL</TabsTrigger>
+            <TabsTrigger value="manual" disabled={isLoading}>Scrivi Testo</TabsTrigger>
+            <TabsTrigger value="fetch" disabled={isLoading}>Fetch da URL</TabsTrigger>
           </TabsList>
           <TabsContent value="manual">
             <div className="space-y-4">
@@ -132,6 +144,7 @@ const Index = () => {
                 fontSize={fontSize}
                 onFontSizeChange={setFontSize}
                 label="Titolo"
+                disabled={isLoading}
               />
               <TextInput 
                 value={description} 
@@ -141,6 +154,7 @@ const Index = () => {
                 fontSize={descriptionFontSize}
                 onFontSizeChange={setDescriptionFontSize}
                 label="Descrizione"
+                disabled={isLoading}
               />
             </div>
           </TabsContent>
@@ -149,6 +163,7 @@ const Index = () => {
               onTitleExtracted={handleTitleExtracted}
               onDescriptionExtracted={handleDescriptionExtracted}
               onTabChange={setActiveTab}
+              onLoadingChange={setIsLoading}
             />
           </TabsContent>
         </Tabs>
@@ -157,6 +172,7 @@ const Index = () => {
           onSelectColors={handleColorSelect}
           currentBackground={backgroundColor}
           currentText={textColor}
+          disabled={isLoading}
         />
         
         <div className="flex items-center space-x-2">
@@ -164,11 +180,12 @@ const Index = () => {
             id="safe-zone"
             checked={showSafeZone}
             onCheckedChange={setShowSafeZone}
+            disabled={isLoading}
           />
           <Label htmlFor="safe-zone">Mostra margini di sicurezza</Label>
         </div>
         
-        <DownloadButton onDownload={handleDownload} />
+        <DownloadButton onDownload={handleDownload} disabled={isLoading} />
       </div>
       
       <div className="preview-container">

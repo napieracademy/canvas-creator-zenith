@@ -11,9 +11,15 @@ interface UrlInputProps {
   onTitleExtracted: (title: string) => void;
   onDescriptionExtracted: (description: string) => void;
   onTabChange?: (value: string) => void;
+  onLoadingChange?: (loading: boolean) => void;
 }
 
-const UrlInput: React.FC<UrlInputProps> = ({ onTitleExtracted, onDescriptionExtracted, onTabChange }) => {
+const UrlInput: React.FC<UrlInputProps> = ({ 
+  onTitleExtracted, 
+  onDescriptionExtracted, 
+  onTabChange,
+  onLoadingChange 
+}) => {
   const [url, setUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -21,6 +27,7 @@ const UrlInput: React.FC<UrlInputProps> = ({ onTitleExtracted, onDescriptionExtr
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    onLoadingChange?.(true);
 
     try {
       const result = await MetaService.extractMetadata(url);
@@ -56,6 +63,7 @@ const UrlInput: React.FC<UrlInputProps> = ({ onTitleExtracted, onDescriptionExtr
       });
     } finally {
       setIsLoading(false);
+      onLoadingChange?.(false);
     }
   };
 
