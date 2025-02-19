@@ -44,7 +44,7 @@ const Index = () => {
 
   const handleColorSelect = (background: string, text: string, overlay?: string) => {
     if (overlay) {
-      setBackgroundColor(`${background}, linear-gradient(${overlay}, ${overlay})`);
+      setBackgroundColor(`linear-gradient(${overlay}, ${overlay}), ${background}`);
     } else {
       setBackgroundColor(background);
     }
