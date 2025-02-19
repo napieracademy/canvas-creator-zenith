@@ -54,12 +54,12 @@ const TextEditor: React.FC<TextEditorProps> = ({
       <TabsList className="grid w-full grid-cols-3">
         <TabsTrigger value="manual" disabled={disabled}>Scrivi Testo</TabsTrigger>
         <TabsTrigger value="fetch" disabled={disabled}>Fetch da URL</TabsTrigger>
-        <TooltipProvider>
+        <TooltipProvider delayDuration={100}>
           <Tooltip>
-            <TooltipTrigger asChild>
-              <TabsTrigger value="featured" disabled>Featured</TabsTrigger>
+            <TooltipTrigger className="w-full">
+              <TabsTrigger value="featured" disabled className="w-full">Featured</TabsTrigger>
             </TooltipTrigger>
-            <TooltipContent>
+            <TooltipContent side="bottom" align="center">
               <p>Soon</p>
             </TooltipContent>
           </Tooltip>
