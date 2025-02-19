@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from './ui/button';
 import {
@@ -84,7 +83,7 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
       text: "#E0AAFF",
       category: 'classic'
     },
-    // Temi Cosmici (con gradienti)
+    // Temi Cosmici (con gradienti e maggior contrasto)
     {
       name: "Aurora Borealis",
       background: "linear-gradient(135deg, #8B5CF6 0%, #D946EF 100%)",
@@ -93,14 +92,14 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
     },
     {
       name: "Quantum Flux",
-      background: "linear-gradient(135deg, #D946EF 0%, #F97316 100%)",
+      background: "linear-gradient(135deg, #7209B7 0%, #3B82F6 100%)",
       text: "#4ADE80",
       category: 'cosmic'
     },
     {
       name: "Nebula Storm",
-      background: "linear-gradient(135deg, #F97316 0%, #8B5CF6 100%)",
-      text: "#22D3EE",
+      background: "linear-gradient(135deg, #1E40AF 0%, #7E22CE 100%)",
+      text: "#F0ABFC",
       category: 'cosmic'
     }
   ];
