@@ -39,7 +39,6 @@ const TextInput: React.FC<TextInputProps> = ({
           className="w-full min-h-[100px] resize-y"
           style={{
             textAlign: textAlign,
-            fontSize: `${fontSize}px`,
             lineHeight: 1.2,
             whiteSpace: 'pre-wrap',
             overflowWrap: 'break-word'
