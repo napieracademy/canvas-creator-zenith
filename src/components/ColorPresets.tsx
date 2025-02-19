@@ -11,6 +11,7 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
   currentText,
   featuredImage 
 }) => {
+  // Creiamo un tema per l'immagine featured se esiste
   const featuredTheme = featuredImage ? [{
     name: "Featured Image",
     background: `url(${featuredImage})`,
