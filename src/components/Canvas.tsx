@@ -34,8 +34,8 @@ const Canvas: React.FC<CanvasProps> = ({
   const lastYRef = useRef(0);
   const [showSpacingControl, setShowSpacingControl] = useState(false);
   const [localSpacing, setLocalSpacing] = useState(spacing);
-  const [imagePosition, setImagePosition] = useState(0.4); // 40% dell'altezza
-  const [showImageControl, setShowImageControl] = useState(false);
+  const [imagePosition, setImagePosition] = useState(0.2); // Cambiato a 20% dell'altezza per essere più visibile
+  const [showImageControl, setShowImageControl] = useState(true); // Sempre visibile inizialmente
   const isImageDraggingRef = useRef(false);
   
   const ORIGINAL_WIDTH = 1080;
@@ -73,7 +73,7 @@ const Canvas: React.FC<CanvasProps> = ({
     if (template === 'lucky' && imageUrl) {
       const img = new Image();
       img.onload = () => {
-        const maxHeight = ORIGINAL_HEIGHT * 0.4;
+        const maxHeight = ORIGINAL_HEIGHT * 0.3; // Ridotto per una migliore proporzione
         const maxWidth = ORIGINAL_WIDTH - (2 * SAFE_ZONE_MARGIN);
         
         const imgAspectRatio = img.width / img.height;
@@ -86,7 +86,7 @@ const Canvas: React.FC<CanvasProps> = ({
         }
         
         const x = (ORIGINAL_WIDTH - targetWidth) / 2;
-        const y = ORIGINAL_HEIGHT * imagePosition;
+        const y = ORIGINAL_HEIGHT * imagePosition - targetHeight / 2; // Centrato verticalmente
 
         ctx.drawImage(img, x, y, targetWidth, targetHeight);
 
@@ -94,6 +94,8 @@ const Canvas: React.FC<CanvasProps> = ({
           drawSafeZone(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
         }
 
+        // Disegna il testo dopo l'immagine
+        const textY = y + targetHeight + SAFE_ZONE_MARGIN;
         drawText(context, text, textAlign, textColor, fontSize, 'title', localSpacing, template);
         if (description) {
           drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', localSpacing, template);
@@ -148,7 +150,7 @@ const Canvas: React.FC<CanvasProps> = ({
         onSpacingChange(newSpacing);
       }
     } else if (isImageDraggingRef.current) {
-      const newPosition = Math.max(0.1, Math.min(0.6, imagePosition + delta));
+      const newPosition = Math.max(0.1, Math.min(0.8, imagePosition + delta));
       setImagePosition(newPosition);
     }
     
@@ -158,10 +160,11 @@ const Canvas: React.FC<CanvasProps> = ({
   const handleMouseUp = () => {
     isDraggingRef.current = false;
     isImageDraggingRef.current = false;
-    setTimeout(() => {
-      setShowSpacingControl(false);
-      setShowImageControl(false);
-    }, 1500);
+    if (!isImageDraggingRef.current) {
+      setTimeout(() => {
+        setShowSpacingControl(false);
+      }, 1500);
+    }
   };
 
   return (
@@ -207,6 +210,7 @@ const Canvas: React.FC<CanvasProps> = ({
               zIndex: 10 
             }}
             onMouseDown={handleImageMouseDown}
+            onMouseEnter={() => setShowImageControl(true)}
           >
             <div className="bg-black/50 backdrop-blur-sm text-white px-2 py-1 rounded-full flex items-center gap-2 select-none">
               <GripVertical className="h-4 w-4" />
