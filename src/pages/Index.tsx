@@ -21,6 +21,7 @@ const Index = () => {
   };
 
   const handleTitleExtracted = (extractedTitle: string) => {
+    // Aggiorna direttamente il testo con il titolo estratto
     setText(extractedTitle);
   };
 
@@ -35,7 +36,7 @@ const Index = () => {
   };
 
   return (
-    <div className="fixed inset-0 overflow-hidden">
+    <div className="min-h-screen w-full">
       <div className="controls-panel">
         <div className="space-y-1.5">
           <h1 className="text-xl font-semibold text-gray-900">Social Image Creator</h1>
