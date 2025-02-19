@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect, useState } from 'react';
 import { CanvasProps } from '@/types/canvas';
 import { useCanvasScale } from '@/hooks/useCanvasScale';
@@ -6,6 +7,7 @@ import {
   SAFE_ZONE_MARGIN,
   drawBackground,
   drawSafeZone,
+  textFitsInSafeZone,
   drawText
 } from '@/utils/canvasUtils';
 
@@ -23,9 +25,7 @@ const Canvas: React.FC<CanvasProps> = ({
   showSafeZone = false,
   format = 'post',
   overlay,
-  onSpacingChange,
-  imageUrl,
-  template = 'klaus'
+  onSpacingChange
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -33,9 +33,6 @@ const Canvas: React.FC<CanvasProps> = ({
   const lastYRef = useRef(0);
   const [showSpacingControl, setShowSpacingControl] = useState(false);
   const [localSpacing, setLocalSpacing] = useState(spacing);
-  const [imagePosition, setImagePosition] = useState(0.2);
-  const [showImageControl, setShowImageControl] = useState(true);
-  const isImageDraggingRef = useRef(false);
   
   const ORIGINAL_WIDTH = 1080;
   const ORIGINAL_HEIGHT = format === 'post' ? 1350 : 1920;
@@ -67,54 +64,55 @@ const Canvas: React.FC<CanvasProps> = ({
       safeZoneMargin: SAFE_ZONE_MARGIN
     };
 
-    drawBackground(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT, backgroundColor);
-
-    if (template === 'lucky' && imageUrl) {
+    // Gestione sfondo
+    if (backgroundColor.startsWith('url(')) {
       const img = new Image();
-      img.crossOrigin = 'anonymous';
       img.onload = () => {
-        const maxHeight = ORIGINAL_HEIGHT * 0.3;
-        const maxWidth = ORIGINAL_WIDTH - (2 * SAFE_ZONE_MARGIN);
+        const scale = Math.max(canvas.width / img.width, canvas.height / img.height);
+        const x = (canvas.width - img.width * scale) / 2;
+        const y = (canvas.height - img.height * scale) / 2;
         
-        const imgAspectRatio = img.width / img.height;
-        let targetWidth = maxWidth;
-        let targetHeight = targetWidth / imgAspectRatio;
-        
-        if (targetHeight > maxHeight) {
-          targetHeight = maxHeight;
-          targetWidth = targetHeight * imgAspectRatio;
-        }
-        
-        const x = (ORIGINAL_WIDTH - targetWidth) / 2;
-        const y = ORIGINAL_HEIGHT * imagePosition - targetHeight / 2;
+        ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
 
-        ctx.drawImage(img, x, y, targetWidth, targetHeight);
+        if (overlay) {
+          ctx.fillStyle = overlay;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
 
         if (showSafeZone) {
           drawSafeZone(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
         }
 
-        const textY = y + targetHeight + SAFE_ZONE_MARGIN;
-        drawText(context, text, textAlign, textColor, fontSize, 'title', localSpacing, template);
+        drawText(context, text, textAlign, textColor, fontSize, 'title', localSpacing);
         if (description) {
-          drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', localSpacing, template);
+          drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', localSpacing);
         }
       };
-      img.onerror = () => {
-        console.error('Errore nel caricamento dell\'immagine');
-      };
-      img.src = imageUrl;
+      img.src = backgroundColor.slice(4, -1);
     } else {
+      if (backgroundColor.includes('gradient')) {
+        const gradient = ctx.createLinearGradient(0, 0, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
+        const colors = backgroundColor.match(/#[a-fA-F0-9]{6}/g);
+        if (colors && colors.length >= 2) {
+          gradient.addColorStop(0, colors[0]);
+          gradient.addColorStop(1, colors[1]);
+        }
+        ctx.fillStyle = gradient;
+      } else {
+        ctx.fillStyle = backgroundColor;
+      }
+      ctx.fillRect(0, 0, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
+
       if (showSafeZone) {
         drawSafeZone(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
       }
 
-      drawText(context, text, textAlign, textColor, fontSize, 'title', localSpacing, template);
+      drawText(context, text, textAlign, textColor, fontSize, 'title', localSpacing);
       if (description) {
-        drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', localSpacing, template);
+        drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', localSpacing);
       }
     }
-  }, [text, description, backgroundColor, textAlign, descriptionAlign, textColor, fontSize, descriptionFontSize, localSpacing, onEffectiveFontSizeChange, showSafeZone, format, overlay, imageUrl, template, imagePosition]);
+  }, [text, description, backgroundColor, textAlign, descriptionAlign, textColor, fontSize, descriptionFontSize, localSpacing, onEffectiveFontSizeChange, showSafeZone, format, overlay]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!containerRef.current) return;
@@ -127,33 +125,17 @@ const Canvas: React.FC<CanvasProps> = ({
     setShowSpacingControl(true);
   };
 
-  const handleImageMouseDown = (e: React.MouseEvent) => {
-    if (!containerRef.current) return;
-    
-    const rect = containerRef.current.getBoundingClientRect();
-    const y = e.clientY - rect.top;
-    
-    isImageDraggingRef.current = true;
-    lastYRef.current = y;
-    setShowImageControl(true);
-  };
-
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (!containerRef.current) return;
+    if (!isDraggingRef.current || !containerRef.current) return;
     
     const rect = containerRef.current.getBoundingClientRect();
     const y = e.clientY - rect.top;
-    const delta = (y - lastYRef.current) / rect.height;
+    const delta = (y - lastYRef.current) * 2; // Moltiplichiamo per 2 per un movimento più ampio
     
-    if (isDraggingRef.current) {
-      const newSpacing = Math.max(0, Math.min(200, localSpacing + delta * 200));
-      setLocalSpacing(newSpacing);
-      if (onSpacingChange) {
-        onSpacingChange(newSpacing);
-      }
-    } else if (isImageDraggingRef.current) {
-      const newPosition = Math.max(0.1, Math.min(0.8, imagePosition + delta));
-      setImagePosition(newPosition);
+    const newSpacing = Math.max(0, Math.min(200, localSpacing + delta));
+    setLocalSpacing(newSpacing);
+    if (onSpacingChange) {
+      onSpacingChange(newSpacing);
     }
     
     lastYRef.current = y;
@@ -161,12 +143,7 @@ const Canvas: React.FC<CanvasProps> = ({
 
   const handleMouseUp = () => {
     isDraggingRef.current = false;
-    isImageDraggingRef.current = false;
-    if (!isImageDraggingRef.current) {
-      setTimeout(() => {
-        setShowSpacingControl(false);
-      }, 1500);
-    }
+    setTimeout(() => setShowSpacingControl(false), 1500);
   };
 
   return (
@@ -200,23 +177,6 @@ const Canvas: React.FC<CanvasProps> = ({
             <div className="bg-black/50 backdrop-blur-sm text-white px-2 py-1 rounded-full flex items-center gap-2 select-none">
               <GripVertical className="h-4 w-4" />
               <span className="text-sm">{Math.round(localSpacing)}px</span>
-            </div>
-          </div>
-        )}
-        {template === 'lucky' && imageUrl && (
-          <div 
-            className={`absolute left-1/2 -translate-x-1/2 cursor-ns-resize transition-opacity duration-300 ${showImageControl ? 'opacity-100' : 'opacity-0'}`}
-            style={{ 
-              top: `${imagePosition * 100}%`,
-              transform: 'translateX(-50%)',
-              zIndex: 10 
-            }}
-            onMouseDown={handleImageMouseDown}
-            onMouseEnter={() => setShowImageControl(true)}
-          >
-            <div className="bg-black/50 backdrop-blur-sm text-white px-2 py-1 rounded-full flex items-center gap-2 select-none">
-              <GripVertical className="h-4 w-4" />
-              <span className="text-sm">{Math.round(imagePosition * 100)}%</span>
             </div>
           </div>
         )}

@@ -17,8 +17,6 @@ interface CanvasPreviewProps {
   format?: 'post' | 'story';
   overlay?: string;
   onSpacingChange?: (spacing: number) => void;
-  imageUrl?: string | null;
-  template?: 'klaus' | 'lucky';
 }
 
 const CanvasPreview: React.FC<CanvasPreviewProps> = ({
@@ -35,9 +33,7 @@ const CanvasPreview: React.FC<CanvasPreviewProps> = ({
   showSafeZone,
   format,
   overlay,
-  onSpacingChange,
-  imageUrl,
-  template
+  onSpacingChange
 }) => {
   return (
     <div className="preview-container">
@@ -57,8 +53,6 @@ const CanvasPreview: React.FC<CanvasPreviewProps> = ({
           format={format}
           overlay={overlay}
           onSpacingChange={onSpacingChange}
-          imageUrl={imageUrl}
-          template={template}
         />
       </div>
     </div>

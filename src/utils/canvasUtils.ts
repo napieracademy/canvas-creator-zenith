@@ -3,39 +3,13 @@ import { CanvasContext } from '@/types/canvas';
 
 export const SAFE_ZONE_MARGIN = 120;
 
-// Precarica i font per il template Lucky
-const link = document.createElement('link');
-link.href = 'https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Josefin+Sans:wght@400;700&display=swap';
-link.rel = 'stylesheet';
-document.head.appendChild(link);
-
 export function drawBackground(ctx: CanvasRenderingContext2D, width: number, height: number, color: string) {
-  if (color.startsWith('url(')) {
-    const img = new Image();
-    img.onload = () => {
-      const scale = Math.max(width / img.width, height / img.height);
-      const x = (width - img.width * scale) / 2;
-      const y = (height - img.height * scale) / 2;
-      
-      ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
-    };
-    img.src = color.slice(4, -1);
-  } else if (color.includes('gradient')) {
-    const gradient = ctx.createLinearGradient(0, 0, width, height);
-    const colors = color.match(/#[a-fA-F0-9]{6}/g);
-    if (colors && colors.length >= 2) {
-      gradient.addColorStop(0, colors[0]);
-      gradient.addColorStop(1, colors[1]);
-    }
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, width, height);
-  } else {
-    ctx.fillStyle = color;
-    ctx.fillRect(0, 0, width, height);
-  }
+  ctx.fillStyle = color;
+  ctx.fillRect(0, 0, width, height);
 }
 
 export function drawSafeZone(ctx: CanvasRenderingContext2D, width: number, height: number) {
+  // Overlay semi-trasparente fuori dalla safe zone
   ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
   ctx.fillRect(0, 0, width, SAFE_ZONE_MARGIN);
   ctx.fillRect(0, height - SAFE_ZONE_MARGIN, width, SAFE_ZONE_MARGIN);
@@ -53,20 +27,11 @@ export function drawSafeZone(ctx: CanvasRenderingContext2D, width: number, heigh
   );
 }
 
-function getFontStyle(type: 'title' | 'description', fontSize: number, template: 'klaus' | 'lucky' = 'klaus'): string {
-  if (template === 'lucky') {
-    return type === 'title' 
-      ? `${fontSize}px 'Bebas Neue'` 
-      : `${fontSize}px 'Josefin Sans'`;
-  }
-  return `${type === 'title' ? 'bold' : ''} ${fontSize}px Inter`;
-}
-
 export function calculateLines(context: CanvasContext, text: string, size: number, type: 'title' | 'description' = 'title') {
   const { ctx, width, safeZoneMargin } = context;
   const maxWidth = width - (2 * safeZoneMargin);
   
-  ctx.font = getFontStyle(type, size);
+  ctx.font = `${type === 'title' ? 'bold' : ''} ${size}px Inter`;
   const words = text.split(' ');
   const lines: string[] = [];
   let currentLine = '';
@@ -87,6 +52,19 @@ export function calculateLines(context: CanvasContext, text: string, size: numbe
   return lines;
 }
 
+export function textFitsInSafeZone(context: CanvasContext, text: string, size: number, type: 'title' | 'description' = 'title') {
+  const { height, safeZoneMargin } = context;
+  const maxHeight = height - (2 * safeZoneMargin);
+  
+  const lines = calculateLines(context, text, size, type);
+  const totalHeight = lines.length * (size * 1.2);
+  
+  return totalHeight <= maxHeight && lines.every(line => {
+    const metrics = context.ctx.measureText(line);
+    return metrics.width <= (context.width - (2 * safeZoneMargin));
+  });
+}
+
 export function drawText(
   context: CanvasContext,
   text: string,
@@ -94,14 +72,13 @@ export function drawText(
   textColor: string,
   fontSize: number,
   type: 'title' | 'description' = 'title',
-  spacing: number = 40,
-  template: 'klaus' | 'lucky' = 'klaus'
+  spacing: number = 40
 ) {
-  const { ctx, width, height, safeZoneMargin } = context;
+  const { ctx, width, height } = context;
   
   if (!text.trim()) {
     if (type === 'title') {
-      ctx.font = getFontStyle('title', 32, template);
+      ctx.font = 'bold 32px Inter';
       ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -110,7 +87,7 @@ export function drawText(
     return;
   }
 
-  ctx.font = getFontStyle(type, fontSize, template);
+  ctx.font = `${type === 'title' ? 'bold' : ''} ${fontSize}px Inter`;
   ctx.fillStyle = textColor;
   ctx.textAlign = textAlign;
   ctx.textBaseline = 'middle';
@@ -118,29 +95,21 @@ export function drawText(
 
   const lines = calculateLines(context, text, fontSize, type);
   const lineHeight = fontSize * 1.2;
-  const textHeight = lines.length * lineHeight;
+  const totalHeight = lines.length * lineHeight;
+  
+  // Calcola la posizione verticale in base al tipo di testo e allo spacing
   let startY;
-
-  if (template === 'lucky') {
-    const imageHeight = height * 0.4;
-    if (type === 'title') {
-      startY = imageHeight + safeZoneMargin;
-    } else {
-      startY = imageHeight + safeZoneMargin + fontSize * 2 + spacing;
-    }
+  if (type === 'title') {
+    startY = (height / 2) - (spacing / 2) - totalHeight; // Posiziona il titolo sopra il centro
   } else {
-    const centerY = height / 2;
-    startY = type === 'title' 
-      ? centerY - textHeight - spacing/2
-      : centerY + spacing/2;
+    startY = (height / 2) + (spacing / 2); // Posiziona la descrizione sotto il centro
   }
 
-  const x = textAlign === 'left' ? safeZoneMargin : 
-           textAlign === 'right' ? width - safeZoneMargin : 
+  const x = textAlign === 'left' ? SAFE_ZONE_MARGIN : 
+           textAlign === 'right' ? width - SAFE_ZONE_MARGIN : 
            width / 2;
 
   lines.forEach((line, index) => {
-    const y = startY + (index * lineHeight);
-    ctx.fillText(line, x, y);
+    ctx.fillText(line, x, startY + (index * lineHeight) + (lineHeight / 2));
   });
 }

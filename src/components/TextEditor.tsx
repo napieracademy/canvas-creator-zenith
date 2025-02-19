@@ -6,8 +6,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import UrlInput from '@/components/UrlInput';
 import { toast } from "@/components/ui/use-toast";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
 
 interface TextEditorProps {
   text: string;
@@ -26,7 +24,6 @@ interface TextEditorProps {
   onSpacingChange: (spacing: number) => void;
   onTitleExtracted: (title: string) => void;
   onDescriptionExtracted: (description: string) => void;
-  onImageExtracted?: (image: string) => void;
   onTabChange: (value: string) => void;
   onLoadingChange: (loading: boolean) => void;
   disabled?: boolean;
@@ -49,7 +46,6 @@ const TextEditor: React.FC<TextEditorProps> = ({
   onSpacingChange,
   onTitleExtracted,
   onDescriptionExtracted,
-  onImageExtracted,
   onTabChange,
   onLoadingChange,
   disabled
@@ -66,17 +62,6 @@ const TextEditor: React.FC<TextEditorProps> = ({
         label="Titolo"
         disabled={disabled}
       />
-
-      <div className="space-y-2">
-        <Label htmlFor="featured-image">Immagine Featured</Label>
-        <Input
-          id="featured-image"
-          type="url"
-          placeholder="https://example.com/image.jpg"
-          onChange={(e) => onImageExtracted?.(e.target.value)}
-          disabled={disabled}
-        />
-      </div>
       
       {description && (
         <SpacingControl
@@ -132,7 +117,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
                 </TabsTrigger>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Estrai automaticamente i contenuti da un URL</p>
+                <p>Estrai automaticamente il testo da un URL</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -141,15 +126,12 @@ const TextEditor: React.FC<TextEditorProps> = ({
           {renderTextControls()}
         </TabsContent>
         <TabsContent value="fetch">
-          <div className="space-y-4">
-            <UrlInput
-              onTitleExtracted={onTitleExtracted}
-              onDescriptionExtracted={onDescriptionExtracted}
-              onImageExtracted={onImageExtracted}
-              onTabChange={onTabChange}
-              onLoadingChange={onLoadingChange}
-            />
-          </div>
+          <UrlInput 
+            onTitleExtracted={onTitleExtracted}
+            onDescriptionExtracted={onDescriptionExtracted}
+            onTabChange={onTabChange}
+            onLoadingChange={onLoadingChange}
+          />
         </TabsContent>
       </Tabs>
     </div>

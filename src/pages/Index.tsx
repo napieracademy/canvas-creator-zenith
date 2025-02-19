@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from '@/components/ui/use-toast';
@@ -10,54 +9,32 @@ import SafeZoneToggle from '@/components/SafeZoneToggle';
 import TextEditor from '@/components/TextEditor';
 import CanvasPreview from '@/components/CanvasPreview';
 import MagicButton from '@/components/MagicButton';
-import TemplateSelector from '@/components/TemplateSelector';
 import { colorPairs } from '@/data/colorPairs';
 import { calculateOptimalSizes } from '@/utils/fontSizeCalculator';
-import { getTemplate } from '@/data/templates';
 
 const Index = () => {
-  const [template, setTemplate] = useState<'klaus' | 'lucky'>('klaus');
   const getRandomTheme = () => {
     const randomIndex = Math.floor(Math.random() * colorPairs.length);
     return colorPairs[randomIndex];
   };
 
   const randomTheme = getRandomTheme();
-  const currentTemplate = getTemplate(template);
 
   const [text, setText] = useState('Social Image Creator');
   const [description, setDescription] = useState('Crea bellissime immagini per i social media in pochi secondi. Personalizza colori, font e layout per ottenere il massimo impatto visivo.');
-  const [backgroundColor, setBackgroundColor] = useState(currentTemplate.backgroundColor);
-  const [textAlign, setTextAlign] = useState(currentTemplate.textAlign);
-  const [descriptionAlign, setDescriptionAlign] = useState(currentTemplate.descriptionAlign);
-  const [fontSize, setFontSize] = useState(currentTemplate.fontSize);
-  const [descriptionFontSize, setDescriptionFontSize] = useState(currentTemplate.descriptionFontSize);
-  const [spacing, setSpacing] = useState(currentTemplate.spacing);
-  const [effectiveFontSize, setEffectiveFontSize] = useState(currentTemplate.fontSize);
-  const [textColor, setTextColor] = useState(currentTemplate.textColor);
+  const [backgroundColor, setBackgroundColor] = useState(randomTheme.background);
+  const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right'>('left');
+  const [descriptionAlign, setDescriptionAlign] = useState<'left' | 'center' | 'right'>('left');
+  const [fontSize, setFontSize] = useState(111);
+  const [descriptionFontSize, setDescriptionFontSize] = useState(56);
+  const [spacing, setSpacing] = useState(100);
+  const [effectiveFontSize, setEffectiveFontSize] = useState(111);
+  const [textColor, setTextColor] = useState(randomTheme.text);
   const [showSafeZone, setShowSafeZone] = useState(false);
   const [format, setFormat] = useState<'post' | 'story'>('post');
   const [activeTab, setActiveTab] = useState('manual');
   const [isLoading, setIsLoading] = useState(false);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const isMobile = useIsMobile();
-
-  const handleTemplateChange = (newTemplate: 'klaus' | 'lucky') => {
-    const template = getTemplate(newTemplate);
-    setTemplate(newTemplate);
-    setBackgroundColor(template.backgroundColor);
-    setTextAlign(template.textAlign);
-    setDescriptionAlign(template.descriptionAlign);
-    setFontSize(template.fontSize);
-    setDescriptionFontSize(template.descriptionFontSize);
-    setSpacing(template.spacing);
-    setTextColor(template.textColor);
-
-    toast({
-      title: "Template cambiato",
-      description: `Template: ${template.name}`,
-    });
-  };
 
   useEffect(() => {
     toast({
@@ -87,51 +64,28 @@ const Index = () => {
     });
   };
 
-  const handleImageExtracted = (imageUrl: string) => {
-    setImageUrl(imageUrl);
-  };
-
   const handleDownload = () => {
-    // Quando c'è un'immagine caricata, non permettiamo il download diretto
-    if (imageUrl) {
-      toast({
-        title: "Screenshot necessario",
-        description: "Per salvare un'immagine con contenuti esterni, utilizza la funzione screenshot del tuo browser (⌘+Shift+S su Mac, Ctrl+Shift+S su Windows)",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    // Se non c'è un'immagine esterna, procediamo con il download normale
     const canvas = document.querySelector('canvas');
-    if (!canvas) {
-      toast({
-        title: "Errore",
-        description: "Canvas non trovato",
-        variant: "destructive"
-      });
-      return;
-    }
+    if (!canvas) return;
 
-    try {
-      const dataUrl = canvas.toDataURL('image/png');
-      const link = document.createElement('a');
-      link.download = `social-image-${format}.png`;
-      link.href = dataUrl;
-      link.click();
+    const tempCanvas = document.createElement('canvas');
+    const ctx = tempCanvas.getContext('2d');
+    if (!ctx) return;
 
-      toast({
-        title: "Immagine scaricata",
-        description: `L'immagine è stata salvata nel formato ${format === 'post' ? 'post (1080x1350)' : 'story (1080x1920)'}`,
-      });
-    } catch (error) {
-      console.error('Errore durante il download:', error);
-      toast({
-        title: "Screenshot necessario",
-        description: "Per salvare l'immagine, utilizza la funzione screenshot del tuo browser (⌘+Shift+S su Mac, Ctrl+Shift+S su Windows)",
-        variant: "destructive"
-      });
-    }
+    tempCanvas.width = 1080;
+    tempCanvas.height = format === 'post' ? 1350 : 1920;
+
+    ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, tempCanvas.width, tempCanvas.height);
+
+    const link = document.createElement('a');
+    link.download = `social-image-${format}.png`;
+    link.href = tempCanvas.toDataURL('image/png');
+    link.click();
+
+    toast({
+      title: "Immagine scaricata",
+      description: `L'immagine è stata salvata nel formato ${format === 'post' ? 'post (1080x1350)' : 'story (1080x1920)'}`,
+    });
   };
 
   const handleMagicOptimization = () => {
@@ -196,11 +150,6 @@ const Index = () => {
             disabled={isLoading}
           />
 
-          <TemplateSelector
-            currentTemplate={template}
-            onTemplateChange={handleTemplateChange}
-          />
-
           <TextEditor 
             text={text}
             description={description}
@@ -218,7 +167,6 @@ const Index = () => {
             onSpacingChange={setSpacing}
             onTitleExtracted={handleTitleExtracted}
             onDescriptionExtracted={handleDescriptionExtracted}
-            onImageExtracted={handleImageExtracted}
             onTabChange={setActiveTab}
             onLoadingChange={setIsLoading}
             disabled={isLoading}
@@ -248,8 +196,6 @@ const Index = () => {
             showSafeZone={showSafeZone}
             format={format}
             onSpacingChange={setSpacing}
-            imageUrl={imageUrl}
-            template={template}
           />
           <div className="absolute top-3 right-3 flex gap-2">
             <MagicButton onMagicOptimization={handleMagicOptimization} disabled={isLoading} />

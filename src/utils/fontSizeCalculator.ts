@@ -1,70 +1,38 @@
 
-export const calculateOptimalSizes = (title: string, description: string, template: 'klaus' | 'lucky' = 'klaus') => {
-  if (template === 'lucky') {
-    // Calcola il font size del titolo per Lucky
-    let titleFontSize = 70; // Default size per Lucky
-    const titleLength = title.length;
-    
-    if (titleLength > 50) {
-      titleFontSize = 56;
-    } else if (titleLength > 30) {
-      titleFontSize = 64;
-    }
-
-    // Calcola il font size della descrizione per Lucky
-    let descriptionFontSize = 50; // Default size per Lucky
-    const descriptionLength = description.length;
-    
-    if (descriptionLength > 200) {
-      descriptionFontSize = 36;
-    } else if (descriptionLength > 100) {
-      descriptionFontSize = 42;
-    }
-
-    // Calcola lo spacing ottimale per Lucky
-    let spacing = 80;
-    if (titleLength > 30 || descriptionLength > 100) {
-      spacing = 60;
-    }
-    if (titleLength > 50 || descriptionLength > 200) {
-      spacing = 40;
-    }
-
-    return {
-      titleFontSize,
-      descriptionFontSize,
-      spacing
-    };
-  }
-
-  // Klaus template mantiene le dimensioni originali
-  let titleFontSize = 120;
+export const calculateOptimalSizes = (title: string, description: string) => {
+  // Calcola il font size del titolo in base alla lunghezza
+  let titleFontSize = 120; // Default size più grande per mobile
   const titleLength = title.length;
   
   if (titleLength > 50) {
-    titleFontSize = 72;
+    titleFontSize = 72; // Minimo 72px per garantire leggibilità
   } else if (titleLength > 30) {
     titleFontSize = 88;
   } else if (titleLength > 20) {
     titleFontSize = 96;
   }
 
-  let descriptionFontSize = 72;
+  // Calcola il font size della descrizione
+  let descriptionFontSize = 72; // Default size più grande per mobile
   const descriptionLength = description.length;
   
   if (descriptionLength > 200) {
-    descriptionFontSize = 48;
+    descriptionFontSize = 48; // Minimo 48px per garantire leggibilità
   } else if (descriptionLength > 100) {
     descriptionFontSize = 56;
   } else if (descriptionLength > 50) {
     descriptionFontSize = 64;
   }
 
-  let spacing = 120;
+  // Calcola lo spazio tra titolo e descrizione
+  let spacing = 120; // Default spacing più ampio
   
+  // Aumenta lo spazio se entrambi i testi sono corti
   if (titleLength < 20 && descriptionLength < 50) {
     spacing = 160;
-  } else if (titleLength > 30 || descriptionLength > 100) {
+  }
+  // Riduci lo spazio se uno dei testi è lungo, ma mantieni comunque una buona spaziatura
+  else if (titleLength > 30 || descriptionLength > 100) {
     spacing = 100;
   }
 
