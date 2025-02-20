@@ -1,4 +1,3 @@
-
 import React from 'react';
 import FormatSelector from '@/components/FormatSelector';
 import TextEditor from '@/components/TextEditor';
@@ -31,6 +30,7 @@ interface SidebarProps {
   onDescriptionExtracted: (description: string) => void;
   onTabChange: (value: string) => void;
   onLoadingChange: (loading: boolean) => void;
+  onCreditsExtracted: (credits: string) => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -57,7 +57,8 @@ const Sidebar: React.FC<SidebarProps> = ({
   onTitleExtracted,
   onDescriptionExtracted,
   onTabChange,
-  onLoadingChange
+  onLoadingChange,
+  onCreditsExtracted
 }) => {
   return (
     <div className="h-screen p-6 border-r bg-white overflow-y-auto">

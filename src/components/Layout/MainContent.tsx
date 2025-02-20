@@ -19,6 +19,7 @@ interface MainContentProps {
   format: 'post' | 'story';
   currentFont: string;
   isLoading: boolean;
+  credits: string;
   onEffectiveFontSizeChange: (size: number) => void;
   onShowSafeZoneChange: (show: boolean) => void;
   onSpacingChange: (spacing: number) => void;
@@ -40,6 +41,7 @@ const MainContent: React.FC<MainContentProps> = ({
   format,
   currentFont,
   isLoading,
+  credits,
   onEffectiveFontSizeChange,
   onShowSafeZoneChange,
   onSpacingChange,
@@ -64,6 +66,7 @@ const MainContent: React.FC<MainContentProps> = ({
           format={format}
           onSpacingChange={onSpacingChange}
           font={currentFont}
+          credits={credits}
         />
         <div className="absolute top-3 right-3 flex gap-2">
           <MagicButton onMagicOptimization={onMagicOptimization} disabled={isLoading} />
