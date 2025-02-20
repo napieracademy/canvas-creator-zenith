@@ -73,8 +73,8 @@ const MainContent: React.FC<MainContentProps> = ({
   onFormatChange
 }) => {
   return (
-    <div className="h-screen p-6">
-      <div className="relative">
+    <div className="h-screen p-6 flex justify-end">
+      <div className="relative max-w-[calc(100vh-120px)]">
         <CanvasPreview 
           text={text}
           description={description}
