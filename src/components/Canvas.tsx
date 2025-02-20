@@ -1,5 +1,5 @@
 
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { CanvasProps } from '@/types/canvas';
 import { useCanvasScale } from '@/hooks/useCanvasScale';
 import { 
@@ -26,7 +26,8 @@ const Canvas: React.FC<CanvasProps> = ({
   onFontSizeChange,
   onDescriptionFontSizeChange,
   onSpacingChange,
-  onEffectiveFontSizeChange
+  onEffectiveFontSizeChange,
+  credits
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -98,6 +99,12 @@ const Canvas: React.FC<CanvasProps> = ({
           if (description) {
             drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', spacing);
           }
+          if (credits) {
+            ctx.font = `16px ${fontFamily}`;
+            ctx.fillStyle = textColor;
+            ctx.textAlign = 'left';
+            ctx.fillText(credits, SAFE_ZONE_MARGIN, ORIGINAL_HEIGHT - SAFE_ZONE_MARGIN + 8);
+          }
         };
         img.src = backgroundColor.slice(4, -1);
       } else {
@@ -122,11 +129,16 @@ const Canvas: React.FC<CanvasProps> = ({
         if (description) {
           drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', spacing);
         }
+        if (credits) {
+          ctx.font = `16px ${fontFamily}`;
+          ctx.fillStyle = textColor;
+          ctx.textAlign = 'left';
+          ctx.fillText(credits, SAFE_ZONE_MARGIN, ORIGINAL_HEIGHT - SAFE_ZONE_MARGIN + 8);
+        }
       }
     });
-  }, [text, description, backgroundColor, textAlign, descriptionAlign, textColor, fontSize, descriptionFontSize, spacing, showSafeZone, format, overlay, font]);
+  }, [text, description, backgroundColor, textAlign, descriptionAlign, textColor, fontSize, descriptionFontSize, spacing, showSafeZone, format, overlay, font, credits]);
 
-  // Effetto per aggiornare il font size effettivo quando cambia il font size
   useEffect(() => {
     if (onEffectiveFontSizeChange) {
       onEffectiveFontSizeChange(fontSize);

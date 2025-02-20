@@ -4,6 +4,7 @@ interface MetadataResult {
   title?: string;
   description?: string;
   image?: string;
+  credits?: string;
   error?: string;
 }
 
@@ -29,7 +30,7 @@ export class MetaService {
         doc.querySelector('meta[property="og:title"]')?.getAttribute('content') ||
         doc.querySelector('title')?.textContent || '';
 
-      let description = 
+      const description = 
         doc.querySelector('meta[property="og:description"]')?.getAttribute('content') ||
         doc.querySelector('meta[name="description"]')?.getAttribute('content') || '';
 
@@ -45,24 +46,22 @@ export class MetaService {
         doc.querySelector('meta[property="og:site_name"]')?.getAttribute('content') ||
         doc.querySelector('meta[name="publisher"]')?.getAttribute('content') || '';
 
+      let credits = '';
       if (author || publisher) {
-        const credits = [author, publisher]
+        credits = [author, publisher]
           .filter(Boolean)
           .map(text => text.toLowerCase())
           .join(' · ');
-        
-        if (credits) {
-          description = `${description.trim()}\n\n${credits}`;
-        }
       }
 
-      console.log('Extracted metadata:', { title, description, image });
+      console.log('Extracted metadata:', { title, description, image, credits });
 
       return {
         success: true,
         title: title.trim(),
         description: description.trim(),
-        image: image.trim()
+        image: image.trim(),
+        credits: credits
       };
 
     } catch (error) {
