@@ -26,22 +26,34 @@ export function calculateLines(context: CanvasContext, text: string, size: numbe
   const maxWidth = width - (2 * safeZoneMargin);
   
   ctx.font = `${type === 'title' ? 'bold' : ''} ${size}px ${fontFamily}`;
-  const words = text.split(' ');
+  
+  // Prima dividiamo per i ritorni a capo manuali
+  const paragraphs = text.split('\n');
   const lines: string[] = [];
-  let currentLine = '';
 
-  for (const word of words) {
-    const testLine = currentLine ? `${currentLine} ${word}` : word;
-    const metrics = ctx.measureText(testLine);
-
-    if (metrics.width > maxWidth) {
-      if (currentLine) lines.push(currentLine);
-      currentLine = word;
-    } else {
-      currentLine = testLine;
+  // Per ogni paragrafo, calcoliamo il word wrap
+  for (const paragraph of paragraphs) {
+    if (!paragraph.trim()) {
+      lines.push(''); // Manteniamo le linee vuote
+      continue;
     }
+
+    const words = paragraph.split(' ');
+    let currentLine = '';
+
+    for (const word of words) {
+      const testLine = currentLine ? `${currentLine} ${word}` : word;
+      const metrics = ctx.measureText(testLine);
+
+      if (metrics.width > maxWidth) {
+        if (currentLine) lines.push(currentLine);
+        currentLine = word;
+      } else {
+        currentLine = testLine;
+      }
+    }
+    if (currentLine) lines.push(currentLine);
   }
-  if (currentLine) lines.push(currentLine);
   
   return lines;
 }
