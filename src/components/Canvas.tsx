@@ -96,20 +96,30 @@ const Canvas: React.FC<CanvasProps> = ({
           }
 
           drawText(context, text, textAlign, textColor, fontSize, 'title', spacing);
+          
+          // Draw description and credits on the same line if both exist
           if (description) {
             drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', spacing);
-          }
-
-          // Draw credits at the bottom
-          if (credits) {
-            ctx.font = `12px ${fontFamily}`;
+            
+            if (credits) {
+              // Draw credits next to description
+              ctx.font = `${descriptionFontSize}px ${fontFamily}`;
+              ctx.fillStyle = textColor;
+              ctx.textAlign = 'right';
+              const x = ORIGINAL_WIDTH - SAFE_ZONE_MARGIN;
+              const y = (ORIGINAL_HEIGHT / 2) + (spacing / 2) + (descriptionFontSize * 1.2 / 2);
+              ctx.fillText(` · ${credits}`, x, y);
+            }
+          } else if (credits) {
+            // If no description, draw credits alone
+            ctx.font = `${descriptionFontSize}px ${fontFamily}`;
             ctx.fillStyle = textColor;
             ctx.textAlign = textAlign;
-            const creditsY = ORIGINAL_HEIGHT - SAFE_ZONE_MARGIN - 20;
             const x = textAlign === 'left' ? SAFE_ZONE_MARGIN : 
                      textAlign === 'right' ? ORIGINAL_WIDTH - SAFE_ZONE_MARGIN : 
                      ORIGINAL_WIDTH / 2;
-            ctx.fillText(credits, x, creditsY);
+            const y = (ORIGINAL_HEIGHT / 2) + (spacing / 2);
+            ctx.fillText(credits, x, y);
           }
         };
         img.src = backgroundColor.slice(4, -1);
@@ -132,20 +142,30 @@ const Canvas: React.FC<CanvasProps> = ({
         }
 
         drawText(context, text, textAlign, textColor, fontSize, 'title', spacing);
+        
+        // Draw description and credits on the same line if both exist
         if (description) {
           drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', spacing);
-        }
-
-        // Draw credits at the bottom
-        if (credits) {
-          ctx.font = `12px ${fontFamily}`;
+          
+          if (credits) {
+            // Draw credits next to description
+            ctx.font = `${descriptionFontSize}px ${fontFamily}`;
+            ctx.fillStyle = textColor;
+            ctx.textAlign = 'right';
+            const x = ORIGINAL_WIDTH - SAFE_ZONE_MARGIN;
+            const y = (ORIGINAL_HEIGHT / 2) + (spacing / 2) + (descriptionFontSize * 1.2 / 2);
+            ctx.fillText(` · ${credits}`, x, y);
+          }
+        } else if (credits) {
+          // If no description, draw credits alone
+          ctx.font = `${descriptionFontSize}px ${fontFamily}`;
           ctx.fillStyle = textColor;
           ctx.textAlign = textAlign;
-          const creditsY = ORIGINAL_HEIGHT - SAFE_ZONE_MARGIN - 20;
           const x = textAlign === 'left' ? SAFE_ZONE_MARGIN : 
                    textAlign === 'right' ? ORIGINAL_WIDTH - SAFE_ZONE_MARGIN : 
                    ORIGINAL_WIDTH / 2;
-          ctx.fillText(credits, x, creditsY);
+          const y = (ORIGINAL_HEIGHT / 2) + (spacing / 2);
+          ctx.fillText(credits, x, y);
         }
       }
     });
@@ -171,3 +191,4 @@ const Canvas: React.FC<CanvasProps> = ({
 };
 
 export default Canvas;
+
