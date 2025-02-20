@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Label } from './ui/label';
+import { Progress } from './ui/progress';
 import { useToast } from './ui/use-toast';
 import { MetaService } from '@/utils/MetaService';
 import { Loader2, Image as ImageIcon } from 'lucide-react';
@@ -25,7 +26,23 @@ const UrlInput: React.FC<UrlInputProps> = ({
 }) => {
   const [url, setUrl] = useState('');
   const [isImageUrl, setIsImageUrl] = useState(false);
+  const [progress, setProgress] = useState(0);
   const { toast } = useToast();
+
+  const simulateProgress = () => {
+    setProgress(0);
+    const interval = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 90) {
+          clearInterval(interval);
+          return prev;
+        }
+        return prev + 10;
+      });
+    }, 500);
+
+    return () => clearInterval(interval);
+  };
 
   const isValidImageUrl = (url: string) => {
     const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
@@ -41,14 +58,15 @@ const UrlInput: React.FC<UrlInputProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     onLoadingChange?.(true);
+    const stopProgress = simulateProgress();
 
     try {
       if (isImageUrl) {
-        // Test if the image URL is valid
         const img = new Image();
         img.onload = () => {
           if (onImageExtracted) {
             onImageExtracted(url);
+            setProgress(100);
             toast({
               title: "Immagine caricata",
               description: "L'immagine è stata aggiunta correttamente",
@@ -64,7 +82,6 @@ const UrlInput: React.FC<UrlInputProps> = ({
         };
         img.src = url;
       } else {
-        // Se non è un'immagine, estraiamo i metadati come prima
         const result = await MetaService.extractMetadata(url);
         
         if (result.success) {
@@ -87,12 +104,13 @@ const UrlInput: React.FC<UrlInputProps> = ({
             extracted = true;
           }
           if (result.credits) {
-            // Emettiamo l'evento credits
             const creditsEvent = new CustomEvent('creditsExtracted', {
               detail: { credits: result.credits }
             });
             document.dispatchEvent(creditsEvent);
           }
+
+          setProgress(100);
 
           if (extracted) {
             toast({
@@ -127,49 +145,57 @@ const UrlInput: React.FC<UrlInputProps> = ({
       });
     } finally {
       onLoadingChange?.(false);
+      stopProgress();
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-2">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <Label className="text-sm font-medium text-gray-700">
         {isImageUrl ? "URL dell'immagine" : "URL dell'articolo"}
       </Label>
-      <div className="flex gap-2">
-        <Input
-          type="url"
-          value={url}
-          onChange={handleUrlChange}
-          placeholder={isImageUrl ? "https://example.com/image.jpg" : "https://example.com/article"}
-          className="flex-1"
-          required
-        />
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button type="submit">
-                {isImageUrl ? (
-                  <>
+      <div className="space-y-2">
+        <div className="flex gap-2">
+          <Input
+            type="url"
+            value={url}
+            onChange={handleUrlChange}
+            placeholder={isImageUrl ? "https://example.com/image.jpg" : "https://example.com/article"}
+            className="flex-1"
+            required
+          />
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button type="submit" disabled={progress > 0 && progress < 100}>
+                  {progress > 0 && progress < 100 ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : isImageUrl ? (
                     <ImageIcon className="mr-2 h-4 w-4" />
-                    Carica immagine
-                  </>
-                ) : (
-                  "Estrai contenuti"
-                )}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>
-                {isImageUrl 
-                  ? "Carica un'immagine da URL" 
-                  : "Estrai automaticamente titolo e descrizione dall'URL"}
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+                  ) : null}
+                  {isImageUrl ? "Carica immagine" : "Estrai contenuti"}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>
+                  {isImageUrl 
+                    ? "Carica un'immagine da URL" 
+                    : "Estrai automaticamente titolo e descrizione dall'URL"}
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+        {progress > 0 && (
+          <div className="space-y-1">
+            <Progress value={progress} className="h-2" />
+            <p className="text-sm text-gray-500 text-right">{progress}%</p>
+          </div>
+        )}
       </div>
     </form>
   );
 };
 
 export default UrlInput;
+
