@@ -22,6 +22,8 @@ interface TextEditorProps {
   onTabChange: (value: string) => void;
   onLoadingChange: (loading: boolean) => void;
   disabled?: boolean;
+  extractedContent?: string;
+  onContentExtracted?: (content: string) => void;
 }
 
 const TextEditor: React.FC<TextEditorProps> = ({
@@ -31,17 +33,21 @@ const TextEditor: React.FC<TextEditorProps> = ({
   descriptionAlign,
   fontSize,
   descriptionFontSize,
+  spacing,
   onTextChange,
   onDescriptionChange,
   onTextAlignChange,
   onDescriptionAlignChange,
   onFontSizeChange,
   onDescriptionFontSizeChange,
+  onSpacingChange,
   onTitleExtracted,
   onDescriptionExtracted,
   onTabChange,
   onLoadingChange,
-  disabled
+  disabled,
+  extractedContent,
+  onContentExtracted
 }) => {
   return (
     <div className="space-y-4">
@@ -60,6 +66,8 @@ const TextEditor: React.FC<TextEditorProps> = ({
           onTabChange={onTabChange}
           onLoadingChange={onLoadingChange}
           otherText={description}
+          extractedContent={extractedContent}
+          onContentExtracted={onContentExtracted}
         />
 
         <TextInput 
@@ -72,6 +80,8 @@ const TextEditor: React.FC<TextEditorProps> = ({
           label="Descrizione"
           disabled={disabled}
           otherText={text}
+          extractedContent={extractedContent}
+          onContentExtracted={onContentExtracted}
         />
       </div>
     </div>

@@ -17,6 +17,7 @@ interface SidebarProps {
   textColor: string;
   currentFont: string;
   disabled?: boolean;
+  extractedContent?: string;
   onFormatChange: (format: 'post' | 'story') => void;
   onTextChange: (text: string) => void;
   onDescriptionChange: (description: string) => void;
@@ -30,6 +31,7 @@ interface SidebarProps {
   onTabChange: (value: string) => void;
   onLoadingChange: (loading: boolean) => void;
   onColorSelect: (background: string, text: string) => void;
+  onContentExtracted?: (content: string) => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -44,6 +46,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   textColor,
   currentFont,
   disabled,
+  extractedContent,
   onTextChange,
   onDescriptionChange,
   onTextAlignChange,
@@ -55,7 +58,8 @@ const Sidebar: React.FC<SidebarProps> = ({
   onDescriptionExtracted,
   onTabChange,
   onLoadingChange,
-  onColorSelect
+  onColorSelect,
+  onContentExtracted
 }) => {
   return (
     <div className="h-screen p-6 border-r bg-white overflow-y-auto">
@@ -82,6 +86,8 @@ const Sidebar: React.FC<SidebarProps> = ({
           onTabChange={onTabChange}
           onLoadingChange={onLoadingChange}
           disabled={disabled}
+          extractedContent={extractedContent}
+          onContentExtracted={onContentExtracted}
         />
 
         <ColorPresets 
