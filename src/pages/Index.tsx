@@ -33,6 +33,7 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState('manual');
   const [isLoading, setIsLoading] = useState(false);
   const [currentFont, setCurrentFont] = useState('');
+  const [credits, setCredits] = useState('');
 
   useEffect(() => {
     toast({
@@ -164,6 +165,13 @@ const Index = () => {
         }}
         onTabChange={setActiveTab}
         onLoadingChange={setIsLoading}
+        onCreditsExtracted={(newCredits) => {
+          setCredits(newCredits);
+          toast({
+            title: "Credits estratti",
+            description: "I credits sono stati aggiornati",
+          });
+        }}
       />
       
       <MainContent
@@ -185,6 +193,7 @@ const Index = () => {
         onSpacingChange={setSpacing}
         onMagicOptimization={handleMagicOptimization}
         onDownload={handleDownload}
+        credits={credits}
       />
     </div>
   );
