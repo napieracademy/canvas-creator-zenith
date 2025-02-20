@@ -23,12 +23,15 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
   return (
     <div className="space-y-4">
       <Tabs defaultValue="classic" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="classic" className="text-xs px-1">
             Classici
           </TabsTrigger>
           <TabsTrigger value="cosmic" className="text-xs px-1">
             Cosmici
+          </TabsTrigger>
+          <TabsTrigger value="retro" className="text-xs px-1">
+            Retrò
           </TabsTrigger>
           <TabsTrigger value="featured" className="text-xs px-1" disabled={!featuredImage}>
             Featured
@@ -45,6 +48,14 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
         <TabsContent value="cosmic" className="mt-4">
           <ColorPaletteCarousel 
             colors={colorPairs.filter(pair => pair.category === 'cosmic')}
+            currentBackground={currentBackground}
+            currentText={currentText}
+            onSelectColors={onSelectColors}
+          />
+        </TabsContent>
+        <TabsContent value="retro" className="mt-4">
+          <ColorPaletteCarousel 
+            colors={colorPairs.filter(pair => pair.category === 'retro')}
             currentBackground={currentBackground}
             currentText={currentText}
             onSelectColors={onSelectColors}

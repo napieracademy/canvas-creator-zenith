@@ -153,5 +153,30 @@ export const colorPairs: ColorPresetPair[] = [
     background: "linear-gradient(135deg, #1D4ED8 0%, #4F46E5 100%)",
     text: "#F472B6",
     category: 'cosmic'
+  },
+  // Temi Retrò
+  {
+    name: "Vinyl Blues",
+    background: "linear-gradient(135deg, #2B2D42 0%, #403E43 100%)",
+    text: "#F2FCE2",
+    category: 'retro'
+  },
+  {
+    name: "Arcade Neon",
+    background: "linear-gradient(135deg, #221F26 0%, #1A1F2C 100%)",
+    text: "#F97316",
+    category: 'retro'
+  },
+  {
+    name: "Pastel Wave",
+    background: "linear-gradient(135deg, #E5DEFF 0%, #FFDEE2 100%)",
+    text: "#7E69AB",
+    category: 'retro'
+  },
+  {
+    name: "Vintage Radio",
+    background: "linear-gradient(135deg, #FDE1D3 0%, #D3E4FD 100%)",
+    text: "#403E43",
+    category: 'retro'
   }
 ];

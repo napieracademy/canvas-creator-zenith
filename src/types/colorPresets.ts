@@ -3,7 +3,7 @@ export interface ColorPresetPair {
   name: string;
   background: string;
   text: string;
-  category: 'classic' | 'cosmic' | 'featured';
+  category: 'classic' | 'cosmic' | 'featured' | 'retro';
   overlay?: string;
 }
 
