@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -124,29 +123,26 @@ const Sidebar: React.FC<SidebarProps> = ({
       <div className="space-y-4">
         <div className="space-y-4">
           <div className="flex flex-col gap-2">
-            <Label className="text-sm font-medium text-gray-700">Logo</Label>
+            <Label>Logo</Label>
             <div className="flex gap-2 items-center">
-              <div className="flex-1">
-                <Input
-                  type="file"
-                  onChange={handleLogoChange}
-                  accept="image/*"
-                  className="w-full file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-secondary file:text-secondary-foreground hover:file:bg-secondary/80"
-                />
-              </div>
+              <Input
+                type="file"
+                onChange={handleLogoChange}
+                accept="image/*"
+                className="flex-1"
+              />
               <Button
                 variant="outline"
                 size="icon"
                 onClick={() => onLogoChange?.('/placeholder.svg')}
                 title="Rimuovi logo"
-                className="shrink-0"
               >
                 <Image className="h-4 w-4" />
               </Button>
             </div>
           </div>
 
-          <Separator className="my-6" />
+          <Separator />
           
           <div className="space-y-6">
             <Header />
