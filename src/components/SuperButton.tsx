@@ -42,7 +42,33 @@ const SuperButton: React.FC<SuperButtonProps> = ({
     return isTitle ? data?.title?.improvedText : data?.description?.improvedText;
   };
 
+  const detectLanguage = async (text: string) => {
+    const { data, error } = await supabase.functions.invoke('translate-text', {
+      body: {
+        texts: { title: text, description: '' },
+        mode: 'detect'
+      }
+    });
+
+    if (error) throw error;
+    return data.detectedLanguage;
+  };
+
   const translateTexts = async (title: string, desc: string) => {
+    // Controllo della lingua per il titolo
+    const titleLang = await detectLanguage(title);
+    const descLang = await detectLanguage(desc);
+
+    // Se entrambi i testi sono già in italiano, ritorna i testi originali
+    if (titleLang === 'it' && descLang === 'it') {
+      toast({
+        title: "Informazione",
+        description: "I testi sono già in italiano, nessuna traduzione necessaria"
+      });
+      return { title, description: desc };
+    }
+
+    // Altrimenti procedi con la traduzione
     const { data, error } = await supabase.functions.invoke('translate-text', {
       body: {
         texts: { title, description: desc },
