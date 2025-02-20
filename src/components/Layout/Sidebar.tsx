@@ -1,9 +1,9 @@
+
 import React from 'react';
 import FormatSelector from '@/components/FormatSelector';
 import TextEditor from '@/components/TextEditor';
 import ColorPresets from '@/components/ColorPresets';
 import Header from '@/components/Layout/Header';
-import { toast } from '@/components/ui/use-toast';
 
 interface SidebarProps {
   format: 'post' | 'story';
@@ -16,7 +16,8 @@ interface SidebarProps {
   spacing: number;
   backgroundColor: string;
   textColor: string;
-  isLoading: boolean;
+  currentFont: string;
+  disabled?: boolean;
   onFormatChange: (format: 'post' | 'story') => void;
   onTextChange: (text: string) => void;
   onDescriptionChange: (description: string) => void;
@@ -25,12 +26,11 @@ interface SidebarProps {
   onFontSizeChange: (size: number) => void;
   onDescriptionFontSizeChange: (size: number) => void;
   onSpacingChange: (spacing: number) => void;
-  onColorSelect: (background: string, text: string, overlay?: string, font?: string) => void;
   onTitleExtracted: (title: string) => void;
   onDescriptionExtracted: (description: string) => void;
   onTabChange: (value: string) => void;
   onLoadingChange: (loading: boolean) => void;
-  onCreditsExtracted: (credits: string) => void;
+  onColorSelect: (background: string, text: string) => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -44,7 +44,8 @@ const Sidebar: React.FC<SidebarProps> = ({
   spacing,
   backgroundColor,
   textColor,
-  isLoading,
+  currentFont,
+  disabled,
   onFormatChange,
   onTextChange,
   onDescriptionChange,
@@ -53,12 +54,11 @@ const Sidebar: React.FC<SidebarProps> = ({
   onFontSizeChange,
   onDescriptionFontSizeChange,
   onSpacingChange,
-  onColorSelect,
   onTitleExtracted,
   onDescriptionExtracted,
   onTabChange,
   onLoadingChange,
-  onCreditsExtracted
+  onColorSelect
 }) => {
   return (
     <div className="h-screen p-6 border-r bg-white overflow-y-auto">
@@ -68,7 +68,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         <FormatSelector 
           format={format}
           onFormatChange={onFormatChange}
-          disabled={isLoading}
+          disabled={disabled}
         />
 
         <TextEditor 
@@ -90,7 +90,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           onDescriptionExtracted={onDescriptionExtracted}
           onTabChange={onTabChange}
           onLoadingChange={onLoadingChange}
-          disabled={isLoading}
+          disabled={disabled}
         />
 
         <ColorPresets 
