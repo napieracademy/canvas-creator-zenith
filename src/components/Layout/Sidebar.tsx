@@ -3,6 +3,7 @@ import React from 'react';
 import FormatSelector from '@/components/FormatSelector';
 import TextEditor from '@/components/TextEditor';
 import ColorPresets from '@/components/ColorPresets';
+import Header from '@/components/Layout/Header';
 import { toast } from '@/components/ui/use-toast';
 
 interface SidebarProps {
