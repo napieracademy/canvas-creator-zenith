@@ -79,7 +79,11 @@ export function drawText(
   }
 
   ctx.save();
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+  if (type === 'title') {
+    ctx.fillStyle = 'rgba(135, 140, 150, 0.15)'; // Grigio bluastro per il titolo
+  } else {
+    ctx.fillStyle = 'rgba(145, 145, 155, 0.15)'; // Grigio leggermente più chiaro per la descrizione
+  }
   const areaHeight = fontSize * 2;
   let areaY;
   if (type === 'title') {
