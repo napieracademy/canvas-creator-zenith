@@ -13,21 +13,21 @@ export class MetaService {
     try {
       console.log('Attempting to fetch metadata via proxy for URL:', url);
 
-      // Usiamo cors-anywhere come alternativa a allorigins
-      const proxyUrl = `https://cors-anywhere.herokuapp.com/${url}`;
-      const response = await fetch(proxyUrl, {
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest'
-        }
-      });
+      // Utilizziamo api.allorigins.win come proxy CORS
+      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+      const response = await fetch(proxyUrl);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const contents = await response.text();
+      const data = await response.json();
+      if (!data.contents) {
+        throw new Error('Nessun contenuto ricevuto dal proxy');
+      }
+
       const parser = new DOMParser();
-      const doc = parser.parseFromString(contents, 'text/html');
+      const doc = parser.parseFromString(data.contents, 'text/html');
 
       const title = 
         doc.querySelector('meta[property="og:title"]')?.getAttribute('content') ||
