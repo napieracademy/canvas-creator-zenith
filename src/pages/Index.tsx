@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from '@/components/ui/use-toast';
@@ -44,6 +45,52 @@ const IndexPage = () => {
   const handleColorSelect = (background: string, text: string) => {
     setBackgroundColor(background);
     setTextColor(text);
+  };
+
+  const handleMagicOptimization = () => {
+    if (!text && !description) {
+      toast({
+        title: "Contenuto mancante",
+        description: "Inserisci del testo prima di utilizzare l'ottimizzazione automatica",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const { titleFontSize, descriptionFontSize: newDescFontSize, spacing: newSpacing } = calculateOptimalSizes(text, description);
+    
+    setFontSize(titleFontSize);
+    setDescriptionFontSize(newDescFontSize);
+    setSpacing(newSpacing);
+
+    toast({
+      title: "Layout ottimizzato",
+      description: "Le dimensioni sono state ottimizzate in base al contenuto"
+    });
+  };
+
+  const handleDownload = () => {
+    const canvas = document.querySelector('canvas');
+    if (!canvas) return;
+
+    const tempCanvas = document.createElement('canvas');
+    const ctx = tempCanvas.getContext('2d');
+    if (!ctx) return;
+
+    tempCanvas.width = 1080;
+    tempCanvas.height = format === 'post' ? 1350 : 1920;
+
+    ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, tempCanvas.width, tempCanvas.height);
+
+    const link = document.createElement('a');
+    link.download = `social-image-${format}.png`;
+    link.href = tempCanvas.toDataURL('image/png');
+    link.click();
+
+    toast({
+      title: "Immagine scaricata",
+      description: `L'immagine è stata salvata nel formato ${format === 'post' ? 'post (1080x1350)' : 'story (1080x1920)'}`,
+    });
   };
 
   if (isMobile) {
