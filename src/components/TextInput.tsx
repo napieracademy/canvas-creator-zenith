@@ -22,6 +22,7 @@ interface TextInputProps {
   onTabChange?: (value: string) => void;
   onLoadingChange?: (loading: boolean) => void;
   otherText?: string;
+  extractedContent?: string;
 }
 
 const TextInput: React.FC<TextInputProps> = ({ 
@@ -33,7 +34,8 @@ const TextInput: React.FC<TextInputProps> = ({
   onFontSizeChange,
   label,
   disabled,
-  otherText
+  otherText,
+  extractedContent
 }) => {
   const isDescription = label.toLowerCase() === 'descrizione';
   const hasTitle = isDescription && otherText && otherText.trim().length > 0;
@@ -84,9 +86,19 @@ const TextInput: React.FC<TextInputProps> = ({
         style={{ textAlign }}
         disabled={disabled}
       />
+
+      {extractedContent && (
+        <div className="mt-4">
+          <Label className="text-sm font-medium text-gray-700">Contenuto estratto</Label>
+          <Textarea
+            value={extractedContent}
+            readOnly
+            className="mt-2 resize-y min-h-[100px] max-h-[400px] bg-gray-50 text-sm"
+          />
+        </div>
+      )}
     </div>
   );
 };
 
 export default TextInput;
-

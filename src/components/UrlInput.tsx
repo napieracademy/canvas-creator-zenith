@@ -13,6 +13,7 @@ interface UrlInputProps {
   onTitleExtracted: (title: string) => void;
   onDescriptionExtracted: (description: string) => void;
   onImageExtracted?: (image: string) => void;
+  onContentExtracted?: (content: string) => void;
   onTabChange?: (value: string) => void;
   onLoadingChange?: (loading: boolean) => void;
 }
@@ -21,6 +22,7 @@ const UrlInput: React.FC<UrlInputProps> = ({
   onTitleExtracted, 
   onDescriptionExtracted,
   onImageExtracted,
+  onContentExtracted,
   onTabChange,
   onLoadingChange 
 }) => {
@@ -102,6 +104,9 @@ const UrlInput: React.FC<UrlInputProps> = ({
               description: "L'immagine è stata estratta dall'articolo",
             });
             extracted = true;
+          }
+          if (result.content && onContentExtracted) {
+            onContentExtracted(result.content);
           }
           if (result.credits) {
             const creditsEvent = new CustomEvent('creditsExtracted', {
@@ -198,4 +203,3 @@ const UrlInput: React.FC<UrlInputProps> = ({
 };
 
 export default UrlInput;
-

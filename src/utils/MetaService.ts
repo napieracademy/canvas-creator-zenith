@@ -5,6 +5,7 @@ interface MetadataResult {
   description?: string;
   image?: string;
   credits?: string;
+  content?: string;
   error?: string;
 }
 
@@ -152,7 +153,8 @@ export class MetaService {
         title: title.trim(),
         description: description.trim(),
         image: image.trim(),
-        credits: credits
+        credits: credits,
+        content: content
       };
 
     } catch (error) {
