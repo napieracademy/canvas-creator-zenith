@@ -87,7 +87,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
   return (
     <div className="space-y-4">
       <Tabs defaultValue="manual" onValueChange={onTabChange}>
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid grid-cols-2">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
