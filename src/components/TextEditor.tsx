@@ -96,7 +96,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
                   disabled={disabled}
                   aria-label="Inserisci manualmente il testo"
                 >
-                  Scrivi Testo
+                  Testo
                 </TabsTrigger>
               </TooltipTrigger>
               <TooltipContent>
@@ -113,7 +113,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
                   disabled={disabled}
                   aria-label="Estrai testo da un URL"
                 >
-                  Fetch da URL
+                  Fetch
                 </TabsTrigger>
               </TooltipTrigger>
               <TooltipContent>
