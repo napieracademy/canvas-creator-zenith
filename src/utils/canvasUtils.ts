@@ -68,6 +68,24 @@ export function drawText(
     return;
   }
 
+  // Disegna un rettangolo per visualizzare l'area
+  ctx.save();
+  if (type === 'title') {
+    ctx.fillStyle = 'rgba(255, 0, 0, 0.1)';
+  } else {
+    ctx.fillStyle = 'rgba(0, 255, 0, 0.1)';
+  }
+  const areaHeight = fontSize * 2;
+  let areaY;
+  if (type === 'title') {
+    areaY = (height / 2) - (spacing / 2) - areaHeight;
+  } else {
+    areaY = (height / 2) + (spacing / 2);
+  }
+  ctx.fillRect(SAFE_ZONE_MARGIN, areaY, width - (2 * SAFE_ZONE_MARGIN), areaHeight);
+  ctx.restore();
+
+  // Disegna il testo
   ctx.font = `${type === 'title' ? 'bold' : ''} ${fontSize}px ${fontFamily}`;
   ctx.fillStyle = textColor;
   ctx.textAlign = textAlign;
@@ -106,12 +124,21 @@ export function drawCredits(
   
   if (!credits?.trim()) return;
 
+  // Disegna un rettangolo per visualizzare l'area dei credits
+  ctx.save();
+  ctx.fillStyle = 'rgba(0, 0, 255, 0.1)';
+  const areaHeight = fontSize * 2;
+  const areaY = (height / 2) + (spacing / 2) + fontSize;
+  ctx.fillRect(SAFE_ZONE_MARGIN, areaY, width - (2 * SAFE_ZONE_MARGIN), areaHeight);
+  ctx.restore();
+
+  // Disegna il testo dei credits
   ctx.font = `${fontSize}px ${fontFamily}`;
   ctx.fillStyle = textColor;
   ctx.textAlign = textAlign;
   ctx.textBaseline = 'middle';
 
-  const startY = (height / 2) + (spacing / 2) + (fontSize * 1.5); // Posiziona sotto la descrizione
+  const startY = (height / 2) + (spacing / 2) + (fontSize * 1.5);
   const x = textAlign === 'left' ? SAFE_ZONE_MARGIN : 
            textAlign === 'right' ? width - SAFE_ZONE_MARGIN : 
            width / 2;
