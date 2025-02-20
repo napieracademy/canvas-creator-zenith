@@ -1,4 +1,3 @@
-
 import { CanvasContext } from '@/types/canvas';
 
 export const SAFE_ZONE_MARGIN = 120;
@@ -68,7 +67,6 @@ export function drawText(
     return;
   }
 
-  // Disegna un rettangolo per visualizzare l'area
   ctx.save();
   if (type === 'title') {
     ctx.fillStyle = 'rgba(255, 0, 0, 0.1)';
@@ -85,7 +83,6 @@ export function drawText(
   ctx.fillRect(SAFE_ZONE_MARGIN, areaY, width - (2 * SAFE_ZONE_MARGIN), areaHeight);
   ctx.restore();
 
-  // Disegna il testo
   ctx.font = `${type === 'title' ? 'bold' : ''} ${fontSize}px ${fontFamily}`;
   ctx.fillStyle = textColor;
   ctx.textAlign = textAlign;
@@ -122,28 +119,21 @@ export function drawCredits(
 ) {
   const { ctx, width, height, fontFamily = 'Inter' } = context;
   
-  console.log('Drawing credits:', credits); // Debug log
-  
-  if (!credits?.trim()) {
-    console.log('Credits are empty, returning'); // Debug log
-    return;
-  }
+  if (!credits?.trim()) return;
 
-  // Disegna un rettangolo per visualizzare l'area dei credits
   ctx.save();
   ctx.fillStyle = 'rgba(0, 0, 255, 0.1)';
-  const areaHeight = fontSize * 2;
-  const areaY = height - SAFE_ZONE_MARGIN - areaHeight - 20; // Posiziona l'area più in basso
+  const areaHeight = fontSize;
+  const areaY = height - (SAFE_ZONE_MARGIN * 1.5);
   ctx.fillRect(SAFE_ZONE_MARGIN, areaY, width - (2 * SAFE_ZONE_MARGIN), areaHeight);
   ctx.restore();
 
-  // Disegna il testo dei credits
   ctx.font = `${fontSize}px ${fontFamily}`;
   ctx.fillStyle = textColor;
   ctx.textAlign = textAlign;
   ctx.textBaseline = 'middle';
 
-  const startY = height - SAFE_ZONE_MARGIN - (fontSize * 0.5) - 20; // Posiziona il testo più in basso
+  const startY = areaY + (areaHeight / 2);
   const x = textAlign === 'left' ? SAFE_ZONE_MARGIN : 
            textAlign === 'right' ? width - SAFE_ZONE_MARGIN : 
            width / 2;
