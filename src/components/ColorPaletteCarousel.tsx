@@ -14,7 +14,7 @@ interface ColorPaletteCarouselProps {
   colors: ColorPresetPair[];
   currentBackground: string;
   currentText: string;
-  onSelectColors: (background: string, text: string, overlay?: string) => void;
+  onSelectColors: (background: string, text: string, overlay?: string, font?: string) => void;
 }
 
 export const ColorPaletteCarousel: React.FC<ColorPaletteCarouselProps> = ({
@@ -47,9 +47,9 @@ export const ColorPaletteCarousel: React.FC<ColorPaletteCarouselProps> = ({
                 }}
                 onClick={() => {
                   if (isUrl && pair.overlay) {
-                    onSelectColors(`url(${imageUrl})`, pair.text, pair.overlay);
+                    onSelectColors(`url(${imageUrl})`, pair.text, pair.overlay, pair.font);
                   } else {
-                    onSelectColors(pair.background, pair.text);
+                    onSelectColors(pair.background, pair.text, undefined, pair.font);
                   }
                 }}
               >
