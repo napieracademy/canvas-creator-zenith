@@ -6,6 +6,12 @@ export interface ColorPresetPair {
   category: 'classic' | 'cosmic' | 'featured' | 'retro';
   overlay?: string;
   font?: string;
+  pattern?: {
+    type: 'stripes' | 'dots' | 'grid' | 'checkerboard';
+    color1: string;
+    color2: string;
+    size?: number;
+  };
 }
 
 export interface ColorPresetsProps {

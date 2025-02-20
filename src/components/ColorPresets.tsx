@@ -19,8 +19,43 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
     overlay: "rgba(0, 0, 0, 0.5)"
   }] : [];
 
-  const handleColorSelect = (background: string, text: string, overlay?: string, font?: string) => {
-    onSelectColors(background, text, overlay, font);
+  const generatePatternStyle = (pattern?: ColorPresetPair['pattern']) => {
+    if (!pattern) return undefined;
+
+    switch (pattern.type) {
+      case 'stripes':
+        return `repeating-linear-gradient(
+          45deg,
+          ${pattern.color1},
+          ${pattern.color1} ${pattern.size || 10}px,
+          ${pattern.color2} ${pattern.size || 10}px,
+          ${pattern.color2} ${(pattern.size || 10) * 2}px
+        )`;
+      case 'dots':
+        return `radial-gradient(
+          circle at ${pattern.size || 4}px ${pattern.size || 4}px,
+          ${pattern.color2} ${(pattern.size || 4) / 2}px,
+          ${pattern.color1} ${(pattern.size || 4) / 2}px
+        )`;
+      case 'grid':
+        return `linear-gradient(
+          to right,
+          ${pattern.color2} 1px,
+          transparent 1px
+        ),
+        linear-gradient(
+          to bottom,
+          ${pattern.color2} 1px,
+          transparent 1px
+        )`;
+      case 'checkerboard':
+        return `repeating-conic-gradient(
+          ${pattern.color1} 0% 25%,
+          ${pattern.color2} 0% 50%
+        )`;
+      default:
+        return undefined;
+    }
   };
 
   const ColorGrid = ({ colors }: { colors: typeof colorPairs }) => (
@@ -28,7 +63,9 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
       {colors.map((pair) => {
         const isUrl = pair.background.startsWith('url(');
         const isGradient = pair.background.includes('gradient');
+        const hasPattern = pair.pattern !== undefined;
         const imageUrl = isUrl ? pair.background.match(/url\((.*?)\)/)?.[1] : null;
+        const patternStyle = generatePatternStyle(pair.pattern);
         
         return (
           <div key={pair.name} className="flex flex-col items-center gap-2">
@@ -42,6 +79,8 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
               onClick={() => {
                 if (isUrl && pair.overlay) {
                   onSelectColors(`url(${imageUrl})`, pair.text, pair.overlay, pair.font);
+                } else if (hasPattern && patternStyle) {
+                  onSelectColors(patternStyle, pair.text, undefined, pair.font);
                 } else {
                   onSelectColors(pair.background, pair.text, undefined, pair.font);
                 }
@@ -51,15 +90,15 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
                 <div 
                   className="absolute inset-0" 
                   style={{ 
-                    backgroundImage: isUrl ? `url(${imageUrl})` : undefined,
-                    background: !isUrl ? (isGradient ? pair.background : undefined) : undefined,
-                    backgroundColor: (!isUrl && !isGradient) ? pair.background : undefined,
-                    backgroundSize: 'cover',
+                    backgroundImage: isUrl ? `url(${imageUrl})` : (hasPattern ? patternStyle : undefined),
+                    background: !isUrl && !hasPattern ? (isGradient ? pair.background : undefined) : undefined,
+                    backgroundColor: (!isUrl && !isGradient && !hasPattern) ? pair.background : undefined,
+                    backgroundSize: hasPattern ? (pair.pattern?.size ? `${pair.pattern.size * 2}px ${pair.pattern.size * 2}px` : '20px 20px') : 'cover',
                     backgroundPosition: 'center',
                     borderRadius: '50%'
                   }}
                 >
-                  {!isUrl && !isGradient && (
+                  {!isUrl && !isGradient && !hasPattern && (
                     <div 
                       className="absolute inset-0"
                       style={{
