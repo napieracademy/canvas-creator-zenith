@@ -13,21 +13,17 @@ export class MetaService {
     try {
       console.log('Attempting to fetch metadata via proxy for URL:', url);
 
-      // Utilizziamo api.allorigins.win come proxy CORS
-      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+      // Utilizziamo cors-anywhere come proxy alternativo
+      const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
       const response = await fetch(proxyUrl);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
-      if (!data.contents) {
-        throw new Error('Nessun contenuto ricevuto dal proxy');
-      }
-
+      const text = await response.text();
       const parser = new DOMParser();
-      const doc = parser.parseFromString(data.contents, 'text/html');
+      const doc = parser.parseFromString(text, 'text/html');
 
       // Usando let invece di const per permettere la modifica successiva
       let title = 
