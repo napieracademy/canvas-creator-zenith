@@ -3,63 +3,63 @@ import { ColorPresetPair } from "@/types/colorPresets";
 
 export const avengersThemes: ColorPresetPair[] = [
   {
-    name: "Thor",
-    background: "linear-gradient(135deg, #8B5CF6 0%, #D946EF 100%)",
-    text: "#F9FF21",
-    category: 'avengers'
-  },
-  {
-    name: "Hulk",
-    background: "#1B4332",
-    text: "#95D5B2",
-    category: 'avengers'
-  },
-  {
     name: "Iron Man",
-    background: "#991B1B",
-    text: "#FCD34D",
-    category: 'avengers'
-  },
-  {
-    name: "Spider-Man",
-    background: "#991B1B",
-    text: "#1E40AF",
-    category: 'avengers'
-  },
-  {
-    name: "Black Widow",
-    background: "#18181B",
-    text: "#DC2626",
+    background: "linear-gradient(135deg, #C41E3A 0%, #D4AF37 100%)",
+    text: "#FFFFFF",
     category: 'avengers'
   },
   {
     name: "Captain America",
-    background: "#1E3A8A",
-    text: "#F9FAFB",
+    background: "linear-gradient(135deg, #1F8AC0 0%, #D52027 100%)",
+    text: "#FFFFFF",
     category: 'avengers'
   },
   {
-    name: "Doctor Strange",
-    background: "#831843",
-    text: "#FCD34D",
+    name: "Thor",
+    background: "linear-gradient(135deg, #0A3E62 0%, #8B0000 100%)",
+    text: "#FFFFFF",
     category: 'avengers'
   },
   {
-    name: "Black Panther",
-    background: "#27272A",
-    text: "#8B5CF6",
+    name: "Hulk",
+    background: "linear-gradient(135deg, #4CAF50 0%, #6A0DAD 100%)",
+    text: "#FFFFFF",
     category: 'avengers'
   },
   {
-    name: "Vision",
-    background: "#4C1D95",
-    text: "#34D399",
+    name: "Black Widow",
+    background: "#000000",
+    text: "#B22222",
+    category: 'avengers'
+  },
+  {
+    name: "Hawkeye",
+    background: "#800080",
+    text: "#808080",
     category: 'avengers'
   },
   {
     name: "Scarlet Witch",
-    background: "#9D174D",
-    text: "#F9A8D4",
+    background: "#A40000",
+    text: "#000000",
+    category: 'avengers'
+  },
+  {
+    name: "Vision",
+    background: "linear-gradient(135deg, #B22222 0%, #228B22 50%, #FFD700 100%)",
+    text: "#FFFFFF",
+    category: 'avengers'
+  },
+  {
+    name: "Spider-Man",
+    background: "linear-gradient(135deg, #E60026 0%, #1C75BC 100%)",
+    text: "#000000",
+    category: 'avengers'
+  },
+  {
+    name: "Star-Lord",
+    background: "linear-gradient(135deg, #A6192E 0%, #5C3A21 100%)",
+    text: "#FFFFFF",
     category: 'avengers'
   }
 ];
