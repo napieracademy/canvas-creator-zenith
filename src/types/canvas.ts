@@ -16,3 +16,16 @@ export interface CanvasProps {
   onSpacingChange?: (spacing: number) => void;
   font?: string;
 }
+
+export interface CanvasSize {
+  width: number;
+  height: number;
+}
+
+export interface CanvasContext {
+  ctx: CanvasRenderingContext2D;
+  width: number;
+  height: number;
+  safeZoneMargin: number;
+  fontFamily?: string;
+}
