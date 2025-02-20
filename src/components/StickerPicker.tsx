@@ -2,7 +2,7 @@
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Smile, SmilePlus, Laugh, Angry, Ghost, Alien } from "lucide-react";
+import { Smile, SmilePlus, Laugh, Angry, Ghost } from "lucide-react";
 
 interface StickerPickerProps {
   onStickerSelect: (sticker: string) => void;
@@ -15,7 +15,6 @@ const StickerPicker: React.FC<StickerPickerProps> = ({ onStickerSelect }) => {
     { icon: <Laugh className="w-6 h-6" />, name: "laugh" },
     { icon: <Angry className="w-6 h-6" />, name: "angry" },
     { icon: <Ghost className="w-6 h-6" />, name: "ghost" },
-    { icon: <Alien className="w-6 h-6" />, name: "alien" },
   ];
 
   return (
