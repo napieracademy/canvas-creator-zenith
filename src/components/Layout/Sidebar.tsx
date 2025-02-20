@@ -3,7 +3,6 @@ import React from 'react';
 import FormatSelector from '@/components/FormatSelector';
 import TextEditor from '@/components/TextEditor';
 import ColorPresets from '@/components/ColorPresets';
-import StickerPicker from '@/components/StickerPicker';
 import Header from '@/components/Layout/Header';
 import { toast } from '@/components/ui/use-toast';
 
@@ -28,7 +27,6 @@ interface SidebarProps {
   onDescriptionFontSizeChange: (size: number) => void;
   onSpacingChange: (spacing: number) => void;
   onColorSelect: (background: string, text: string, overlay?: string, font?: string) => void;
-  onStickerSelect?: (sticker: string) => void;
   onTitleExtracted: (title: string) => void;
   onDescriptionExtracted: (description: string) => void;
   onTabChange: (value: string) => void;
@@ -56,7 +54,6 @@ const Sidebar: React.FC<SidebarProps> = ({
   onDescriptionFontSizeChange,
   onSpacingChange,
   onColorSelect,
-  onStickerSelect,
   onTitleExtracted,
   onDescriptionExtracted,
   onTabChange,
@@ -100,13 +97,6 @@ const Sidebar: React.FC<SidebarProps> = ({
           currentBackground={backgroundColor}
           currentText={textColor}
         />
-
-        {onStickerSelect && (
-          <div className="space-y-2">
-            <h3 className="text-sm font-medium">Sticker & Emoji</h3>
-            <StickerPicker onStickerSelect={onStickerSelect} />
-          </div>
-        )}
       </div>
     </div>
   );

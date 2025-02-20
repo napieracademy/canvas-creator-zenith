@@ -18,7 +18,6 @@ interface CanvasPreviewProps {
   overlay?: string;
   onSpacingChange?: (spacing: number) => void;
   font?: string;
-  onStickerAdd?: (sticker: string) => void;
 }
 
 const CanvasPreview: React.FC<CanvasPreviewProps> = ({
@@ -36,8 +35,7 @@ const CanvasPreview: React.FC<CanvasPreviewProps> = ({
   format,
   overlay,
   onSpacingChange,
-  font,
-  onStickerAdd
+  font
 }) => {
   return (
     <div className="preview-container w-full h-full flex items-center justify-center">
@@ -64,7 +62,6 @@ const CanvasPreview: React.FC<CanvasPreviewProps> = ({
           overlay={overlay}
           onSpacingChange={onSpacingChange}
           font={font}
-          onStickerAdd={onStickerAdd}
         />
       </div>
     </div>

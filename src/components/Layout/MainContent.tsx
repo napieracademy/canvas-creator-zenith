@@ -24,7 +24,6 @@ interface MainContentProps {
   onSpacingChange: (spacing: number) => void;
   onMagicOptimization: () => void;
   onDownload: () => void;
-  onStickerAdd?: (sticker: string) => void;
 }
 
 const MainContent: React.FC<MainContentProps> = ({
@@ -45,8 +44,7 @@ const MainContent: React.FC<MainContentProps> = ({
   onShowSafeZoneChange,
   onSpacingChange,
   onMagicOptimization,
-  onDownload,
-  onStickerAdd
+  onDownload
 }) => {
   return (
     <div className="h-screen p-6">
@@ -66,7 +64,6 @@ const MainContent: React.FC<MainContentProps> = ({
           format={format}
           onSpacingChange={onSpacingChange}
           font={currentFont}
-          onStickerAdd={onStickerAdd}
         />
         <div className="absolute top-3 right-3 flex gap-2">
           <MagicButton onMagicOptimization={onMagicOptimization} disabled={isLoading} />
