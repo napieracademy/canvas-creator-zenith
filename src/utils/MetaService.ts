@@ -1,4 +1,3 @@
-
 interface MetadataResult {
   success: boolean;
   title?: string;
@@ -140,14 +139,8 @@ export class MetaService {
         }
       }
 
-      console.log('Extracted and improved metadata:', { 
-        title, 
-        description, 
-        image, 
-        credits,
-        contentLength: content.length 
-      });
-
+      console.log('Extracted content:', content.slice(0, 200) + '...'); // Solo per debug
+      
       return {
         success: true,
         title: title.trim(),
