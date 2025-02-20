@@ -4,6 +4,7 @@ import CanvasPreview from '@/components/CanvasPreview';
 import MagicButton from '@/components/MagicButton';
 import SafeZoneToggle from '@/components/SafeZoneToggle';
 import DownloadButton from '@/components/DownloadButton';
+import TextTranslateControl from '@/components/TextControls/TextTranslateControl';
 
 interface MainContentProps {
   text: string;
@@ -25,6 +26,8 @@ interface MainContentProps {
   onSpacingChange: (spacing: number) => void;
   onMagicOptimization: () => void;
   onDownload: () => void;
+  onTextChange: (text: string) => void;
+  onDescriptionChange: (description: string) => void;
 }
 
 const MainContent: React.FC<MainContentProps> = ({
@@ -46,9 +49,14 @@ const MainContent: React.FC<MainContentProps> = ({
   onShowSafeZoneChange,
   onSpacingChange,
   onMagicOptimization,
-  onDownload
+  onDownload,
+  onTextChange,
+  onDescriptionChange
 }) => {
-  console.log('Credits in MainContent:', credits); // Debug log
+  const handleTranslate = ({ title, description }: { title: string; description: string }) => {
+    onTextChange(title);
+    onDescriptionChange(description);
+  };
 
   return (
     <div className="h-screen p-6">
@@ -71,6 +79,11 @@ const MainContent: React.FC<MainContentProps> = ({
           credits={credits}
         />
         <div className="absolute top-3 right-3 flex gap-2">
+          <TextTranslateControl 
+            texts={{ title: text, description }}
+            onTranslate={handleTranslate}
+            disabled={isLoading}
+          />
           <MagicButton onMagicOptimization={onMagicOptimization} disabled={isLoading} />
           <SafeZoneToggle 
             showSafeZone={showSafeZone}

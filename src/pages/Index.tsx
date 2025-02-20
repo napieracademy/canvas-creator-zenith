@@ -188,12 +188,14 @@ const Index = () => {
         format={format}
         currentFont={currentFont}
         isLoading={isLoading}
+        credits={credits}
         onEffectiveFontSizeChange={setEffectiveFontSize}
         onShowSafeZoneChange={setShowSafeZone}
         onSpacingChange={setSpacing}
         onMagicOptimization={handleMagicOptimization}
         onDownload={handleDownload}
-        credits={credits}
+        onTextChange={setText}
+        onDescriptionChange={setDescription}
       />
     </div>
   );
