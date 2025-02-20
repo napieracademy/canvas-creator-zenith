@@ -1,3 +1,4 @@
+
 export interface CanvasProps {
   text: string;
   description: string;
@@ -16,6 +17,7 @@ export interface CanvasProps {
   font?: string;
   onFontSizeChange?: (size: number) => void;
   onDescriptionFontSizeChange?: (size: number) => void;
+  onStickerAdd?: (sticker: string) => void;
 }
 
 export interface CanvasSize {

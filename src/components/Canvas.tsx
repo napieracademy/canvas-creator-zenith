@@ -22,7 +22,8 @@ const Canvas: React.FC<CanvasProps> = ({
   showSafeZone = false,
   format = 'post',
   overlay,
-  font
+  font,
+  onStickerAdd
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
