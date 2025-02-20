@@ -1,3 +1,4 @@
+
 import { CanvasContext } from '@/types/canvas';
 
 export const SAFE_ZONE_MARGIN = 120;
@@ -91,4 +92,29 @@ export function drawText(
   lines.forEach((line, index) => {
     ctx.fillText(line, x, startY + (index * lineHeight) + (lineHeight / 2));
   });
+}
+
+export function drawCredits(
+  context: CanvasContext,
+  credits: string,
+  textAlign: 'left' | 'center' | 'right',
+  textColor: string,
+  fontSize: number,
+  spacing: number = 40
+) {
+  const { ctx, width, height, fontFamily = 'Inter' } = context;
+  
+  if (!credits?.trim()) return;
+
+  ctx.font = `${fontSize}px ${fontFamily}`;
+  ctx.fillStyle = textColor;
+  ctx.textAlign = textAlign;
+  ctx.textBaseline = 'middle';
+
+  const startY = (height / 2) + (spacing / 2) + (fontSize * 1.5); // Posiziona sotto la descrizione
+  const x = textAlign === 'left' ? SAFE_ZONE_MARGIN : 
+           textAlign === 'right' ? width - SAFE_ZONE_MARGIN : 
+           width / 2;
+
+  ctx.fillText(credits, x, startY);
 }
