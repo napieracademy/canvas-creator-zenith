@@ -30,6 +30,7 @@ interface SidebarProps {
   onDescriptionExtracted: (description: string) => void;
   onTabChange: (value: string) => void;
   onLoadingChange: (loading: boolean) => void;
+  onColorSelect: (background: string, text: string) => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -56,7 +57,8 @@ const Sidebar: React.FC<SidebarProps> = ({
   onTitleExtracted,
   onDescriptionExtracted,
   onTabChange,
-  onLoadingChange
+  onLoadingChange,
+  onColorSelect
 }) => {
   return (
     <div className="h-screen p-6 border-r bg-white overflow-y-auto">
@@ -92,10 +94,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         />
 
         <ColorPresets 
-          onSelectColors={(bg, text) => {
-            setBackgroundColor(bg);
-            setTextColor(text);
-          }}
+          onSelectColors={onColorSelect}
           currentBackground={backgroundColor}
           currentText={textColor}
         />
