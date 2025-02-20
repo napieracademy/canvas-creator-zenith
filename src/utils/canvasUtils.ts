@@ -3,13 +3,7 @@ import { CanvasContext } from '@/types/canvas';
 
 export const SAFE_ZONE_MARGIN = 120;
 
-export function drawBackground(ctx: CanvasRenderingContext2D, width: number, height: number, color: string) {
-  ctx.fillStyle = color;
-  ctx.fillRect(0, 0, width, height);
-}
-
 export function drawSafeZone(ctx: CanvasRenderingContext2D, width: number, height: number) {
-  // Overlay semi-trasparente fuori dalla safe zone
   ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
   ctx.fillRect(0, 0, width, SAFE_ZONE_MARGIN);
   ctx.fillRect(0, height - SAFE_ZONE_MARGIN, width, SAFE_ZONE_MARGIN);
@@ -50,19 +44,6 @@ export function calculateLines(context: CanvasContext, text: string, size: numbe
   if (currentLine) lines.push(currentLine);
   
   return lines;
-}
-
-export function textFitsInSafeZone(context: CanvasContext, text: string, size: number, type: 'title' | 'description' = 'title') {
-  const { height, safeZoneMargin } = context;
-  const maxHeight = height - (2 * safeZoneMargin);
-  
-  const lines = calculateLines(context, text, size, type);
-  const totalHeight = lines.length * (size * 1.2);
-  
-  return totalHeight <= maxHeight && lines.every(line => {
-    const metrics = context.ctx.measureText(line);
-    return metrics.width <= (context.width - (2 * safeZoneMargin));
-  });
 }
 
 export function drawText(

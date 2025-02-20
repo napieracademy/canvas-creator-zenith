@@ -4,9 +4,7 @@ import { CanvasProps } from '@/types/canvas';
 import { useCanvasScale } from '@/hooks/useCanvasScale';
 import { 
   SAFE_ZONE_MARGIN,
-  drawBackground,
   drawSafeZone,
-  textFitsInSafeZone,
   drawText
 } from '@/utils/canvasUtils';
 import CanvasRender from './Canvas/CanvasRender';
@@ -21,37 +19,21 @@ const Canvas: React.FC<CanvasProps> = ({
   fontSize,
   descriptionFontSize = 32,
   spacing = 40,
-  onEffectiveFontSizeChange,
   showSafeZone = false,
   format = 'post',
   overlay,
-  onSpacingChange,
-  font,
-  onFontSizeChange,
-  onDescriptionFontSizeChange
+  font
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [localSpacing, setLocalSpacing] = useState(spacing);
-  const [localFontSize, setLocalFontSize] = useState(fontSize);
-  const [localDescFontSize, setLocalDescFontSize] = useState(descriptionFontSize);
+  const [localSpacing] = useState(spacing);
+  const [localFontSize] = useState(fontSize);
+  const [localDescFontSize] = useState(descriptionFontSize);
   
   const ORIGINAL_WIDTH = 1080;
   const ORIGINAL_HEIGHT = format === 'post' ? 1350 : 1920;
   
   const { scale, updateScale } = useCanvasScale(canvasRef, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
-
-  useEffect(() => {
-    setLocalSpacing(spacing);
-  }, [spacing]);
-
-  useEffect(() => {
-    setLocalFontSize(fontSize);
-  }, [fontSize]);
-
-  useEffect(() => {
-    setLocalDescFontSize(descriptionFontSize);
-  }, [descriptionFontSize]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -141,7 +123,7 @@ const Canvas: React.FC<CanvasProps> = ({
         }
       }
     });
-  }, [text, description, backgroundColor, textAlign, descriptionAlign, textColor, localFontSize, localDescFontSize, localSpacing, onEffectiveFontSizeChange, showSafeZone, format, overlay, font]);
+  }, [text, description, backgroundColor, textAlign, descriptionAlign, textColor, localFontSize, localDescFontSize, localSpacing, showSafeZone, format, overlay, font]);
 
   return (
     <div className="flex flex-col w-full h-full">
