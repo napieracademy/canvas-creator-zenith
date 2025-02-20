@@ -46,7 +46,7 @@ const SuperButton: React.FC<SuperButtonProps> = ({
     const { data, error } = await supabase.functions.invoke('translate-text', {
       body: {
         texts: { title, description: desc },
-        targetLanguage: 'en'
+        targetLanguage: 'it'
       }
     });
 
