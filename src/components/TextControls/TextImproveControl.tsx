@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 
 type LengthType = 'shorter' | 'similar' | 'longer';
+type ToneType = 'formal' | 'casual' | 'professional' | 'friendly';
 
 interface TextImproveControlProps {
   value: string;
@@ -38,6 +39,7 @@ const TextImproveControl: React.FC<TextImproveControlProps> = ({
 }) => {
   const [isImproving, setIsImproving] = React.useState(false);
   const [selectedLength, setSelectedLength] = React.useState<LengthType>('similar');
+  const [selectedTone, setSelectedTone] = React.useState<ToneType>('professional');
   const [isOpen, setIsOpen] = React.useState(false);
 
   const getLengthLabel = (length: LengthType) => {
@@ -45,6 +47,15 @@ const TextImproveControl: React.FC<TextImproveControlProps> = ({
       case 'shorter': return 'Più corto';
       case 'similar': return 'Lunghezza simile';
       case 'longer': return 'Più lungo';
+    }
+  };
+
+  const getToneLabel = (tone: ToneType) => {
+    switch (tone) {
+      case 'formal': return 'Formale';
+      case 'casual': return 'Informale';
+      case 'professional': return 'Professionale';
+      case 'friendly': return 'Amichevole';
     }
   };
 
@@ -64,7 +75,8 @@ const TextImproveControl: React.FC<TextImproveControlProps> = ({
       const requestBody = {
         title: isTitle ? value : otherText || '',
         description: isTitle ? otherText || '' : value,
-        length: selectedLength
+        length: selectedLength,
+        tone: selectedTone
       };
 
       console.log('Chiamata a improve-text con:', requestBody);
@@ -84,7 +96,7 @@ const TextImproveControl: React.FC<TextImproveControlProps> = ({
       onChange(improvedText);
       toast({
         title: "Testo migliorato",
-        description: `Testo migliorato con lunghezza ${getLengthLabel(selectedLength).toLowerCase()}`
+        description: `Testo migliorato in stile ${getToneLabel(selectedTone).toLowerCase()} con lunghezza ${getLengthLabel(selectedLength).toLowerCase()}`
       });
     } catch (error) {
       console.error('Errore nel miglioramento del testo:', error);
@@ -118,6 +130,25 @@ const TextImproveControl: React.FC<TextImproveControlProps> = ({
             <PopoverContent className="w-72">
               <div className="space-y-4">
                 <div>
+                  <Label className="mb-2 block">Tono desiderato</Label>
+                  <Select 
+                    value={selectedTone} 
+                    onValueChange={(value: ToneType) => setSelectedTone(value)}
+                    disabled={disabled || isImproving}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Scegli il tono" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="formal">Formale</SelectItem>
+                      <SelectItem value="casual">Informale</SelectItem>
+                      <SelectItem value="professional">Professionale</SelectItem>
+                      <SelectItem value="friendly">Amichevole</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
                   <Label className="mb-2 block">Lunghezza desiderata</Label>
                   <Select 
                     value={selectedLength} 
@@ -147,7 +178,7 @@ const TextImproveControl: React.FC<TextImproveControlProps> = ({
           </Popover>
         </TooltipTrigger>
         <TooltipContent>
-          <p className="whitespace-nowrap">Migliora il testo: puoi allungarlo o accorciarlo mantenendo lo stesso tono</p>
+          <p className="whitespace-nowrap">Migliora il testo: puoi modificarne il tono e la lunghezza</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

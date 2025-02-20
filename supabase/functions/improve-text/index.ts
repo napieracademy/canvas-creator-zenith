@@ -15,12 +15,22 @@ serve(async (req) => {
   }
 
   try {
-    const { title, description, length } = await req.json();
+    const { title, description, length, tone } = await req.json();
 
-    const promptTitle = title ? `Migliora questo titolo. Rendilo ${length === 'shorter' ? 'più conciso' : length === 'longer' ? 'più dettagliato' : 'della stessa lunghezza circa'}:
+    const getToneInstruction = (tone: string) => {
+      switch (tone) {
+        case 'formal': return 'in modo formale ed elegante';
+        case 'casual': return 'in modo informale e rilassato';
+        case 'professional': return 'in modo professionale e autorevole';
+        case 'friendly': return 'in modo amichevole e accogliente';
+        default: return 'mantenendo il tono originale';
+      }
+    };
+
+    const promptTitle = title ? `Migliora questo titolo ${getToneInstruction(tone)}. Rendilo ${length === 'shorter' ? 'più conciso' : length === 'longer' ? 'più dettagliato' : 'della stessa lunghezza circa'}:
 ${title}` : '';
 
-    const promptDescription = description ? `Migliora questa descrizione. Rendila ${length === 'shorter' ? 'più concisa' : length === 'longer' ? 'più dettagliata' : 'della stessa lunghezza circa'}:
+    const promptDescription = description ? `Migliora questa descrizione ${getToneInstruction(tone)}. Rendila ${length === 'shorter' ? 'più concisa' : length === 'longer' ? 'più dettagliata' : 'della stessa lunghezza circa'}:
 ${description}` : '';
 
     const results = await Promise.all([
@@ -35,7 +45,7 @@ ${description}` : '';
           messages: [
             { 
               role: 'system', 
-              content: 'Sei un esperto copywriter. Migliora il testo mantenendo il suo tono e stile originale. Non modificare informazioni fattuali.' 
+              content: 'Sei un esperto copywriter. Migliora il testo seguendo le istruzioni di tono e lunghezza. Non modificare informazioni fattuali.' 
             },
             { role: 'user', content: promptTitle }
           ],
@@ -53,7 +63,7 @@ ${description}` : '';
           messages: [
             { 
               role: 'system', 
-              content: 'Sei un esperto copywriter. Migliora il testo mantenendo il suo tono e stile originale. Non modificare informazioni fattuali.' 
+              content: 'Sei un esperto copywriter. Migliora il testo seguendo le istruzioni di tono e lunghezza. Non modificare informazioni fattuali.' 
             },
             { role: 'user', content: promptDescription }
           ],
