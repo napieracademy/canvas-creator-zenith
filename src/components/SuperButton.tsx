@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from './ui/button';
 import { Rocket } from 'lucide-react';
@@ -35,7 +36,7 @@ const SuperButton: React.FC<SuperButtonProps> = ({
     const requestBody = {
       title: isTitle ? content : '',
       description: isTitle ? '' : content,
-      length: 'similar',
+      length: isTitle ? 'similar' : 'shorter', // Similar per il titolo, shorter per la descrizione
       tone: 'professional'
     };
 
@@ -75,7 +76,7 @@ const SuperButton: React.FC<SuperButtonProps> = ({
       body: {
         texts: { title, description: desc },
         targetLanguage: 'it',
-        length: 'similar'
+        length: 'shorter' // Manteniamo shorter per la traduzione della descrizione
       }
     });
 
