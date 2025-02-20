@@ -18,6 +18,7 @@ export interface CanvasProps {
   onFontSizeChange?: (size: number) => void;
   onDescriptionFontSizeChange?: (size: number) => void;
   credits?: string;
+  logo?: string;
 }
 
 export interface CanvasSize {

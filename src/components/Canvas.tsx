@@ -6,6 +6,7 @@ import {
   SAFE_ZONE_MARGIN,
   drawSafeZone,
   drawText,
+  drawLogo,
 } from '@/utils/canvasUtils';
 import CanvasRender from './Canvas/CanvasRender';
 
@@ -27,6 +28,7 @@ const Canvas: React.FC<CanvasProps> = ({
   onDescriptionFontSizeChange,
   onSpacingChange,
   onEffectiveFontSizeChange,
+  logo,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -90,6 +92,10 @@ const Canvas: React.FC<CanvasProps> = ({
             ctx.fillRect(0, 0, canvas.width, canvas.height);
           }
 
+          if (logo) {
+            drawLogo(context, logo);
+          }
+
           if (showSafeZone) {
             drawSafeZone(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
           }
@@ -115,6 +121,10 @@ const Canvas: React.FC<CanvasProps> = ({
         }
         ctx.fillRect(0, 0, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
 
+        if (logo) {
+          drawLogo(context, logo);
+        }
+
         if (showSafeZone) {
           drawSafeZone(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
         }
@@ -126,7 +136,7 @@ const Canvas: React.FC<CanvasProps> = ({
         }
       }
     });
-  }, [text, description, backgroundColor, textAlign, descriptionAlign, textColor, fontSize, descriptionFontSize, spacing, showSafeZone, format, overlay, font]);
+  }, [text, description, backgroundColor, textAlign, descriptionAlign, textColor, fontSize, descriptionFontSize, spacing, showSafeZone, format, overlay, font, logo]);
 
   useEffect(() => {
     if (onEffectiveFontSizeChange) {

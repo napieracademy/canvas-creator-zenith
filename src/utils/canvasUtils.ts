@@ -2,6 +2,8 @@
 import { CanvasContext } from '@/types/canvas';
 
 export const SAFE_ZONE_MARGIN = 120;
+const LOGO_SIZE = 80;
+const LOGO_MARGIN = 40;
 
 export function drawSafeZone(ctx: CanvasRenderingContext2D, width: number, height: number) {
   ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
@@ -19,6 +21,25 @@ export function drawSafeZone(ctx: CanvasRenderingContext2D, width: number, heigh
     width - (2 * SAFE_ZONE_MARGIN), 
     height - (2 * SAFE_ZONE_MARGIN)
   );
+}
+
+export function drawLogo(context: CanvasContext, logoUrl: string) {
+  const { ctx, width, safeZoneMargin } = context;
+  const img = new Image();
+  img.onload = () => {
+    const scale = LOGO_SIZE / Math.max(img.width, img.height);
+    const scaledWidth = img.width * scale;
+    const scaledHeight = img.height * scale;
+    
+    ctx.drawImage(
+      img,
+      safeZoneMargin + LOGO_MARGIN,
+      safeZoneMargin + LOGO_MARGIN,
+      scaledWidth,
+      scaledHeight
+    );
+  };
+  img.src = logoUrl;
 }
 
 export function calculateLines(context: CanvasContext, text: string, size: number, type: 'title' | 'description' = 'title') {
