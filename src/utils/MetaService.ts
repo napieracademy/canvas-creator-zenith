@@ -5,6 +5,7 @@ interface MetadataResult {
   description?: string;
   image?: string;
   credits?: string;
+  content?: string;
   error?: string;
 }
 
@@ -49,6 +50,42 @@ export class MetaService {
         doc.querySelector('meta[property="og:site_name"]')?.getAttribute('content') ||
         doc.querySelector('meta[name="publisher"]')?.getAttribute('content') || '';
 
+      // Estrazione del contenuto principale dell'articolo
+      let content = '';
+      const possibleContentSelectors = [
+        'article',
+        '[role="main"]',
+        'main',
+        '.post-content',
+        '.article-content',
+        '.entry-content',
+        '.content',
+        '#content',
+        '.post-body',
+        '[itemprop="articleBody"]'
+      ];
+
+      // Cerca il contenuto usando i selettori comuni
+      for (const selector of possibleContentSelectors) {
+        const element = doc.querySelector(selector);
+        if (element) {
+          // Rimuovi elementi non necessari
+          const elementsToRemove = element.querySelectorAll(
+            'script, style, nav, header, footer, .ad, .advertisement, .social-share, .related-posts, .comments'
+          );
+          elementsToRemove.forEach(el => el.remove());
+
+          // Estrai il testo pulito
+          content = element.textContent?.trim() || '';
+          if (content) break;
+        }
+      }
+
+      // Se non troviamo contenuto con i selettori specifici, prova a prendere il corpo del testo
+      if (!content) {
+        content = doc.body.textContent?.trim() || '';
+      }
+
       let credits = '';
       if (author || publisher) {
         credits = [author, publisher]
@@ -57,14 +94,15 @@ export class MetaService {
           .join(' · ');
       }
 
-      console.log('Extracted metadata:', { title, description, image, credits });
+      console.log('Extracted metadata:', { title, description, image, credits, contentLength: content.length });
 
       return {
         success: true,
         title: title.trim(),
         description: description.trim(),
         image: image.trim(),
-        credits: credits
+        credits: credits,
+        content: content
       };
 
     } catch (error) {
