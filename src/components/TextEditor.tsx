@@ -85,10 +85,11 @@ const TextEditor: React.FC<TextEditorProps> = ({
           onDescriptionExtracted={onDescriptionExtracted}
           onTabChange={onTabChange}
           onLoadingChange={onLoadingChange}
-          onContentExtracted={extracted => {
-            if (extractedContent !== undefined) {
-              // Solo se la prop è definita, altrimenti ignora
-              onTitleExtracted(extracted);
+          onContentExtracted={content => {
+            if (content) {
+              // Non passiamo più il contenuto al titolo
+              // Il contenuto estratto verrà visualizzato separatamente
+              console.log('Contenuto estratto:', content);
             }
           }}
         />
