@@ -6,6 +6,7 @@ import TextAlignControl from './TextControls/TextAlignControl';
 import FontSizeControl from './TextControls/FontSizeControl';
 import TextImproveControl from './TextControls/TextImproveControl';
 import DescriptionGenerateControl from './TextControls/DescriptionGenerateControl';
+import { ChevronRight } from 'lucide-react';
 
 interface TextInputProps {
   value: string;
@@ -61,17 +62,22 @@ const TextInput: React.FC<TextInputProps> = ({
             otherText={otherText}
           />
           {isDescription && hasTitle && isEmpty && (
-            <DescriptionGenerateControl
-              title={otherText}
-              onDescriptionGenerated={onChange}
-              disabled={disabled}
-            />
+            <>
+              <ChevronRight className="h-4 w-4 text-gray-400 animate-bounce-x" />
+              <DescriptionGenerateControl
+                title={otherText}
+                onDescriptionGenerated={onChange}
+                disabled={disabled}
+              />
+            </>
           )}
         </div>
       </div>
       
       <Textarea
-        placeholder={`Scrivi il tuo ${label.toLowerCase()} qui...`}
+        placeholder={isDescription && hasTitle && isEmpty 
+          ? "Clicca sulla bacchetta magica per generare automaticamente una descrizione dal titolo..." 
+          : `Scrivi il tuo ${label.toLowerCase()} qui...`}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="resize-none h-32 bg-white/50 backdrop-blur-sm focus:bg-white transition-colors duration-200"
@@ -83,3 +89,4 @@ const TextInput: React.FC<TextInputProps> = ({
 };
 
 export default TextInput;
+
