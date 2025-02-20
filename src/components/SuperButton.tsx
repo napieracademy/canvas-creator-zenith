@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from './ui/button';
-import { Wand2 } from 'lucide-react';
+import { TriangleAlert } from 'lucide-react';
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
@@ -116,7 +116,7 @@ const SuperButton: React.FC<SuperButtonProps> = ({
             variant="outline"
             className="w-9 p-0"
           >
-            <Wand2 className={`h-4 w-4 ${isProcessing ? 'animate-spin' : ''}`} />
+            <TriangleAlert className={`h-4 w-4 ${isProcessing ? 'animate-spin' : ''}`} />
           </Button>
         </TooltipTrigger>
         <TooltipContent>
