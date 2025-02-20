@@ -25,6 +25,7 @@ interface TextEditorProps {
   onDescriptionExtracted: (description: string) => void;
   onTabChange: (value: string) => void;
   onLoadingChange: (loading: boolean) => void;
+  onContentExtracted?: (content: string) => void;
 }
 
 const TextEditor: React.FC<TextEditorProps> = ({
@@ -48,6 +49,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
   onDescriptionExtracted,
   onTabChange,
   onLoadingChange,
+  onContentExtracted
 }) => {
   return (
     <Tabs defaultValue="manual" className="w-full" onValueChange={onTabChange}>
@@ -85,13 +87,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
           onDescriptionExtracted={onDescriptionExtracted}
           onTabChange={onTabChange}
           onLoadingChange={onLoadingChange}
-          onContentExtracted={content => {
-            if (content) {
-              // Non passiamo più il contenuto al titolo
-              // Il contenuto estratto verrà visualizzato separatamente
-              console.log('Contenuto estratto:', content);
-            }
-          }}
+          onContentExtracted={onContentExtracted}
         />
       </TabsContent>
     </Tabs>
