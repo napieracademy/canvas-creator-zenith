@@ -31,13 +31,34 @@ export class MetaService {
         doc.querySelector('meta[property="og:title"]')?.getAttribute('content') ||
         doc.querySelector('title')?.textContent || '';
 
-      const description = 
+      let description = 
         doc.querySelector('meta[property="og:description"]')?.getAttribute('content') ||
         doc.querySelector('meta[name="description"]')?.getAttribute('content') || '';
 
       const image = 
         doc.querySelector('meta[property="og:image"]')?.getAttribute('content') ||
         doc.querySelector('meta[name="twitter:image"]')?.getAttribute('content') || '';
+
+      // Estrazione dell'autore e della testata
+      const author = 
+        doc.querySelector('meta[name="author"]')?.getAttribute('content') ||
+        doc.querySelector('meta[property="article:author"]')?.getAttribute('content') || '';
+
+      const publisher = 
+        doc.querySelector('meta[property="og:site_name"]')?.getAttribute('content') ||
+        doc.querySelector('meta[name="publisher"]')?.getAttribute('content') || '';
+
+      // Aggiungiamo autore e testata alla descrizione se presenti
+      if (author || publisher) {
+        const additionalInfo = [
+          author && `Autore: ${author}`,
+          publisher
+        ].filter(Boolean).join('\n');
+
+        if (additionalInfo) {
+          description = `${description.trim()}\n\n${additionalInfo}`;
+        }
+      }
 
       console.log('Extracted metadata:', { title, description, image });
 
