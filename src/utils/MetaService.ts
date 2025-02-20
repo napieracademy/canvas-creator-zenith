@@ -7,10 +7,12 @@ interface MetadataResult {
   error?: string;
 }
 
+type LanguageType = 'original' | 'it' | 'en' | 'fr' | 'de' | 'es';
+
 export class MetaService {
-  static async extractMetadata(url: string): Promise<MetadataResult> {
+  static async extractMetadata(url: string, language: LanguageType = 'it'): Promise<MetadataResult> {
     try {
-      console.log('Attempting to fetch metadata via proxy for URL:', url);
+      console.log('Attempting to fetch metadata via proxy for URL:', url, 'in language:', language);
 
       // Usiamo un servizio proxy per evitare problemi CORS
       const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
@@ -40,6 +42,8 @@ export class MetaService {
         doc.querySelector('meta[name="twitter:image"]')?.getAttribute('content') || '';
 
       console.log('Extracted metadata:', { title, description, image });
+
+      // TODO: Implementare la traduzione se language !== 'original'
 
       return {
         success: true,
