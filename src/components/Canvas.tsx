@@ -25,7 +25,8 @@ const Canvas: React.FC<CanvasProps> = ({
   showSafeZone = false,
   format = 'post',
   overlay,
-  onSpacingChange
+  onSpacingChange,
+  font
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -57,11 +58,27 @@ const Canvas: React.FC<CanvasProps> = ({
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    const getFontFamily = () => {
+      switch (font) {
+        case 'font-c64-system':
+          return '"Press Start 2P"';
+        case 'font-c64-mono':
+          return '"Share Tech Mono"';
+        case 'font-c64-bold':
+          return 'VT323';
+        case 'font-c64-wide':
+          return 'Silkscreen';
+        default:
+          return 'Inter';
+      }
+    };
+
     const context = {
       ctx,
       width: ORIGINAL_WIDTH,
       height: ORIGINAL_HEIGHT,
-      safeZoneMargin: SAFE_ZONE_MARGIN
+      safeZoneMargin: SAFE_ZONE_MARGIN,
+      fontFamily: getFontFamily()
     };
 
     // Gestione sfondo
@@ -112,7 +129,7 @@ const Canvas: React.FC<CanvasProps> = ({
         drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', localSpacing);
       }
     }
-  }, [text, description, backgroundColor, textAlign, descriptionAlign, textColor, fontSize, descriptionFontSize, localSpacing, onEffectiveFontSizeChange, showSafeZone, format, overlay]);
+  }, [text, description, backgroundColor, textAlign, descriptionAlign, textColor, fontSize, descriptionFontSize, localSpacing, onEffectiveFontSizeChange, showSafeZone, format, overlay, font]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!containerRef.current) return;
@@ -130,7 +147,7 @@ const Canvas: React.FC<CanvasProps> = ({
     
     const rect = containerRef.current.getBoundingClientRect();
     const y = e.clientY - rect.top;
-    const delta = (y - lastYRef.current) * 2; // Moltiplichiamo per 2 per un movimento più ampio
+    const delta = (y - lastYRef.current) * 2;
     
     const newSpacing = Math.max(0, Math.min(200, localSpacing + delta));
     setLocalSpacing(newSpacing);

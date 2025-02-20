@@ -28,10 +28,10 @@ export function drawSafeZone(ctx: CanvasRenderingContext2D, width: number, heigh
 }
 
 export function calculateLines(context: CanvasContext, text: string, size: number, type: 'title' | 'description' = 'title') {
-  const { ctx, width, safeZoneMargin } = context;
+  const { ctx, width, safeZoneMargin, fontFamily = 'Inter' } = context;
   const maxWidth = width - (2 * safeZoneMargin);
   
-  ctx.font = `${type === 'title' ? 'bold' : ''} ${size}px Inter`;
+  ctx.font = `${type === 'title' ? 'bold' : ''} ${size}px ${fontFamily}`;
   const words = text.split(' ');
   const lines: string[] = [];
   let currentLine = '';
@@ -74,11 +74,11 @@ export function drawText(
   type: 'title' | 'description' = 'title',
   spacing: number = 40
 ) {
-  const { ctx, width, height } = context;
+  const { ctx, width, height, fontFamily = 'Inter' } = context;
   
   if (!text.trim()) {
     if (type === 'title') {
-      ctx.font = 'bold 32px Inter';
+      ctx.font = `bold 32px ${fontFamily}`;
       ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -87,7 +87,7 @@ export function drawText(
     return;
   }
 
-  ctx.font = `${type === 'title' ? 'bold' : ''} ${fontSize}px Inter`;
+  ctx.font = `${type === 'title' ? 'bold' : ''} ${fontSize}px ${fontFamily}`;
   ctx.fillStyle = textColor;
   ctx.textAlign = textAlign;
   ctx.textBaseline = 'middle';
@@ -97,12 +97,11 @@ export function drawText(
   const lineHeight = fontSize * 1.2;
   const totalHeight = lines.length * lineHeight;
   
-  // Calcola la posizione verticale in base al tipo di testo e allo spacing
   let startY;
   if (type === 'title') {
-    startY = (height / 2) - (spacing / 2) - totalHeight; // Posiziona il titolo sopra il centro
+    startY = (height / 2) - (spacing / 2) - totalHeight;
   } else {
-    startY = (height / 2) + (spacing / 2); // Posiziona la descrizione sotto il centro
+    startY = (height / 2) + (spacing / 2);
   }
 
   const x = textAlign === 'left' ? SAFE_ZONE_MARGIN : 

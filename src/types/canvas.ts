@@ -14,6 +14,7 @@ export interface CanvasProps {
   format?: 'post' | 'story';
   overlay?: string;
   onSpacingChange?: (spacing: number) => void;
+  font?: string;
 }
 
 export interface CanvasSize {
@@ -26,4 +27,5 @@ export interface CanvasContext {
   width: number;
   height: number;
   safeZoneMargin: number;
+  fontFamily?: string;
 }
