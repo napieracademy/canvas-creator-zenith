@@ -51,36 +51,17 @@ const TextEditor: React.FC<TextEditorProps> = ({
   onCreditsExtracted,
   disabled
 }) => {
-  const [authorName, setAuthorName] = React.useState("");
-  const OUTLET_NAME = "IL GIORNALE";
+  const [credits, setCredits] = React.useState("");
 
-  const handleAuthorNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newName = e.target.value;
-    setAuthorName(newName);
-    if (onCreditsExtracted) {
-      const credits = newName ? `${newName} | ${OUTLET_NAME}` : "";
-      onCreditsExtracted(credits);
-    }
-  };
-
-  // Funzione per aggiornare l'autore quando viene estratto dall'articolo
+  // Funzione per aggiornare i credits quando viene estratto dall'articolo
   React.useEffect(() => {
-    const updateFromCredits = (credits: string) => {
-      if (credits) {
-        const parts = credits.split(' · ');
-        if (parts.length > 0) {
-          setAuthorName(parts[0]);
-          if (onCreditsExtracted) {
-            onCreditsExtracted(`${parts[0]} | ${OUTLET_NAME}`);
-          }
-        }
-      }
-    };
-
     const handleExtraction = (event: Event) => {
       const customEvent = event as CustomEvent;
       if (customEvent.detail?.credits) {
-        updateFromCredits(customEvent.detail.credits);
+        setCredits(customEvent.detail.credits);
+        if (onCreditsExtracted) {
+          onCreditsExtracted(customEvent.detail.credits);
+        }
       }
     };
 
@@ -91,23 +72,26 @@ const TextEditor: React.FC<TextEditorProps> = ({
     };
   }, [onCreditsExtracted]);
 
+  const handleCreditsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newCredits = e.target.value;
+    setCredits(newCredits);
+    if (onCreditsExtracted) {
+      onCreditsExtracted(newCredits);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="space-y-6">
-        <div className="space-y-4">
+        <div className="space-y-2">
           <Label className="text-sm font-medium text-gray-700">Credits</Label>
           <Input
-            placeholder="Nome dell'autore"
-            value={authorName}
-            onChange={handleAuthorNameChange}
+            placeholder="Autore · Testata"
+            value={credits}
+            onChange={handleCreditsChange}
             className="bg-white/50 backdrop-blur-sm focus:bg-white transition-colors duration-200"
             disabled={disabled}
           />
-          {authorName && (
-            <div className="text-sm text-gray-500">
-              {authorName} | {OUTLET_NAME}
-            </div>
-          )}
         </div>
 
         <Separator className="my-4" />
