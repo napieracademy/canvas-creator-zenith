@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from '@/components/ui/use-toast';
@@ -119,6 +118,13 @@ const Index = () => {
     });
   };
 
+  const handleStickerSelect = (sticker: string) => {
+    toast({
+      title: "Sticker selezionato",
+      description: `Hai selezionato: ${sticker}`,
+    });
+  };
+
   if (isMobile) {
     return <MobileWarning />;
   }
@@ -148,6 +154,7 @@ const Index = () => {
         onDescriptionFontSizeChange={setDescriptionFontSize}
         onSpacingChange={setSpacing}
         onColorSelect={handleColorSelect}
+        onStickerSelect={handleStickerSelect}
         onTitleExtracted={(title) => {
           setText(title);
           toast({
