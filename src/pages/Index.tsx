@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from '@/components/ui/use-toast';
@@ -38,7 +37,7 @@ const IndexPage = () => {
   const [credits, setCredits] = useState('');
   const [viewMode, setViewMode] = useState<'full' | 'fast'>('full');
   const [extractedContent, setExtractedContent] = useState('');
-  const [logo, setLogo] = useState('/placeholder.svg'); // Aggiungiamo lo stato per il logo
+  const [logo, setLogo] = useState('/placeholder.svg');
 
   useEffect(() => {
     toast({
@@ -108,6 +107,10 @@ const IndexPage = () => {
     });
   };
 
+  const handleLogoChange = (newLogo: string) => {
+    setLogo(newLogo);
+  };
+
   if (isMobile) {
     return <MobileWarning />;
   }
@@ -146,6 +149,7 @@ const IndexPage = () => {
                 onColorSelect={handleColorSelect}
                 extractedContent={extractedContent}
                 onContentExtracted={setExtractedContent}
+                onLogoChange={handleLogoChange}
               />
             )}
             <button
@@ -172,7 +176,7 @@ const IndexPage = () => {
           isLoading={isLoading}
           credits={credits}
           viewMode={viewMode}
-          logo={logo} // Aggiungiamo la prop logo
+          logo={logo}
           onEffectiveFontSizeChange={setEffectiveFontSize}
           onShowSafeZoneChange={setShowSafeZone}
           onSpacingChange={setSpacing}
