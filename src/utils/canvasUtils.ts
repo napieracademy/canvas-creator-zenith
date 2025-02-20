@@ -1,3 +1,4 @@
+
 import { CanvasContext } from '@/types/canvas';
 
 export const SAFE_ZONE_MARGIN = 120;
@@ -119,12 +120,18 @@ export function drawCredits(
 ) {
   const { ctx, width, height, fontFamily = 'Inter' } = context;
   
-  if (!credits?.trim()) return;
+  console.log('drawCredits called with:', { credits, textAlign, textColor, fontSize });
+  
+  if (!credits?.trim()) {
+    console.log('Credits check failed:', { credits, trimmed: credits?.trim() });
+    return;
+  }
 
   ctx.save();
   ctx.fillStyle = 'rgba(0, 0, 255, 0.1)';
   const areaHeight = fontSize;
   const areaY = height - (SAFE_ZONE_MARGIN * 1.5);
+  console.log('Drawing credits area at:', { areaY, areaHeight });
   ctx.fillRect(SAFE_ZONE_MARGIN, areaY, width - (2 * SAFE_ZONE_MARGIN), areaHeight);
   ctx.restore();
 
@@ -138,5 +145,6 @@ export function drawCredits(
            textAlign === 'right' ? width - SAFE_ZONE_MARGIN : 
            width / 2;
 
+  console.log('Drawing credits text at:', { x, startY, text: credits });
   ctx.fillText(credits, x, startY);
 }
