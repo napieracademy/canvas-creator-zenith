@@ -13,8 +13,8 @@ export class MetaService {
     try {
       console.log('Attempting to fetch metadata via proxy for URL:', url);
 
-      // Utilizziamo cors-anywhere come proxy alternativo
-      const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
+      // Utilizziamo api.codetabs.com come proxy veloce e affidabile
+      const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`;
       const response = await fetch(proxyUrl);
       
       if (!response.ok) {
