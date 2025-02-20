@@ -123,10 +123,6 @@ const Index = () => {
       title: "Sticker selezionato",
       description: `Hai selezionato: ${sticker}`,
     });
-    // Passa lo sticker al canvas
-    if (onStickerAdd) {
-      onStickerAdd(sticker);
-    }
   };
 
   if (isMobile) {
