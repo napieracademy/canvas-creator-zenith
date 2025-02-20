@@ -70,8 +70,24 @@ serve(async (req) => {
             { 
               role: 'system', 
               content: type === 'title' 
-                ? `Sei un traduttore esperto. Traduci questo titolo dall'${LANGUAGE_NAMES[sourceLanguage]} al ${LANGUAGE_NAMES[targetLanguage]} RIMANENDO IL PIÙ FEDELE POSSIBILE al significato originale. Non interpretare o rielaborare, mantieni la traduzione molto vicina all'originale. Usa solo parole semplici e dirette. Se ci sono giochi di parole o modi di dire, cerca l'equivalente più vicino possibile nella lingua target.`
-                : `Sei un traduttore esperto. Traduci questo testo dall'${LANGUAGE_NAMES[sourceLanguage]} al ${LANGUAGE_NAMES[targetLanguage]} rimanendo il più fedele possibile al significato originale. Mantieni lo stesso tono e stile, evitando interpretazioni libere. Se ci sono espressioni idiomatiche, usa l'equivalente più vicino possibile nella lingua target.` 
+                ? `Sei un traduttore professionista esperto in localizzazione di contenuti digitali, specializzato in ${LANGUAGE_NAMES[targetLanguage]}. 
+                   Il tuo compito è tradurre questo titolo dall'${LANGUAGE_NAMES[sourceLanguage]} mantenendo:
+                   1. Il tono e lo stile originale
+                   2. Il contesto culturale appropriato per il pubblico di destinazione
+                   3. Le sfumature emotive e l'impatto del messaggio originale
+                   4. La naturalezza della lingua di destinazione
+                   
+                   Se sono presenti giochi di parole o riferimenti culturali, adattali in modo che abbiano senso per il pubblico di destinazione.
+                   La traduzione deve sembrare un contenuto originalmente scritto in ${LANGUAGE_NAMES[targetLanguage]}.`
+                : `Sei un traduttore professionista esperto in localizzazione di contenuti digitali, specializzato in ${LANGUAGE_NAMES[targetLanguage]}. 
+                   Il tuo compito è tradurre questo testo dall'${LANGUAGE_NAMES[sourceLanguage]} mantenendo:
+                   1. Il registro linguistico e il tono dell'originale
+                   2. La precisione tecnica e la terminologia specifica del settore
+                   3. La scorrevolezza e la naturalezza nella lingua di destinazione
+                   4. Le sfumature culturali appropriate per il pubblico target
+                   
+                   La traduzione deve preservare il significato originale adattandolo al contesto culturale della lingua di destinazione.
+                   Il risultato deve sembrare un testo scritto originariamente in ${LANGUAGE_NAMES[targetLanguage]}.` 
             },
             { role: 'user', content: text }
           ],
@@ -84,32 +100,32 @@ serve(async (req) => {
       textToImprove = translationData.choices[0].message.content;
     }
 
-    // Calcola la lunghezza attuale del testo (in parole)
-    const currentWordCount = textToImprove.split(/\s+/).length;
-    const targetWordCount = length === 'shorter' 
-      ? Math.max(Math.floor(currentWordCount * 0.7), type === 'title' ? 3 : 10)  // Riduci del 30% ma mantieni un minimo
-      : length === 'longer' 
-        ? Math.min(Math.ceil(currentWordCount * 1.3), type === 'title' ? 8 : 50)  // Aumenta del 30% ma mantieni un massimo
-        : currentWordCount;  // Mantieni la lunghezza attuale
-
     // Ora procediamo con il miglioramento del testo
-    let systemPrompt = `Sei un esperto copywriter che scrive con un tono professionale e autorevole in ${LANGUAGE_NAMES[targetLanguage]}. `;
+    let systemPrompt = `Sei un esperto copywriter e content strategist che scrive in ${LANGUAGE_NAMES[targetLanguage]} con un tono professionale e coinvolgente. `;
     
     if (type === 'title') {
-      systemPrompt += `Migliora questo titolo mantenendolo MOLTO conciso e d'impatto. Il testo finale DEVE contenere circa ${targetWordCount} parole. Rimuovi parole non essenziali e mantieni solo il messaggio chiave. `;
+      systemPrompt += `
+        Migliora questo titolo seguendo queste linee guida:
+        1. Mantieni il messaggio chiave e l'essenza del contenuto
+        2. Usa un linguaggio preciso e d'impatto
+        3. Evita cliché e frasi fatte
+        4. Mantieni una lunghezza di circa ${targetWordCount} parole
+        5. Assicurati che il tono sia appropriato per il contesto e il pubblico target
+        
+        Il titolo deve essere memorabile e professionale, evitando sensazionalismi o esagerazioni.
+      `;
     } else {
-      systemPrompt += `Migliora questa descrizione mantenendola informativa e coinvolgente. Il testo finale DEVE contenere circa ${targetWordCount} parole. EVITA ASSOLUTAMENTE frasi come "Non perdere l'occasione" o "Da non perdere" o simili inviti all'azione generici. Concentrati invece sui dettagli unici e specifici del film. `;
+      systemPrompt += `
+        Migliora questa descrizione seguendo queste linee guida:
+        1. Mantieni il focus sui dettagli distintivi e specifici
+        2. Usa un linguaggio chiaro e professionale
+        3. Struttura il testo in modo logico e scorrevole
+        4. Mantieni una lunghezza di circa ${targetWordCount} parole
+        5. Assicurati che ogni frase aggiunga valore al messaggio complessivo
+        
+        La descrizione deve essere informativa e coinvolgente, evitando luoghi comuni e call-to-action generiche.
+      `;
     }
-
-    if (length === 'shorter') {
-      systemPrompt += "IMPORTANTE: Il testo risultante DEVE essere PIÙ CORTO dell'originale. ";
-    } else if (length === 'longer') {
-      systemPrompt += "IMPORTANTE: Evita di allungare il testo con frasi fatte o ripetizioni. Aggiungi solo dettagli rilevanti e specifici. ";
-    }
-
-    systemPrompt += type === 'title'
-      ? "Il titolo deve essere memorabile ma senza esagerazioni o sensazionalismi."
-      : "IMPORTANTE: Concludi il testo in modo naturale, senza call-to-action o frasi ad effetto. Concentrati sui dettagli distintivi del film e lascia che siano questi a suscitare interesse.";
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -123,10 +139,16 @@ serve(async (req) => {
           { role: 'system', content: systemPrompt },
           { 
             role: 'user', 
-            content: `Testo originale: ${text}\nTesto da migliorare: ${textToImprove}\nLunghezza desiderata: ${targetWordCount} parole` 
+            content: `
+              Testo originale: ${text}
+              Testo da migliorare: ${textToImprove}
+              
+              Migliora questo testo mantenendo il significato originale ma rendendolo più efficace e naturale nella lingua di destinazione.
+              La lunghezza finale deve essere di circa ${targetWordCount} parole.
+            `
           }
         ],
-        temperature: type === 'title' ? 0.5 : 0.7,
+        temperature: type === 'title' ? 0.4 : 0.6,
         top_p: type === 'title' ? 0.7 : 0.9,
         max_tokens: type === 'title' ? MAX_TOKENS.title : MAX_TOKENS.description
       }),
