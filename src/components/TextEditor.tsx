@@ -2,7 +2,6 @@
 import React from 'react';
 import TextInput from '@/components/TextInput';
 import SpacingControl from '@/components/SpacingControl';
-import CreditsInput from '@/components/CreditsInput';
 import { Separator } from './ui/separator';
 
 interface TextEditorProps {
@@ -24,7 +23,6 @@ interface TextEditorProps {
   onDescriptionExtracted: (description: string) => void;
   onTabChange: (value: string) => void;
   onLoadingChange: (loading: boolean) => void;
-  onCreditsExtracted?: (credits: string) => void;
   disabled?: boolean;
 }
 
@@ -47,45 +45,11 @@ const TextEditor: React.FC<TextEditorProps> = ({
   onDescriptionExtracted,
   onTabChange,
   onLoadingChange,
-  onCreditsExtracted,
   disabled
 }) => {
-  const [credits, setCredits] = React.useState("");
-
-  React.useEffect(() => {
-    const handleExtraction = (event: Event) => {
-      const customEvent = event as CustomEvent;
-      if (customEvent.detail?.credits) {
-        if (onCreditsExtracted) {
-          onCreditsExtracted(customEvent.detail.credits);
-        }
-      }
-    };
-
-    document.addEventListener('creditsExtracted', handleExtraction as EventListener);
-    return () => {
-      document.removeEventListener('creditsExtracted', handleExtraction as EventListener);
-    };
-  }, [onCreditsExtracted]);
-
-  const handleCreditsChange = (newCredits: string) => {
-    setCredits(newCredits);
-    if (onCreditsExtracted) {
-      onCreditsExtracted(newCredits);
-    }
-  };
-
   return (
     <div className="space-y-4">
       <div className="space-y-6">
-        <CreditsInput
-          value={credits}
-          onChange={handleCreditsChange}
-          disabled={disabled}
-        />
-
-        <Separator className="my-4" />
-
         <TextInput 
           value={text} 
           onChange={onTextChange} 

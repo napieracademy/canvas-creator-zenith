@@ -6,7 +6,6 @@ import {
   SAFE_ZONE_MARGIN,
   drawSafeZone,
   drawText,
-  drawCredits
 } from '@/utils/canvasUtils';
 import CanvasRender from './Canvas/CanvasRender';
 
@@ -28,7 +27,6 @@ const Canvas: React.FC<CanvasProps> = ({
   onDescriptionFontSizeChange,
   onSpacingChange,
   onEffectiveFontSizeChange,
-  credits
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -101,10 +99,6 @@ const Canvas: React.FC<CanvasProps> = ({
           if (description) {
             drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', spacing);
           }
-
-          if (credits) {
-            drawCredits(context, credits, descriptionAlign, textColor, descriptionFontSize, spacing);
-          }
         };
         img.src = backgroundColor.slice(4, -1);
       } else {
@@ -130,13 +124,9 @@ const Canvas: React.FC<CanvasProps> = ({
         if (description) {
           drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', spacing);
         }
-
-        if (credits) {
-          drawCredits(context, credits, descriptionAlign, textColor, descriptionFontSize, spacing);
-        }
       }
     });
-  }, [text, description, backgroundColor, textAlign, descriptionAlign, textColor, fontSize, descriptionFontSize, spacing, showSafeZone, format, overlay, font, credits]);
+  }, [text, description, backgroundColor, textAlign, descriptionAlign, textColor, fontSize, descriptionFontSize, spacing, showSafeZone, format, overlay, font]);
 
   useEffect(() => {
     if (onEffectiveFontSizeChange) {
