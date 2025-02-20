@@ -10,6 +10,32 @@ interface MetadataResult {
 type LanguageType = 'original' | 'it' | 'en' | 'fr' | 'de' | 'es';
 
 export class MetaService {
+  static async translateText(text: string, targetLanguage: string): Promise<string> {
+    try {
+      const response = await fetch('/api/improve-text', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text,
+          type: 'translate',
+          targetLanguage,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Translation failed');
+      }
+
+      const data = await response.json();
+      return data.result || text;
+    } catch (error) {
+      console.error('Translation error:', error);
+      return text;
+    }
+  }
+
   static async extractMetadata(url: string, language: LanguageType = 'it'): Promise<MetadataResult> {
     try {
       console.log('Attempting to fetch metadata via proxy for URL:', url, 'in language:', language);
@@ -29,11 +55,11 @@ export class MetaService {
       const doc = parser.parseFromString(contents, 'text/html');
 
       // Priorità ai tag Open Graph
-      const title = 
+      let title = 
         doc.querySelector('meta[property="og:title"]')?.getAttribute('content') ||
         doc.querySelector('title')?.textContent || '';
 
-      const description = 
+      let description = 
         doc.querySelector('meta[property="og:description"]')?.getAttribute('content') ||
         doc.querySelector('meta[name="description"]')?.getAttribute('content') || '';
 
@@ -43,7 +69,16 @@ export class MetaService {
 
       console.log('Extracted metadata:', { title, description, image });
 
-      // TODO: Implementare la traduzione se language !== 'original'
+      // Traduci il contenuto se la lingua non è 'original'
+      if (language !== 'original' && (title || description)) {
+        if (title) {
+          title = await this.translateText(title, language);
+        }
+        if (description) {
+          description = await this.translateText(description, language);
+        }
+        console.log('Translated metadata:', { title, description });
+      }
 
       return {
         success: true,
