@@ -58,6 +58,28 @@ const TextTranslateControl: React.FC<TextTranslateControlProps> = ({
 
     setIsTranslating(true);
     try {
+      // Prima controlliamo la lingua dei testi
+      const { data: detectionData, error: detectionError } = await supabase.functions.invoke('translate-text', {
+        body: {
+          texts,
+          mode: 'detect'
+        }
+      });
+
+      if (detectionError) throw detectionError;
+
+      // Se stiamo traducendo in italiano e i testi sono già in italiano, non procedere
+      if (selectedLanguage === 'it' && detectionData.detectedLanguage === 'it') {
+        toast({
+          title: "Informazione",
+          description: "Il testo è già in italiano"
+        });
+        setIsTranslating(false);
+        setIsOpen(false);
+        return;
+      }
+
+      // Altrimenti procedi con la traduzione
       const { data, error } = await supabase.functions.invoke('translate-text', {
         body: {
           texts,
