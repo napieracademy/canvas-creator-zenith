@@ -29,6 +29,7 @@ interface MainContentProps {
   isLoading: boolean;
   credits: string;
   viewMode: 'full' | 'fast';
+  logo?: string; // Aggiungiamo la prop logo
   onEffectiveFontSizeChange: (size: number) => void;
   onShowSafeZoneChange: (show: boolean) => void;
   onSpacingChange: (spacing: number) => void;
@@ -60,6 +61,7 @@ const MainContent: React.FC<MainContentProps> = ({
   isLoading,
   credits,
   viewMode,
+  logo,
   onEffectiveFontSizeChange,
   onShowSafeZoneChange,
   onSpacingChange,
@@ -93,6 +95,7 @@ const MainContent: React.FC<MainContentProps> = ({
           onSpacingChange={onSpacingChange}
           font={currentFont}
           credits={credits}
+          logo={logo}
         />
         <div className="absolute top-3 right-3 flex items-center gap-2 p-2 rounded-lg bg-white/20 backdrop-blur-sm">
           <div className="flex items-center gap-2 ml-auto">
