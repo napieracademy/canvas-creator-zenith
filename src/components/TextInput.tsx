@@ -5,6 +5,7 @@ import { Textarea } from './ui/textarea';
 import TextAlignControl from './TextControls/TextAlignControl';
 import FontSizeControl from './TextControls/FontSizeControl';
 import TextImproveControl from './TextControls/TextImproveControl';
+import DescriptionGenerateControl from './TextControls/DescriptionGenerateControl';
 
 interface TextInputProps {
   value: string;
@@ -33,6 +34,10 @@ const TextInput: React.FC<TextInputProps> = ({
   disabled,
   otherText
 }) => {
+  const isDescription = label.toLowerCase() === 'descrizione';
+  const hasTitle = isDescription && otherText && otherText.trim().length > 0;
+  const isEmpty = !value || value.trim().length === 0;
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-2">
@@ -55,6 +60,13 @@ const TextInput: React.FC<TextInputProps> = ({
             disabled={disabled}
             otherText={otherText}
           />
+          {isDescription && hasTitle && isEmpty && (
+            <DescriptionGenerateControl
+              title={otherText}
+              onDescriptionGenerated={onChange}
+              disabled={disabled}
+            />
+          )}
         </div>
       </div>
       
