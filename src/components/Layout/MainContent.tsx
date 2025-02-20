@@ -10,7 +10,7 @@ import UrlFetchControl from '@/components/TextControls/UrlFetchControl';
 import SuperButton from '@/components/SuperButton';
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { Square, RectangleVertical } from 'lucide-react';
+import { Square, RectangleVertical, Zap } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface MainContentProps {
@@ -41,6 +41,7 @@ interface MainContentProps {
   onTabChange: (value: string) => void;
   onLoadingChange: (loading: boolean) => void;
   onFormatChange: (format: 'post' | 'story') => void;
+  onViewModeChange: (mode: 'full' | 'fast') => void;
 }
 
 const MainContent: React.FC<MainContentProps> = ({
@@ -70,7 +71,8 @@ const MainContent: React.FC<MainContentProps> = ({
   onDescriptionExtracted,
   onTabChange,
   onLoadingChange,
-  onFormatChange
+  onFormatChange,
+  onViewModeChange
 }) => {
   return (
     <div className="h-screen p-6">
@@ -135,6 +137,29 @@ const MainContent: React.FC<MainContentProps> = ({
 
             <Separator orientation="vertical" className="h-8 bg-white/20" />
 
+            {/* Gruppo Vista - sempre visibile */}
+            <div className="flex items-center gap-2">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant={viewMode === 'fast' ? 'default' : 'ghost'}
+                      size="sm"
+                      onClick={() => onViewModeChange(viewMode === 'full' ? 'fast' : 'full')}
+                      disabled={isLoading}
+                    >
+                      <Zap className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{viewMode === 'full' ? 'Passa alla modalità semplificata' : 'Torna alla modalità completa'}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+
+            <Separator orientation="vertical" className="h-8 bg-white/20" />
+
             {/* Gruppo Importazione/Input - sempre visibile */}
             <div className="flex items-center gap-2">
               <UrlFetchControl
@@ -159,7 +184,6 @@ const MainContent: React.FC<MainContentProps> = ({
               <>
                 <Separator orientation="vertical" className="h-8 bg-white/20" />
 
-                {/* Funzionalità avanzate - visibili solo in modalità full */}
                 <div className="flex items-center gap-2 animate-fade-in">
                   <TextTranslateControl 
                     texts={{ title: text, description }}
