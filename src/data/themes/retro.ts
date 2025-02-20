@@ -64,5 +64,47 @@ export const retroThemes: ColorPresetPair[] = [
     text: "#FFAA00",
     category: 'retro',
     font: 'font-c64-system'
+  },
+  {
+    name: "UNIVAC 1557",
+    background: "#000000",
+    text: "#55FF55",
+    category: 'retro',
+    font: 'font-c64-mono'
+  },
+  {
+    name: "PDP-1",
+    background: "#002211",
+    text: "#00FF99",
+    category: 'retro',
+    font: 'font-c64-system'
+  },
+  {
+    name: "Honeywell 516",
+    background: "#000000",
+    text: "#FFCC00",
+    category: 'retro',
+    font: 'font-c64-mono'
+  },
+  {
+    name: "CDC 713",
+    background: "#001122",
+    text: "#00FFFF",
+    category: 'retro',
+    font: 'font-c64-system'
+  },
+  {
+    name: "IMLAC PDS-1",
+    background: "#112200",
+    text: "#88FF88",
+    category: 'retro',
+    font: 'font-c64-mono'
+  },
+  {
+    name: "DEC GT40",
+    background: "#000000",
+    text: "#FF8800",
+    category: 'retro',
+    font: 'font-c64-system'
   }
 ];
