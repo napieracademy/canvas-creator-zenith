@@ -59,7 +59,32 @@ export class MetaService {
         '.content',
         '#content',
         '.post-body',
-        '[itemprop="articleBody"]'
+        '[itemprop="articleBody"]',
+        // Aggiungiamo più selettori comuni
+        '.article__body',
+        '.story-body',
+        '.story-content',
+        '.article-text',
+        '.article__content',
+        '.post__content',
+        '.main-content',
+        '.body-content',
+        '.article-body-content',
+        '.rich-text',
+        '.page-content',
+        '.post-text',
+        '.news-article-content',
+        // Selettori per elementi specifici di blog
+        '.blog-post',
+        '.blog-entry',
+        '.blog-content',
+        // Selettori per aggregatori di notizie
+        '.news-content',
+        '.news-text',
+        '.news-article',
+        // Selettori per siti di notizie specifici
+        '.ArticleBody-articleBody',
+        '.paywall-article-content'
       ];
 
       // Cerca il contenuto usando i selettori comuni
@@ -70,21 +95,25 @@ export class MetaService {
           
           // Rimuovi elementi non necessari
           const elementsToRemove = clone.querySelectorAll(
-            'script, style, nav, header, footer, .ad, .advertisement, .social-share, .related-posts, .comments'
+            'script, style, nav, header, footer, .ad, .advertisement, .social-share, .related-posts, .comments, .sidebar, .newsletter, .subscription, .paywall, aside'
           );
           elementsToRemove.forEach(el => el.remove());
 
           // Estrai il testo pulito
           content = clone.textContent?.trim() || '';
-          if (content) break;
+          if (content) {
+            console.log(`Found content using selector: ${selector}`);
+            break;
+          }
         }
       }
 
       // Se non troviamo contenuto con i selettori specifici, prova a prendere il corpo del testo
       if (!content) {
+        console.log('No content found with specific selectors, trying body...');
         const clone = doc.body.cloneNode(true) as HTMLElement;
         const elementsToRemove = clone.querySelectorAll(
-          'script, style, nav, header, footer, .ad, .advertisement, .social-share, .related-posts, .comments'
+          'script, style, nav, header, footer, .ad, .advertisement, .social-share, .related-posts, .comments, .sidebar, .newsletter, .subscription, .paywall, aside'
         );
         elementsToRemove.forEach(el => el.remove());
         content = clone.textContent?.trim() || '';
@@ -142,6 +171,7 @@ export class MetaService {
 
       console.log('Extracted content:', content.slice(0, 200) + '...');
       console.log('Content word count:', content.split(/\s+/).filter(word => word.length > 0).length);
+      console.log('Content length:', content.length);
       
       return {
         success: true,
