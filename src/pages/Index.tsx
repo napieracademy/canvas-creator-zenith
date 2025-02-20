@@ -9,7 +9,7 @@ import LoadingOverlay from '@/components/Layout/LoadingOverlay';
 import Sidebar from '@/components/Layout/Sidebar';
 import MainContent from '@/components/Layout/MainContent';
 
-const IndexPage = () => {
+const Index = () => {
   const getRandomTheme = () => {
     const randomIndex = Math.floor(Math.random() * colorPairs.length);
     return colorPairs[randomIndex];
@@ -42,31 +42,36 @@ const IndexPage = () => {
     });
   }, []);
 
-  const handleColorSelect = (background: string, text: string) => {
+  const handleColorSelect = (background: string, text: string, overlay?: string, font?: string) => {
     setBackgroundColor(background);
     setTextColor(text);
-  };
-
-  const handleMagicOptimization = () => {
-    if (!text && !description) {
-      toast({
-        title: "Contenuto mancante",
-        description: "Inserisci del testo prima di utilizzare l'ottimizzazione automatica",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    const { titleFontSize, descriptionFontSize: newDescFontSize, spacing: newSpacing } = calculateOptimalSizes(text, description);
     
-    setFontSize(titleFontSize);
-    setDescriptionFontSize(newDescFontSize);
-    setSpacing(newSpacing);
-
-    toast({
-      title: "Layout ottimizzato",
-      description: "Le dimensioni sono state ottimizzate in base al contenuto"
-    });
+    if (font) {
+      console.log("Font selezionato:", font);
+      const fontClass = document.documentElement.style;
+      
+      switch (font) {
+        case 'font-c64-system':
+          fontClass.setProperty('--font-family', '"Press Start 2P", cursive');
+          setCurrentFont('"Press Start 2P"');
+          break;
+        case 'font-c64-mono':
+          fontClass.setProperty('--font-family', '"Share Tech Mono", monospace');
+          setCurrentFont('"Share Tech Mono"');
+          break;
+        case 'font-c64-bold':
+          fontClass.setProperty('--font-family', 'VT323, monospace');
+          setCurrentFont('VT323');
+          break;
+        case 'font-c64-wide':
+          fontClass.setProperty('--font-family', 'Silkscreen, cursive');
+          setCurrentFont('Silkscreen');
+          break;
+        default:
+          fontClass.setProperty('--font-family', 'Inter, sans-serif');
+          setCurrentFont('Inter');
+      }
+    }
   };
 
   const handleDownload = () => {
@@ -93,24 +98,48 @@ const IndexPage = () => {
     });
   };
 
+  const handleMagicOptimization = () => {
+    if (!text && !description) {
+      toast({
+        title: "Contenuto mancante",
+        description: "Inserisci del testo prima di utilizzare l'ottimizzazione automatica",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const { titleFontSize, descriptionFontSize: newDescFontSize, spacing: newSpacing } = calculateOptimalSizes(text, description);
+    
+    setFontSize(titleFontSize);
+    setDescriptionFontSize(newDescFontSize);
+    setSpacing(newSpacing);
+
+    toast({
+      title: "Layout ottimizzato",
+      description: "Le dimensioni sono state ottimizzate in base al contenuto"
+    });
+  };
+
   if (isMobile) {
     return <MobileWarning />;
   }
 
   return (
-    <div className="flex">
+    <div className="min-h-screen w-full grid grid-cols-[400px_1fr] bg-gray-50/50">
+      <LoadingOverlay isLoading={isLoading} />
+      
       <Sidebar
+        format={format}
         text={text}
         description={description}
         textAlign={textAlign}
         descriptionAlign={descriptionAlign}
-        backgroundColor={backgroundColor}
-        textColor={textColor}
         fontSize={fontSize}
         descriptionFontSize={descriptionFontSize}
         spacing={spacing}
-        format={format}
-        currentFont={currentFont}
+        backgroundColor={backgroundColor}
+        textColor={textColor}
+        isLoading={isLoading}
         onFormatChange={setFormat}
         onTextChange={setText}
         onDescriptionChange={setDescription}
@@ -119,13 +148,32 @@ const IndexPage = () => {
         onFontSizeChange={setFontSize}
         onDescriptionFontSizeChange={setDescriptionFontSize}
         onSpacingChange={setSpacing}
-        disabled={isLoading}
-        onTitleExtracted={setText}
-        onDescriptionExtracted={setDescription}
+        onColorSelect={handleColorSelect}
+        onTitleExtracted={(title) => {
+          setText(title);
+          toast({
+            title: "Titolo estratto",
+            description: "Il testo è stato aggiornato con il titolo della pagina",
+          });
+        }}
+        onDescriptionExtracted={(desc) => {
+          setDescription(desc);
+          toast({
+            title: "Descrizione estratta",
+            description: "Il testo secondario è stato aggiornato con la descrizione della pagina",
+          });
+        }}
         onTabChange={setActiveTab}
         onLoadingChange={setIsLoading}
-        onColorSelect={handleColorSelect}
+        onCreditsExtracted={(newCredits) => {
+          setCredits(newCredits);
+          toast({
+            title: "Credits estratti",
+            description: "I credits sono stati aggiornati",
+          });
+        }}
       />
+      
       <MainContent
         text={text}
         description={description}
@@ -148,15 +196,9 @@ const IndexPage = () => {
         onDownload={handleDownload}
         onTextChange={setText}
         onDescriptionChange={setDescription}
-        onTitleExtracted={setText}
-        onDescriptionExtracted={setDescription}
-        onTabChange={setActiveTab}
-        onLoadingChange={setIsLoading}
       />
-      {isLoading && <LoadingOverlay isLoading={isLoading} />}
-      <MobileWarning />
     </div>
   );
 };
 
-export default IndexPage;
+export default Index;

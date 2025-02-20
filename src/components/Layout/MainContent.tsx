@@ -7,7 +7,6 @@ import DownloadButton from '@/components/DownloadButton';
 import TextTranslateControl from '@/components/TextControls/TextTranslateControl';
 import SpacingControl from '@/components/SpacingControl';
 import UrlFetchControl from '@/components/TextControls/UrlFetchControl';
-import { Separator } from "@/components/ui/separator";
 
 interface MainContentProps {
   text: string;
@@ -89,49 +88,31 @@ const MainContent: React.FC<MainContentProps> = ({
           font={currentFont}
           credits={credits}
         />
-        <div className="absolute top-3 right-3 flex items-center gap-2 p-2 rounded-lg bg-white/20 backdrop-blur-sm">
-          {/* Gruppo Importazione/Input */}
-          <div className="flex items-center gap-2">
-            <UrlFetchControl
-              onTitleExtracted={onTitleExtracted}
-              onDescriptionExtracted={onDescriptionExtracted}
-              onTabChange={onTabChange}
-              onLoadingChange={onLoadingChange}
-              disabled={isLoading}
-            />
-            <TextTranslateControl 
-              texts={{ title: text, description }}
-              onTranslate={handleTranslate}
-              disabled={isLoading}
-            />
-          </div>
-
-          <Separator orientation="vertical" className="h-8 bg-white/20" />
-
-          {/* Gruppo Layout */}
-          <div className="flex items-center gap-2">
-            <SpacingControl 
-              value={spacing} 
-              onChange={onSpacingChange} 
-              disabled={isLoading}
-            />
-            <SafeZoneToggle 
-              showSafeZone={showSafeZone}
-              onShowSafeZoneChange={onShowSafeZoneChange}
-              disabled={isLoading}
-            />
-          </div>
-
-          <Separator orientation="vertical" className="h-8 bg-white/20" />
-
-          {/* Gruppo Azioni */}
-          <div className="flex items-center gap-2">
-            <MagicButton 
-              onMagicOptimization={onMagicOptimization} 
-              disabled={isLoading} 
-            />
-            <DownloadButton onDownload={onDownload} />
-          </div>
+        <div className="absolute top-3 right-3 flex gap-2">
+          <UrlFetchControl
+            onTitleExtracted={onTitleExtracted}
+            onDescriptionExtracted={onDescriptionExtracted}
+            onTabChange={onTabChange}
+            onLoadingChange={onLoadingChange}
+            disabled={isLoading}
+          />
+          <TextTranslateControl 
+            texts={{ title: text, description }}
+            onTranslate={handleTranslate}
+            disabled={isLoading}
+          />
+          <SpacingControl 
+            value={spacing} 
+            onChange={onSpacingChange} 
+            disabled={isLoading}
+          />
+          <MagicButton onMagicOptimization={onMagicOptimization} disabled={isLoading} />
+          <SafeZoneToggle 
+            showSafeZone={showSafeZone}
+            onShowSafeZoneChange={onShowSafeZoneChange}
+            disabled={isLoading}
+          />
+          <DownloadButton onDownload={onDownload} />
         </div>
       </div>
     </div>
