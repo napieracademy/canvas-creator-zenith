@@ -7,6 +7,7 @@ import DownloadButton from '@/components/DownloadButton';
 import TextTranslateControl from '@/components/TextControls/TextTranslateControl';
 import SpacingControl from '@/components/SpacingControl';
 import UrlFetchControl from '@/components/TextControls/UrlFetchControl';
+import SuperButton from '@/components/SuperButton';
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Square, RectangleVertical } from 'lucide-react';
@@ -171,6 +172,14 @@ const MainContent: React.FC<MainContentProps> = ({
 
             {/* Gruppo Azioni */}
             <div className="flex items-center gap-2">
+              <SuperButton 
+                text={text}
+                description={description}
+                onTextChange={onTextChange}
+                onDescriptionChange={onDescriptionChange}
+                onMagicOptimization={onMagicOptimization}
+                disabled={isLoading}
+              />
               <MagicButton 
                 onMagicOptimization={onMagicOptimization} 
                 disabled={isLoading} 
