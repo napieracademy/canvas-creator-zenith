@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect, useState } from 'react';
 import { CanvasProps } from '@/types/canvas';
 import { useCanvasScale } from '@/hooks/useCanvasScale';
@@ -59,11 +58,12 @@ const Canvas: React.FC<CanvasProps> = ({
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     const getFontFamily = () => {
+      console.log('Current font:', font); // Debug log
       switch (font) {
         case 'font-c64-system':
-          return '"Press Start 2P"';
+          return 'Press Start 2P';
         case 'font-c64-mono':
-          return '"Share Tech Mono"';
+          return 'Share Tech Mono';
         case 'font-c64-bold':
           return 'VT323';
         case 'font-c64-wide':
@@ -73,28 +73,57 @@ const Canvas: React.FC<CanvasProps> = ({
       }
     };
 
+    const fontFamily = getFontFamily();
+    console.log('Selected font family:', fontFamily); // Debug log
+
     const context = {
       ctx,
       width: ORIGINAL_WIDTH,
       height: ORIGINAL_HEIGHT,
       safeZoneMargin: SAFE_ZONE_MARGIN,
-      fontFamily: getFontFamily()
+      fontFamily
     };
 
-    // Gestione sfondo
-    if (backgroundColor.startsWith('url(')) {
-      const img = new Image();
-      img.onload = () => {
-        const scale = Math.max(canvas.width / img.width, canvas.height / img.height);
-        const x = (canvas.width - img.width * scale) / 2;
-        const y = (canvas.height - img.height * scale) / 2;
-        
-        ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+    document.fonts.ready.then(() => {
+      console.log('Fonts loaded, available fonts:', document.fonts.check(`12px ${fontFamily}`)); // Debug log
 
-        if (overlay) {
-          ctx.fillStyle = overlay;
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
+      if (backgroundColor.startsWith('url(')) {
+        const img = new Image();
+        img.onload = () => {
+          const scale = Math.max(canvas.width / img.width, canvas.height / img.height);
+          const x = (canvas.width - img.width * scale) / 2;
+          const y = (canvas.height - img.height * scale) / 2;
+          
+          ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+
+          if (overlay) {
+            ctx.fillStyle = overlay;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+          }
+
+          if (showSafeZone) {
+            drawSafeZone(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
+          }
+
+          drawText(context, text, textAlign, textColor, fontSize, 'title', localSpacing);
+          if (description) {
+            drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', localSpacing);
+          }
+        };
+        img.src = backgroundColor.slice(4, -1);
+      } else {
+        if (backgroundColor.includes('gradient')) {
+          const gradient = ctx.createLinearGradient(0, 0, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
+          const colors = backgroundColor.match(/#[a-fA-F0-9]{6}/g);
+          if (colors && colors.length >= 2) {
+            gradient.addColorStop(0, colors[0]);
+            gradient.addColorStop(1, colors[1]);
+          }
+          ctx.fillStyle = gradient;
+        } else {
+          ctx.fillStyle = backgroundColor;
         }
+        ctx.fillRect(0, 0, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
 
         if (showSafeZone) {
           drawSafeZone(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
@@ -104,31 +133,8 @@ const Canvas: React.FC<CanvasProps> = ({
         if (description) {
           drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', localSpacing);
         }
-      };
-      img.src = backgroundColor.slice(4, -1);
-    } else {
-      if (backgroundColor.includes('gradient')) {
-        const gradient = ctx.createLinearGradient(0, 0, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
-        const colors = backgroundColor.match(/#[a-fA-F0-9]{6}/g);
-        if (colors && colors.length >= 2) {
-          gradient.addColorStop(0, colors[0]);
-          gradient.addColorStop(1, colors[1]);
-        }
-        ctx.fillStyle = gradient;
-      } else {
-        ctx.fillStyle = backgroundColor;
       }
-      ctx.fillRect(0, 0, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
-
-      if (showSafeZone) {
-        drawSafeZone(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
-      }
-
-      drawText(context, text, textAlign, textColor, fontSize, 'title', localSpacing);
-      if (description) {
-        drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', localSpacing);
-      }
-    }
+    });
   }, [text, description, backgroundColor, textAlign, descriptionAlign, textColor, fontSize, descriptionFontSize, localSpacing, onEffectiveFontSizeChange, showSafeZone, format, overlay, font]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
