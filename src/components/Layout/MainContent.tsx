@@ -48,6 +48,8 @@ const MainContent: React.FC<MainContentProps> = ({
   onMagicOptimization,
   onDownload
 }) => {
+  console.log('MainContent credits:', credits); // Debug log
+  
   return (
     <div className="h-screen p-6">
       <div className="relative">
