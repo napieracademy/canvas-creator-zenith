@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect, useState } from 'react';
 import { CanvasProps } from '@/types/canvas';
 import { useCanvasScale } from '@/hooks/useCanvasScale';
@@ -91,18 +92,24 @@ const Canvas: React.FC<CanvasProps> = ({
     const y = e.clientY - rect.top;
     const delta = Math.round((lastYRef.current - y) / 2);
     
-    if (isDraggingRef.current && onSpacingChange) {
+    if (isDraggingRef.current) {
       const newSpacing = Math.max(0, Math.min(200, localSpacing + delta));
       setLocalSpacing(newSpacing);
-      onSpacingChange(newSpacing);
-    } else if (isResizingTitleRef.current && onFontSizeChange) {
+      if (onSpacingChange) {
+        onSpacingChange(newSpacing);
+      }
+    } else if (isResizingTitleRef.current) {
       const newSize = Math.max(32, Math.min(120, localFontSize + delta));
       setLocalFontSize(newSize);
-      onFontSizeChange(newSize);
-    } else if (isResizingDescRef.current && onDescriptionFontSizeChange) {
+      if (onFontSizeChange) {
+        onFontSizeChange(newSize);
+      }
+    } else if (isResizingDescRef.current) {
       const newSize = Math.max(32, Math.min(120, localDescFontSize + delta));
       setLocalDescFontSize(newSize);
-      onDescriptionFontSizeChange(newSize);
+      if (onDescriptionFontSizeChange) {
+        onDescriptionFontSizeChange(newSize);
+      }
     }
     
     lastYRef.current = y;
