@@ -100,10 +100,10 @@ const Canvas: React.FC<CanvasProps> = ({
             ctx.font = `12px ${fontFamily}`;
             ctx.fillStyle = textColor;
             ctx.textAlign = textAlign;
-            const creditsY = (height / 2) - (spacing / 2) - fontSize * 1.2 - 20;
+            const creditsY = (ORIGINAL_HEIGHT / 2) - (spacing / 2) - fontSize * 1.2 - 20;
             const x = textAlign === 'left' ? SAFE_ZONE_MARGIN : 
-                     textAlign === 'right' ? width - SAFE_ZONE_MARGIN : 
-                     width / 2;
+                     textAlign === 'right' ? ORIGINAL_WIDTH - SAFE_ZONE_MARGIN : 
+                     ORIGINAL_WIDTH / 2;
             ctx.fillText(credits, x, creditsY);
           }
 
