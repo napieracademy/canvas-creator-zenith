@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ColorPresetsProps } from '@/types/colorPresets';
+import { ColorPresetsProps, ColorPresetPair } from '@/types/colorPresets';
 import { colorPairs } from '@/data/colorPairs';
 import { Button } from './ui/button';
 
@@ -58,7 +57,7 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
     }
   };
 
-  const ColorGrid = ({ colors }: { colors: typeof colorPairs }) => (
+  const ColorGrid = ({ colors }: { colors: ColorPresetPair[] }) => (
     <div className="grid grid-cols-4 md:grid-cols-6 gap-4 p-2">
       {colors.map((pair) => {
         const isUrl = pair.background.startsWith('url(');
@@ -78,11 +77,11 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
               }`}
               onClick={() => {
                 if (isUrl && pair.overlay) {
-                  onSelectColors(`url(${imageUrl})`, pair.text, pair.overlay, pair.font);
+                  handleColorSelect(`url(${imageUrl})`, pair.text, pair.overlay, pair.font);
                 } else if (hasPattern && patternStyle) {
-                  onSelectColors(patternStyle, pair.text, undefined, pair.font);
+                  handleColorSelect(patternStyle, pair.text, undefined, pair.font);
                 } else {
-                  onSelectColors(pair.background, pair.text, undefined, pair.font);
+                  handleColorSelect(pair.background, pair.text, undefined, pair.font);
                 }
               }}
             >
@@ -162,6 +161,10 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
       </Tabs>
     </div>
   );
+
+  function handleColorSelect(background: string, text: string, overlay: string | undefined, font: string | undefined) {
+    onSelectColors(background, text, overlay, font);
+  }
 };
 
 export default ColorPresets;

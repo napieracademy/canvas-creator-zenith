@@ -17,6 +17,7 @@ interface CanvasPreviewProps {
   format?: 'post' | 'story';
   overlay?: string;
   onSpacingChange?: (spacing: number) => void;
+  font?: string;
 }
 
 const CanvasPreview: React.FC<CanvasPreviewProps> = ({
@@ -33,11 +34,18 @@ const CanvasPreview: React.FC<CanvasPreviewProps> = ({
   showSafeZone,
   format,
   overlay,
-  onSpacingChange
+  onSpacingChange,
+  font
 }) => {
   return (
-    <div className="preview-container">
-      <div className="canvas-wrapper" style={{ aspectRatio: format === 'post' ? '1080/1350' : '1080/1920' }}>
+    <div className="preview-container w-full h-full flex items-center justify-center">
+      <div 
+        className="canvas-wrapper relative w-full h-full max-h-[calc(100vh-120px)] flex items-center justify-center"
+        style={{ 
+          aspectRatio: format === 'post' ? '1080/1350' : '1080/1920',
+          maxWidth: format === 'post' ? 'calc((100vh - 120px) * 0.8)' : 'calc((100vh - 120px) * 0.5625)'
+        }}
+      >
         <Canvas
           text={text}
           description={description}
@@ -53,6 +61,7 @@ const CanvasPreview: React.FC<CanvasPreviewProps> = ({
           format={format}
           overlay={overlay}
           onSpacingChange={onSpacingChange}
+          font={font}
         />
       </div>
     </div>
