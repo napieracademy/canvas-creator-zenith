@@ -37,6 +37,7 @@ const IndexPage = () => {
   const [currentFont, setCurrentFont] = useState('');
   const [credits, setCredits] = useState('');
   const [viewMode, setViewMode] = useState<'full' | 'fast'>('full');
+  const [extractedContent, setExtractedContent] = useState('');
 
   useEffect(() => {
     toast({
@@ -142,6 +143,8 @@ const IndexPage = () => {
                 onTabChange={setActiveTab}
                 onLoadingChange={setIsLoading}
                 onColorSelect={handleColorSelect}
+                extractedContent={extractedContent}
+                onContentExtracted={setExtractedContent}
               />
             )}
             <button
