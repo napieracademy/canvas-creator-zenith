@@ -17,6 +17,7 @@ import { Separator } from "@/components/ui/separator";
 import { Image } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import TextEditor from '@/components/TextEditor';
+import Header from '@/components/Layout/Header';
 
 interface SidebarProps {
   text: string;
@@ -144,7 +145,9 @@ const Sidebar: React.FC<SidebarProps> = ({
 
           <Separator />
           
-          <div className="space-y-6">            
+          <div className="space-y-6">
+            <Header />
+            
             <TextEditor 
               text={text}
               description={description}
