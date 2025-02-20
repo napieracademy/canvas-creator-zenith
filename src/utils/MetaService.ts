@@ -49,6 +49,49 @@ export class MetaService {
         doc.querySelector('meta[property="og:site_name"]')?.getAttribute('content') ||
         doc.querySelector('meta[name="publisher"]')?.getAttribute('content') || '';
 
+      // Estrazione del contenuto principale dell'articolo
+      let content = '';
+      const possibleContentSelectors = [
+        'article',
+        '[role="main"]',
+        'main',
+        '.post-content',
+        '.article-content',
+        '.entry-content',
+        '.content',
+        '#content',
+        '.post-body',
+        '[itemprop="articleBody"]'
+      ];
+
+      // Cerca il contenuto usando i selettori comuni
+      for (const selector of possibleContentSelectors) {
+        const element = doc.querySelector(selector);
+        if (element) {
+          const clone = element.cloneNode(true) as HTMLElement;
+          
+          // Rimuovi elementi non necessari
+          const elementsToRemove = clone.querySelectorAll(
+            'script, style, nav, header, footer, .ad, .advertisement, .social-share, .related-posts, .comments'
+          );
+          elementsToRemove.forEach(el => el.remove());
+
+          // Estrai il testo pulito
+          content = clone.textContent?.trim() || '';
+          if (content) break;
+        }
+      }
+
+      // Se non troviamo contenuto con i selettori specifici, prova a prendere il corpo del testo
+      if (!content) {
+        const clone = doc.body.cloneNode(true) as HTMLElement;
+        const elementsToRemove = clone.querySelectorAll(
+          'script, style, nav, header, footer, .ad, .advertisement, .social-share, .related-posts, .comments'
+        );
+        elementsToRemove.forEach(el => el.remove());
+        content = clone.textContent?.trim() || '';
+      }
+
       let credits = '';
       if (author || publisher) {
         credits = [author, publisher]
@@ -57,7 +100,55 @@ export class MetaService {
           .join(' · ');
       }
 
-      console.log('Extracted metadata:', { title, description, image, credits });
+      // Se abbiamo del contenuto, proviamo a migliorare titolo e descrizione
+      if (content) {
+        try {
+          // Migliora il titolo
+          const titleResponse = await fetch('http://localhost:54321/functions/v1/improve-content', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              content: content.slice(0, 2000), // Limitiamo il contenuto per l'API
+              type: 'title'
+            }),
+          });
+
+          if (titleResponse.ok) {
+            const { improvedText: improvedTitle } = await titleResponse.json();
+            if (improvedTitle) title = improvedTitle;
+          }
+
+          // Migliora la descrizione
+          const descriptionResponse = await fetch('http://localhost:54321/functions/v1/improve-content', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              content: content.slice(0, 2000), // Limitiamo il contenuto per l'API
+              type: 'description'
+            }),
+          });
+
+          if (descriptionResponse.ok) {
+            const { improvedText: improvedDescription } = await descriptionResponse.json();
+            if (improvedDescription) description = improvedDescription;
+          }
+        } catch (error) {
+          console.error('Error improving content:', error);
+          // Continuiamo con i metadati originali se l'ottimizzazione fallisce
+        }
+      }
+
+      console.log('Extracted and improved metadata:', { 
+        title, 
+        description, 
+        image, 
+        credits,
+        contentLength: content.length 
+      });
 
       return {
         success: true,
