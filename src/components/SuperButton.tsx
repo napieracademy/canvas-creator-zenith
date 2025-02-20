@@ -5,6 +5,7 @@ import { Rocket } from 'lucide-react';
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
+import { colorPairs } from '@/data/colorPairs';
 
 interface SuperButtonProps {
   text: string;
@@ -13,6 +14,7 @@ interface SuperButtonProps {
   onDescriptionChange: (description: string) => void;
   onMagicOptimization: () => void;
   disabled?: boolean;
+  onColorSelect?: (background: string, text: string) => void;
 }
 
 const SuperButton: React.FC<SuperButtonProps> = ({
@@ -21,7 +23,8 @@ const SuperButton: React.FC<SuperButtonProps> = ({
   onTextChange,
   onDescriptionChange,
   onMagicOptimization,
-  disabled
+  disabled,
+  onColorSelect
 }) => {
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -80,6 +83,24 @@ const SuperButton: React.FC<SuperButtonProps> = ({
     return { title: data.title, description: data.description };
   };
 
+  const suggestTheme = async (title: string, description: string) => {
+    const { data, error } = await supabase.functions.invoke('suggest-theme', {
+      body: { title, description }
+    });
+
+    if (error) throw error;
+
+    const suggestedCategory = data.theme;
+    const themesInCategory = colorPairs.filter(pair => pair.category === suggestedCategory);
+    
+    if (themesInCategory.length > 0) {
+      const randomTheme = themesInCategory[Math.floor(Math.random() * themesInCategory.length)];
+      return randomTheme;
+    }
+
+    return null;
+  };
+
   const handleSuperAction = async () => {
     if (!text.trim() && !description.trim()) {
       toast({
@@ -94,11 +115,11 @@ const SuperButton: React.FC<SuperButtonProps> = ({
     
     try {
       // Step 1: Ottimizzazione layout
-      toast({ title: "Step 1/3", description: "Ottimizzazione layout in corso..." });
+      toast({ title: "Step 1/4", description: "Ottimizzazione layout in corso..." });
       onMagicOptimization();
       
       // Step 2: Miglioramento testi
-      toast({ title: "Step 2/3", description: "Miglioramento testi in corso..." });
+      toast({ title: "Step 2/4", description: "Miglioramento testi in corso..." });
       const improvedTitle = text ? await improveText(text, true) : text;
       const improvedDesc = description ? await improveText(description, false) : description;
       
@@ -106,7 +127,7 @@ const SuperButton: React.FC<SuperButtonProps> = ({
       if (improvedDesc) onDescriptionChange(improvedDesc);
 
       // Step 3: Traduzione
-      toast({ title: "Step 3/3", description: "Traduzione in corso..." });
+      toast({ title: "Step 3/4", description: "Traduzione in corso..." });
       const { title: translatedTitle, description: translatedDesc } = await translateTexts(
         improvedTitle || text,
         improvedDesc || description
@@ -114,6 +135,19 @@ const SuperButton: React.FC<SuperButtonProps> = ({
       
       onTextChange(translatedTitle);
       onDescriptionChange(translatedDesc);
+
+      // Step 4: Suggerimento tema
+      if (onColorSelect) {
+        toast({ title: "Step 4/4", description: "Selezione tema in corso..." });
+        const suggestedTheme = await suggestTheme(translatedTitle, translatedDesc);
+        if (suggestedTheme) {
+          onColorSelect(suggestedTheme.background, suggestedTheme.text);
+          toast({
+            title: "Tema selezionato",
+            description: `È stato applicato il tema "${suggestedTheme.name}" per il tuo contenuto`
+          });
+        }
+      }
 
       toast({
         title: "Operazione completata",
@@ -146,7 +180,7 @@ const SuperButton: React.FC<SuperButtonProps> = ({
           </Button>
         </TooltipTrigger>
         <TooltipContent>
-          <p>Super ottimizzazione: layout, miglioramento testi e traduzione</p>
+          <p>Super ottimizzazione: layout, miglioramento testi, traduzione e tema</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
