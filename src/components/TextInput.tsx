@@ -40,7 +40,6 @@ const TextInput: React.FC<TextInputProps> = ({
   const isDescription = label.toLowerCase() === 'descrizione';
   const hasTitle = isDescription && otherText && otherText.trim().length > 0;
   const isEmpty = !value || value.trim().length === 0;
-  const hasExtractedContent = isDescription && extractedContent && extractedContent.trim().length > 0;
 
   return (
     <div className="space-y-4">
@@ -88,13 +87,13 @@ const TextInput: React.FC<TextInputProps> = ({
         disabled={disabled}
       />
 
-      {hasExtractedContent && (
+      {extractedContent && (
         <div className="mt-4">
-          <Label className="text-sm font-medium text-gray-700">Contenuto completo</Label>
+          <Label className="text-sm font-medium text-gray-700">Contenuto estratto</Label>
           <Textarea
             value={extractedContent}
             readOnly
-            className="mt-2 w-full min-h-[200px] max-h-[400px] text-sm bg-gray-50 resize-y"
+            className="mt-2 resize-y min-h-[100px] max-h-[400px] bg-gray-50 text-sm"
           />
         </div>
       )}

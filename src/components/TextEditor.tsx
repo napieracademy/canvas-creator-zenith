@@ -1,8 +1,6 @@
 
 import React from 'react';
-import TextInput from './TextInput';
-import UrlInput from './UrlInput';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import TextInput from '@/components/TextInput';
 
 interface TextEditorProps {
   text: string;
@@ -12,8 +10,6 @@ interface TextEditorProps {
   fontSize: number;
   descriptionFontSize: number;
   spacing: number;
-  disabled?: boolean;
-  extractedContent?: string;
   onTextChange: (text: string) => void;
   onDescriptionChange: (description: string) => void;
   onTextAlignChange: (align: 'left' | 'center' | 'right') => void;
@@ -25,7 +21,7 @@ interface TextEditorProps {
   onDescriptionExtracted: (description: string) => void;
   onTabChange: (value: string) => void;
   onLoadingChange: (loading: boolean) => void;
-  onContentExtracted?: (content: string) => void;
+  disabled?: boolean;
 }
 
 const TextEditor: React.FC<TextEditorProps> = ({
@@ -35,62 +31,50 @@ const TextEditor: React.FC<TextEditorProps> = ({
   descriptionAlign,
   fontSize,
   descriptionFontSize,
-  spacing,
-  disabled,
-  extractedContent,
   onTextChange,
   onDescriptionChange,
   onTextAlignChange,
   onDescriptionAlignChange,
   onFontSizeChange,
   onDescriptionFontSizeChange,
-  onSpacingChange,
   onTitleExtracted,
   onDescriptionExtracted,
   onTabChange,
   onLoadingChange,
-  onContentExtracted
+  disabled
 }) => {
   return (
-    <Tabs defaultValue="manual" className="w-full" onValueChange={onTabChange}>
-      <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="manual">Manuale</TabsTrigger>
-        <TabsTrigger value="url">URL</TabsTrigger>
-      </TabsList>
-      <TabsContent value="manual" className="space-y-4 mt-4">
-        <TextInput
-          label="Titolo"
-          value={text}
-          onChange={onTextChange}
+    <div className="space-y-4">
+      <div className="space-y-6">
+        <TextInput 
+          value={text} 
+          onChange={onTextChange} 
           textAlign={textAlign}
           onTextAlignChange={onTextAlignChange}
           fontSize={fontSize}
           onFontSizeChange={onFontSizeChange}
+          label="Titolo"
           disabled={disabled}
-        />
-        <TextInput
-          label="Descrizione"
-          value={description}
-          onChange={onDescriptionChange}
-          textAlign={descriptionAlign}
-          onTextAlignChange={onDescriptionAlignChange}
-          fontSize={descriptionFontSize}
-          onFontSizeChange={onDescriptionFontSizeChange}
-          disabled={disabled}
-          otherText={text}
-          extractedContent={extractedContent}
-        />
-      </TabsContent>
-      <TabsContent value="url" className="space-y-4 mt-4">
-        <UrlInput
           onTitleExtracted={onTitleExtracted}
           onDescriptionExtracted={onDescriptionExtracted}
           onTabChange={onTabChange}
           onLoadingChange={onLoadingChange}
-          onContentExtracted={onContentExtracted}
+          otherText={description}
         />
-      </TabsContent>
-    </Tabs>
+
+        <TextInput 
+          value={description} 
+          onChange={onDescriptionChange} 
+          textAlign={descriptionAlign}
+          onTextAlignChange={onDescriptionAlignChange}
+          fontSize={descriptionFontSize}
+          onFontSizeChange={onDescriptionFontSizeChange}
+          label="Descrizione"
+          disabled={disabled}
+          otherText={text}
+        />
+      </div>
+    </div>
   );
 };
 

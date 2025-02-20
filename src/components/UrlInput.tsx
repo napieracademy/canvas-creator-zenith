@@ -97,10 +97,6 @@ const UrlInput: React.FC<UrlInputProps> = ({
             onDescriptionExtracted(result.description);
             extracted = true;
           }
-          if (result.content && onContentExtracted) {
-            console.log('Contenuto estratto in UrlInput:', result.content);
-            onContentExtracted(result.content);
-          }
           if (result.image && onImageExtracted) {
             onImageExtracted(result.image);
             toast({
@@ -108,6 +104,15 @@ const UrlInput: React.FC<UrlInputProps> = ({
               description: "L'immagine è stata estratta dall'articolo",
             });
             extracted = true;
+          }
+          if (result.content && onContentExtracted) {
+            onContentExtracted(result.content);
+          }
+          if (result.credits) {
+            const creditsEvent = new CustomEvent('creditsExtracted', {
+              detail: { credits: result.credits }
+            });
+            document.dispatchEvent(creditsEvent);
           }
 
           setProgress(100);
