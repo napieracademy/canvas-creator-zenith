@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from './ui/button';
 import { Rocket } from 'lucide-react';
@@ -28,7 +27,6 @@ const SuperButton: React.FC<SuperButtonProps> = ({
 }) => {
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Funzione per rimuovere le virgolette dal testo
   const removeQuotes = (text: string) => {
     return text.replace(/["""'']/g, '').trim();
   };
@@ -37,7 +35,7 @@ const SuperButton: React.FC<SuperButtonProps> = ({
     const requestBody = {
       title: isTitle ? content : '',
       description: isTitle ? '' : content,
-      length: 'shorter',
+      length: 'similar',
       tone: 'professional'
     };
 
@@ -77,7 +75,7 @@ const SuperButton: React.FC<SuperButtonProps> = ({
       body: {
         texts: { title, description: desc },
         targetLanguage: 'it',
-        length: 'shorter'
+        length: 'similar'
       }
     });
 
@@ -120,11 +118,9 @@ const SuperButton: React.FC<SuperButtonProps> = ({
     setIsProcessing(true);
     
     try {
-      // Step 1: Ottimizzazione layout
       toast({ title: "Step 1/4", description: "Ottimizzazione layout in corso..." });
       onMagicOptimization();
       
-      // Step 2: Miglioramento testi
       toast({ title: "Step 2/4", description: "Miglioramento testi in corso..." });
       const improvedTitle = text ? await improveText(text, true) : text;
       const improvedDesc = description ? await improveText(description, false) : description;
@@ -132,7 +128,6 @@ const SuperButton: React.FC<SuperButtonProps> = ({
       if (improvedTitle) onTextChange(improvedTitle);
       if (improvedDesc) onDescriptionChange(improvedDesc);
 
-      // Step 3: Traduzione
       toast({ title: "Step 3/4", description: "Traduzione in corso..." });
       const { title: translatedTitle, description: translatedDesc } = await translateTexts(
         improvedTitle || text,
@@ -142,7 +137,6 @@ const SuperButton: React.FC<SuperButtonProps> = ({
       onTextChange(translatedTitle);
       onDescriptionChange(translatedDesc);
 
-      // Step 4: Suggerimento tema
       if (onColorSelect) {
         toast({ title: "Step 4/4", description: "Selezione tema in corso..." });
         const suggestedTheme = await suggestTheme(translatedTitle, translatedDesc);
