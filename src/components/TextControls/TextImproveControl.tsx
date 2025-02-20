@@ -20,14 +20,13 @@ import {
 } from "@/components/ui/select";
 
 type LengthType = 'shorter' | 'similar' | 'longer';
-type LanguageType = 'it' | 'en' | 'fr' | 'de' | 'pt' | 'zh';
 
 interface TextImproveControlProps {
   value: string;
   onChange: (value: string) => void;
   label: string;
   disabled?: boolean;
-  otherText?: string; // Aggiungiamo questa prop per l'altro testo
+  otherText?: string;
 }
 
 const TextImproveControl: React.FC<TextImproveControlProps> = ({ 
@@ -39,7 +38,6 @@ const TextImproveControl: React.FC<TextImproveControlProps> = ({
 }) => {
   const [isImproving, setIsImproving] = React.useState(false);
   const [selectedLength, setSelectedLength] = React.useState<LengthType>('similar');
-  const [selectedLanguage, setSelectedLanguage] = React.useState<LanguageType>('it');
   const [isOpen, setIsOpen] = React.useState(false);
 
   const getLengthLabel = (length: LengthType) => {
@@ -47,17 +45,6 @@ const TextImproveControl: React.FC<TextImproveControlProps> = ({
       case 'shorter': return 'Più corto';
       case 'similar': return 'Lunghezza simile';
       case 'longer': return 'Più lungo';
-    }
-  };
-
-  const getLanguageLabel = (lang: LanguageType) => {
-    switch (lang) {
-      case 'it': return 'Italiano';
-      case 'en': return 'Inglese';
-      case 'fr': return 'Francese';
-      case 'de': return 'Tedesco';
-      case 'pt': return 'Portoghese';
-      case 'zh': return 'Cinese';
     }
   };
 
@@ -77,8 +64,7 @@ const TextImproveControl: React.FC<TextImproveControlProps> = ({
       const requestBody = {
         title: isTitle ? value : otherText || '',
         description: isTitle ? otherText || '' : value,
-        length: selectedLength,
-        targetLanguage: selectedLanguage
+        length: selectedLength
       };
 
       console.log('Chiamata a improve-text con:', requestBody);
@@ -91,16 +77,14 @@ const TextImproveControl: React.FC<TextImproveControlProps> = ({
 
       if (error) throw error;
 
-      // Estraiamo il testo migliorato appropriato dalla risposta
       const improvedText = isTitle ? data?.title?.improvedText : data?.description?.improvedText;
-      const wasTranslated = isTitle ? data?.title?.wasTranslated : data?.description?.wasTranslated;
 
       if (!improvedText) throw new Error('Nessun testo migliorato ricevuto');
 
       onChange(improvedText);
       toast({
-        title: wasTranslated ? "Testo tradotto e migliorato" : "Testo migliorato",
-        description: `${wasTranslated ? 'Tradotto e migliorato' : 'Migliorato'} in ${getLanguageLabel(selectedLanguage).toLowerCase()} con lunghezza ${getLengthLabel(selectedLength).toLowerCase()}`
+        title: "Testo migliorato",
+        description: `Testo migliorato con lunghezza ${getLengthLabel(selectedLength).toLowerCase()}`
       });
     } catch (error) {
       console.error('Errore nel miglioramento del testo:', error);
@@ -134,27 +118,6 @@ const TextImproveControl: React.FC<TextImproveControlProps> = ({
             <PopoverContent className="w-72">
               <div className="space-y-4">
                 <div>
-                  <Label className="mb-2 block">Lingua desiderata</Label>
-                  <Select 
-                    value={selectedLanguage} 
-                    onValueChange={(value: LanguageType) => setSelectedLanguage(value)}
-                    disabled={disabled || isImproving}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Scegli la lingua" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="it">Italiano</SelectItem>
-                      <SelectItem value="en">Inglese</SelectItem>
-                      <SelectItem value="fr">Francese</SelectItem>
-                      <SelectItem value="de">Tedesco</SelectItem>
-                      <SelectItem value="pt">Portoghese</SelectItem>
-                      <SelectItem value="zh">Cinese</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
                   <Label className="mb-2 block">Lunghezza desiderata</Label>
                   <Select 
                     value={selectedLength} 
@@ -184,7 +147,7 @@ const TextImproveControl: React.FC<TextImproveControlProps> = ({
           </Popover>
         </TooltipTrigger>
         <TooltipContent>
-          <p className="whitespace-nowrap">Migliora il testo: puoi allungarlo, accorciarlo o tradurlo in un'altra lingua</p>
+          <p className="whitespace-nowrap">Migliora il testo: puoi allungarlo o accorciarlo mantenendo lo stesso tono</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
