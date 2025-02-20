@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from '@/components/ui/use-toast';
@@ -163,6 +164,7 @@ const IndexPage = () => {
         onDescriptionExtracted={setDescription}
         onTabChange={setActiveTab}
         onLoadingChange={setIsLoading}
+        onFormatChange={setFormat}
       />
       {isLoading && <LoadingOverlay isLoading={isLoading} />}
     </div>
