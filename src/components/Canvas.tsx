@@ -91,24 +91,18 @@ const Canvas: React.FC<CanvasProps> = ({
     const y = e.clientY - rect.top;
     const delta = Math.round((lastYRef.current - y) / 2);
     
-    if (isDraggingRef.current) {
+    if (isDraggingRef.current && onSpacingChange) {
       const newSpacing = Math.max(0, Math.min(200, localSpacing + delta));
       setLocalSpacing(newSpacing);
-      if (onSpacingChange) {
-        onSpacingChange(newSpacing);
-      }
-    } else if (isResizingTitleRef.current) {
+      onSpacingChange(newSpacing);
+    } else if (isResizingTitleRef.current && onFontSizeChange) {
       const newSize = Math.max(32, Math.min(120, localFontSize + delta));
       setLocalFontSize(newSize);
-      if (onFontSizeChange) {
-        onFontSizeChange(newSize);
-      }
-    } else if (isResizingDescRef.current) {
+      onFontSizeChange(newSize);
+    } else if (isResizingDescRef.current && onDescriptionFontSizeChange) {
       const newSize = Math.max(32, Math.min(120, localDescFontSize + delta));
       setLocalDescFontSize(newSize);
-      if (onDescriptionFontSizeChange) {
-        onDescriptionFontSizeChange(newSize);
-      }
+      onDescriptionFontSizeChange(newSize);
     }
     
     lastYRef.current = y;
