@@ -14,15 +14,24 @@ const MAX_TOKENS = {
   description: 150  
 };
 
+const LANGUAGE_NAMES = {
+  it: 'italiano',
+  en: 'inglese',
+  fr: 'francese',
+  de: 'tedesco',
+  pt: 'portoghese',
+  zh: 'cinese mandarino',
+};
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { text, tone, type, length } = await req.json();
+    const { text, type, length, targetLanguage = 'it' } = await req.json();
 
-    // Prima verifichiamo se il testo è in italiano
+    // Verifica la lingua del testo input
     const languageCheckResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -34,7 +43,7 @@ serve(async (req) => {
         messages: [
           { 
             role: 'system', 
-            content: 'Sei un esperto linguista. Rispondi solo "true" se il testo è in italiano, "false" altrimenti.' 
+            content: `Sei un esperto linguista. Rispondi solo con il codice della lingua del testo tra: ${Object.keys(LANGUAGE_NAMES).join(', ')}` 
           },
           { role: 'user', content: text }
         ],
@@ -44,11 +53,11 @@ serve(async (req) => {
     });
 
     const languageData = await languageCheckResponse.json();
-    const isItalian = languageData.choices[0].message.content.toLowerCase().includes('true');
+    const sourceLanguage = languageData.choices[0].message.content.toLowerCase().trim();
 
-    // Se non è in italiano, prima lo traduciamo
+    // Se la lingua sorgente è diversa dalla lingua target, traduciamo
     let textToImprove = text;
-    if (!isItalian) {
+    if (sourceLanguage !== targetLanguage) {
       const translationResponse = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -61,8 +70,8 @@ serve(async (req) => {
             { 
               role: 'system', 
               content: type === 'title' 
-                ? 'Sei un traduttore esperto. Traduci questo titolo in italiano RIMANENDO IL PIÙ FEDELE POSSIBILE al significato originale. Non interpretare o rielaborare, mantieni la traduzione molto vicina all\'originale. Usa solo parole semplici e dirette. Se ci sono giochi di parole o modi di dire, cerca l\'equivalente italiano più simile possibile.'
-                : 'Sei un traduttore esperto. Traduci questo testo in italiano rimanendo il più fedele possibile al significato originale. Mantieni lo stesso tono e stile, evitando interpretazioni libere. Se ci sono espressioni idiomatiche, usa l\'equivalente italiano più vicino possibile.' 
+                ? `Sei un traduttore esperto. Traduci questo titolo dall'${LANGUAGE_NAMES[sourceLanguage]} al ${LANGUAGE_NAMES[targetLanguage]} RIMANENDO IL PIÙ FEDELE POSSIBILE al significato originale. Non interpretare o rielaborare, mantieni la traduzione molto vicina all'originale. Usa solo parole semplici e dirette. Se ci sono giochi di parole o modi di dire, cerca l'equivalente più vicino possibile nella lingua target.`
+                : `Sei un traduttore esperto. Traduci questo testo dall'${LANGUAGE_NAMES[sourceLanguage]} al ${LANGUAGE_NAMES[targetLanguage]} rimanendo il più fedele possibile al significato originale. Mantieni lo stesso tono e stile, evitando interpretazioni libere. Se ci sono espressioni idiomatiche, usa l'equivalente più vicino possibile nella lingua target.` 
             },
             { role: 'user', content: text }
           ],
@@ -84,16 +93,12 @@ serve(async (req) => {
         : currentWordCount;  // Mantieni la lunghezza attuale
 
     // Ora procediamo con il miglioramento del testo
-    let systemPrompt = "Sei un esperto copywriter cinematografico che scrive testi autentici e naturali. ";
+    let systemPrompt = `Sei un esperto copywriter che scrive con un tono professionale e autorevole in ${LANGUAGE_NAMES[targetLanguage]}. `;
     
     if (type === 'title') {
       systemPrompt += `Migliora questo titolo mantenendolo MOLTO conciso e d'impatto. Il testo finale DEVE contenere circa ${targetWordCount} parole. Rimuovi parole non essenziali e mantieni solo il messaggio chiave. `;
     } else {
       systemPrompt += `Migliora questa descrizione mantenendola informativa e coinvolgente. Il testo finale DEVE contenere circa ${targetWordCount} parole. EVITA ASSOLUTAMENTE frasi come "Non perdere l'occasione" o "Da non perdere" o simili inviti all'azione generici. Concentrati invece sui dettagli unici e specifici del film. `;
-    }
-
-    if (tone) {
-      systemPrompt += `Usa un tono ${tone}, ma mantienilo naturale e non eccessivamente promozionale. `;
     }
 
     if (length === 'shorter') {
@@ -137,7 +142,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         improvedText,
-        wasTranslated: !isItalian 
+        wasTranslated: sourceLanguage !== targetLanguage 
       }),
       { 
         headers: { 
