@@ -64,11 +64,6 @@ const MainContent: React.FC<MainContentProps> = ({
   onTabChange,
   onLoadingChange
 }) => {
-  const handleTranslate = ({ title, description }: { title: string; description: string }) => {
-    onTextChange(title);
-    onDescriptionChange(description);
-  };
-
   return (
     <div className="h-screen p-6">
       <div className="relative">
@@ -90,47 +85,52 @@ const MainContent: React.FC<MainContentProps> = ({
           credits={credits}
         />
         <div className="absolute top-3 right-3 flex items-center gap-2 p-2 rounded-lg bg-white/20 backdrop-blur-sm">
-          {/* Gruppo Importazione/Input */}
-          <div className="flex items-center gap-2">
-            <UrlFetchControl
-              onTitleExtracted={onTitleExtracted}
-              onDescriptionExtracted={onDescriptionExtracted}
-              onTabChange={onTabChange}
-              onLoadingChange={onLoadingChange}
-              disabled={isLoading}
-            />
-            <TextTranslateControl 
-              texts={{ title: text, description }}
-              onTranslate={handleTranslate}
-              disabled={isLoading}
-            />
-          </div>
+          <div className="flex items-center gap-2 ml-auto">
+            {/* Gruppo Importazione/Input */}
+            <div className="flex items-center gap-2">
+              <UrlFetchControl
+                onTitleExtracted={onTitleExtracted}
+                onDescriptionExtracted={onDescriptionExtracted}
+                onTabChange={onTabChange}
+                onLoadingChange={onLoadingChange}
+                disabled={isLoading}
+              />
+              <TextTranslateControl 
+                texts={{ title: text, description }}
+                onTranslate={({ title, description }) => {
+                  onTextChange(title);
+                  onDescriptionChange(description);
+                }}
+                disabled={isLoading}
+              />
+            </div>
 
-          <Separator orientation="vertical" className="h-8 bg-white/20" />
+            <Separator orientation="vertical" className="h-8 bg-white/20" />
 
-          {/* Gruppo Layout */}
-          <div className="flex items-center gap-2">
-            <SpacingControl 
-              value={spacing} 
-              onChange={onSpacingChange} 
-              disabled={isLoading}
-            />
-            <SafeZoneToggle 
-              showSafeZone={showSafeZone}
-              onShowSafeZoneChange={onShowSafeZoneChange}
-              disabled={isLoading}
-            />
-          </div>
+            {/* Gruppo Layout */}
+            <div className="flex items-center gap-2">
+              <SpacingControl 
+                value={spacing} 
+                onChange={onSpacingChange} 
+                disabled={isLoading}
+              />
+              <SafeZoneToggle 
+                showSafeZone={showSafeZone}
+                onShowSafeZoneChange={onShowSafeZoneChange}
+                disabled={isLoading}
+              />
+            </div>
 
-          <Separator orientation="vertical" className="h-8 bg-white/20" />
+            <Separator orientation="vertical" className="h-8 bg-white/20" />
 
-          {/* Gruppo Azioni */}
-          <div className="flex items-center gap-2">
-            <MagicButton 
-              onMagicOptimization={onMagicOptimization} 
-              disabled={isLoading} 
-            />
-            <DownloadButton onDownload={onDownload} />
+            {/* Gruppo Azioni */}
+            <div className="flex items-center gap-2">
+              <MagicButton 
+                onMagicOptimization={onMagicOptimization} 
+                disabled={isLoading} 
+              />
+              <DownloadButton onDownload={onDownload} />
+            </div>
           </div>
         </div>
       </div>
