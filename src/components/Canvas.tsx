@@ -242,10 +242,9 @@ const Canvas: React.FC<CanvasProps> = ({
           onMouseLeave={() => setTimeout(() => setShowFontControls(false), 1500)}
         >
           <div 
-            className={`absolute left-1/2 -translate-x-1/2 transition-opacity duration-300 ${showFontControls ? 'opacity-100' : 'opacity-0'}`}
+            className={`absolute right-8 transition-opacity duration-300 ${showFontControls ? 'opacity-100' : 'opacity-0'}`}
             style={{ 
               bottom: '0',
-              transform: 'translateX(-50%)',
             }}
             onMouseDown={(e) => handleMouseDown(e, 'title-font')}
           >
@@ -269,10 +268,10 @@ const Canvas: React.FC<CanvasProps> = ({
             onMouseLeave={() => setTimeout(() => setShowSpacingControl(false), 1500)}
           >
             <div 
-              className={`absolute left-1/2 -translate-x-1/2 transition-opacity duration-300 ${showSpacingControl ? 'opacity-100' : 'opacity-0'}`}
+              className={`absolute left-8 transition-opacity duration-300 ${showSpacingControl ? 'opacity-100' : 'opacity-0'}`}
               style={{ 
                 top: '50%',
-                transform: 'translate(-50%, -50%)',
+                transform: 'translateY(-50%)',
               }}
               onMouseDown={(e) => handleMouseDown(e, 'spacing')}
             >
@@ -297,10 +296,10 @@ const Canvas: React.FC<CanvasProps> = ({
             onMouseLeave={() => setTimeout(() => setShowFontControls(false), 1500)}
           >
             <div 
-              className={`absolute left-1/2 -translate-x-1/2 transition-opacity duration-300 ${showFontControls ? 'opacity-100' : 'opacity-0'}`}
+              className={`absolute right-8 transition-opacity duration-300 ${showFontControls ? 'opacity-100' : 'opacity-0'}`}
               style={{ 
                 top: '50%',
-                transform: 'translate(-50%, -50%)',
+                transform: 'translateY(-50%)',
               }}
               onMouseDown={(e) => handleMouseDown(e, 'desc-font')}
             >
