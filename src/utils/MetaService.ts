@@ -29,11 +29,12 @@ export class MetaService {
       const parser = new DOMParser();
       const doc = parser.parseFromString(data.contents, 'text/html');
 
-      const title = 
+      // Usando let invece di const per permettere la modifica successiva
+      let title = 
         doc.querySelector('meta[property="og:title"]')?.getAttribute('content') ||
         doc.querySelector('title')?.textContent || '';
 
-      const description = 
+      let description = 
         doc.querySelector('meta[property="og:description"]')?.getAttribute('content') ||
         doc.querySelector('meta[name="description"]')?.getAttribute('content') || '';
 
