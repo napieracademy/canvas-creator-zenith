@@ -27,8 +27,26 @@ serve(async (req) => {
       }
     };
 
-    const promptTitle = title ? `Migliora questo titolo ${getToneInstruction(tone)}. Rendilo ${length === 'shorter' ? 'più conciso' : length === 'longer' ? 'più dettagliato' : 'della stessa lunghezza circa'}. Non aggiungere MAI virgolette o apici al testo:
-${title}` : '';
+    const titleSystemPrompt = `Sei un esperto copywriter specializzato in titoli per social media. 
+Il tuo obiettivo è creare titoli:
+- Chiari e diretti, evitando ambiguità
+- Immediati da comprendere
+- Incisivi e memorabili
+- Rilevanti per il pubblico target
+- Senza gergo tecnico non necessario
+- Che mantengono il messaggio chiave originale
+
+Non aggiungere mai virgolette o apici al testo.
+Non usare punti esclamativi multipli.
+Non SCRIVERE IN MAIUSCOLO se non necessario.
+Mantieni il focus sul messaggio principale.`;
+
+    const promptTitle = title ? `Migliora questo titolo ${getToneInstruction(tone)}. 
+Rendilo ${length === 'shorter' ? 'più conciso' : length === 'longer' ? 'più dettagliato' : 'della stessa lunghezza circa'}.
+Assicurati che il significato sia immediatamente chiaro.
+Non aggiungere MAI virgolette o apici al testo.
+
+Titolo da migliorare: ${title}` : '';
 
     const promptDescription = description ? `Migliora questa descrizione ${getToneInstruction(tone)}. Rendila ${length === 'shorter' ? 'più concisa' : length === 'longer' ? 'più dettagliata' : 'della stessa lunghezza circa'}. Non aggiungere MAI virgolette o apici al testo:
 ${description}` : '';
@@ -47,13 +65,13 @@ ${description}` : '';
           messages: [
             { 
               role: 'system', 
-              content: 'Sei un esperto copywriter. Migliora il testo seguendo le istruzioni di tono e lunghezza. Non modificare informazioni fattuali. Non aggiungere mai virgolette o apici al testo.' 
+              content: titleSystemPrompt
             },
             { role: 'user', content: promptTitle }
           ],
-          temperature: 0.7, // Aggiungiamo un po' di creatività ma non troppa
+          temperature: 0.5, // Riduciamo la creatività per favorire la chiarezza
           max_tokens: 150,  // Limitiamo la lunghezza della risposta
-          presence_penalty: 0.3, // Incoraggiamo leggermente la varietà nel testo
+          presence_penalty: 0.2, // Riduciamo leggermente per mantenere più focus
           frequency_penalty: 0.3 // Evitiamo ripetizioni eccessive
         }),
       }).then(r => r.json()) : null,
