@@ -12,7 +12,6 @@ export class MetaService {
     try {
       console.log('Attempting to fetch metadata via proxy for URL:', url);
 
-      // Usiamo un servizio proxy per evitare problemi CORS
       const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
       const response = await fetch(proxyUrl);
       
@@ -26,7 +25,6 @@ export class MetaService {
       const parser = new DOMParser();
       const doc = parser.parseFromString(contents, 'text/html');
 
-      // Priorità ai tag Open Graph
       const title = 
         doc.querySelector('meta[property="og:title"]')?.getAttribute('content') ||
         doc.querySelector('title')?.textContent || '';
@@ -39,7 +37,6 @@ export class MetaService {
         doc.querySelector('meta[property="og:image"]')?.getAttribute('content') ||
         doc.querySelector('meta[name="twitter:image"]')?.getAttribute('content') || '';
 
-      // Estrazione dell'autore e della testata
       const author = 
         doc.querySelector('meta[name="author"]')?.getAttribute('content') ||
         doc.querySelector('meta[property="article:author"]')?.getAttribute('content') || '';
@@ -48,15 +45,14 @@ export class MetaService {
         doc.querySelector('meta[property="og:site_name"]')?.getAttribute('content') ||
         doc.querySelector('meta[name="publisher"]')?.getAttribute('content') || '';
 
-      // Aggiungiamo autore e testata alla descrizione se presenti
       if (author || publisher) {
-        const additionalInfo = [
-          author && `Autore: ${author}`,
-          publisher
-        ].filter(Boolean).join('\n');
-
-        if (additionalInfo) {
-          description = `${description.trim()}\n\n${additionalInfo}`;
+        const credits = [author, publisher]
+          .filter(Boolean)
+          .map(text => text.toLowerCase())
+          .join(' · ');
+        
+        if (credits) {
+          description = `${description.trim()}\n\n${credits}`;
         }
       }
 
