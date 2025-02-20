@@ -79,7 +79,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
           textAlign={descriptionAlign}
           onTextAlignChange={onDescriptionAlignChange}
           fontSize={descriptionFontSize}
-          onFontSizeChange={onDescriptionFontSize}
+          onFontSizeChange={onDescriptionFontSizeChange}
           label="Descrizione"
           disabled={disabled}
         />
