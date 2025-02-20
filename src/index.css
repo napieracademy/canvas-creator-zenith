@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 @tailwind base;
@@ -62,6 +61,23 @@
   .glass-panel {
     @apply backdrop-blur-lg bg-white/90 shadow-lg border border-white/50 transition-all duration-300 hover:shadow-xl hover:bg-white/95;
   }
+}
+
+/* Stile base per le tabs */
+[role="tablist"] {
+  @apply rounded-lg border bg-muted p-1 text-muted-foreground;
+}
+
+[role="tab"] {
+  @apply inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50;
+}
+
+[role="tab"][data-state="active"] {
+  @apply bg-background text-foreground shadow-sm;
+}
+
+[role="tab"][data-state="inactive"] {
+  @apply hover:bg-background/50 hover:text-foreground;
 }
 
 .animate-in {
