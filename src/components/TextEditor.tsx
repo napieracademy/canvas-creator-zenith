@@ -65,21 +65,17 @@ const TextEditor: React.FC<TextEditorProps> = ({
           label="Titolo"
           value={text}
           onChange={onTextChange}
-          placeholder="Inserisci il tuo testo..."
+          textAlign={textAlign}
+          onTextAlignChange={onTextAlignChange}
+          fontSize={fontSize}
+          onFontSizeChange={onFontSizeChange}
           disabled={disabled}
+          onTitleExtracted={onTitleExtracted}
+          onDescriptionExtracted={onDescriptionExtracted}
+          onTabChange={onTabChange}
+          onLoadingChange={onLoadingChange}
+          otherText={description}
         />
-        <div className="flex items-center gap-2">
-          <FontSizeControl
-            fontSize={fontSize}
-            onFontSizeChange={onFontSizeChange}
-            disabled={disabled}
-          />
-          <TextAlignControl
-            align={textAlign}
-            onAlignChange={onTextAlignChange}
-            disabled={disabled}
-          />
-        </div>
       </div>
 
       <div className="space-y-4">
@@ -87,21 +83,17 @@ const TextEditor: React.FC<TextEditorProps> = ({
           label="Descrizione"
           value={description}
           onChange={onDescriptionChange}
-          placeholder="Inserisci una descrizione..."
+          textAlign={descriptionAlign}
+          onTextAlignChange={onDescriptionAlignChange}
+          fontSize={descriptionFontSize}
+          onFontSizeChange={onDescriptionFontSizeChange}
           disabled={disabled}
+          onTitleExtracted={onTitleExtracted}
+          onDescriptionExtracted={onDescriptionExtracted}
+          onTabChange={onTabChange}
+          onLoadingChange={onLoadingChange}
+          otherText={text}
         />
-        <div className="flex items-center gap-2">
-          <FontSizeControl
-            fontSize={descriptionFontSize}
-            onFontSizeChange={onDescriptionFontSizeChange}
-            disabled={disabled}
-          />
-          <TextAlignControl
-            align={descriptionAlign}
-            onAlignChange={onDescriptionAlignChange}
-            disabled={disabled}
-          />
-        </div>
       </div>
     </div>
   );
