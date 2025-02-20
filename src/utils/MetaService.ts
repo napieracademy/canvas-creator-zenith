@@ -26,7 +26,6 @@ export class MetaService {
       const parser = new DOMParser();
       const doc = parser.parseFromString(text, 'text/html');
 
-      // Usando let invece di const per permettere la modifica successiva
       let title = 
         doc.querySelector('meta[property="og:title"]')?.getAttribute('content') ||
         doc.querySelector('title')?.textContent || '';
@@ -98,49 +97,10 @@ export class MetaService {
           .join(' · ');
       }
 
-      // Se abbiamo del contenuto, proviamo a migliorare titolo e descrizione
-      if (content) {
-        try {
-          // Migliora il titolo
-          const titleResponse = await fetch('http://localhost:54321/functions/v1/improve-content', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              content: content.slice(0, 2000), // Limitiamo il contenuto per l'API
-              type: 'title'
-            }),
-          });
+      // Rimuoviamo il tentativo di miglioramento del contenuto che causa l'errore
+      // e restituiamo direttamente i metadati estratti
 
-          if (titleResponse.ok) {
-            const { improvedText: improvedTitle } = await titleResponse.json();
-            if (improvedTitle) title = improvedTitle;
-          }
-
-          // Migliora la descrizione
-          const descriptionResponse = await fetch('http://localhost:54321/functions/v1/improve-content', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              content: content.slice(0, 2000), // Limitiamo il contenuto per l'API
-              type: 'description'
-            }),
-          });
-
-          if (descriptionResponse.ok) {
-            const { improvedText: improvedDescription } = await descriptionResponse.json();
-            if (improvedDescription) description = improvedDescription;
-          }
-        } catch (error) {
-          console.error('Error improving content:', error);
-          // Continuiamo con i metadati originali se l'ottimizzazione fallisce
-        }
-      }
-
-      console.log('Extracted and improved metadata:', { 
+      console.log('Extracted metadata:', { 
         title, 
         description, 
         image, 
