@@ -32,7 +32,7 @@ const SuperButton: React.FC<SuperButtonProps> = ({
     const requestBody = {
       title: isTitle ? content : '',
       description: isTitle ? '' : content,
-      length: 'similar',
+      length: 'shorter',  // Impostiamo sempre 'shorter' per avere testi più concisi
       tone: 'professional'
     };
 
@@ -74,7 +74,8 @@ const SuperButton: React.FC<SuperButtonProps> = ({
     const { data, error } = await supabase.functions.invoke('translate-text', {
       body: {
         texts: { title, description: desc },
-        targetLanguage: 'it'
+        targetLanguage: 'it',
+        length: 'shorter'  // Impostiamo sempre 'shorter' per avere traduzioni più concise
       }
     });
 
