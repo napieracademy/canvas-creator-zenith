@@ -20,7 +20,7 @@ export function drawSafeZone(ctx: CanvasRenderingContext2D, width: number, heigh
   );
 }
 
-export function calculateLines(context: CanvasContext, text: string, size: number, type: 'title' | 'description' = 'title') {
+export function calculateLines(context: CanvasContext, text: string, size: number, type: 'title' | 'description' | 'credits' = 'title') {
   const { ctx, width, safeZoneMargin, fontFamily = 'Inter' } = context;
   const maxWidth = width - (2 * safeZoneMargin);
   
@@ -51,7 +51,7 @@ export function drawText(
   textAlign: 'left' | 'center' | 'right',
   textColor: string,
   fontSize: number,
-  type: 'title' | 'description' = 'title',
+  type: 'title' | 'description' | 'credits' = 'title',
   spacing: number = 40
 ) {
   const { ctx, width, height, fontFamily = 'Inter' } = context;
@@ -80,8 +80,10 @@ export function drawText(
   let startY;
   if (type === 'title') {
     startY = (height / 2) - (spacing / 2) - totalHeight;
-  } else {
+  } else if (type === 'description') {
     startY = (height / 2) + (spacing / 2);
+  } else if (type === 'credits') {
+    startY = (height / 2) + (spacing / 2) + (fontSize * 1.2);
   }
 
   const x = textAlign === 'left' ? SAFE_ZONE_MARGIN : 
