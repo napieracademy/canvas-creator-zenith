@@ -25,12 +25,27 @@ export function useCanvasScale(
   }, [canvasRef, originalWidth, originalHeight]);
 
   useEffect(() => {
-    // Create a ResizeObserver instance
+    let timeoutId: number;
+    let animationFrameId: number;
+
+    // Create a ResizeObserver instance with debounced update
     const resizeObserver = new ResizeObserver((entries) => {
-      // Use requestIdleCallback or setTimeout to debounce the update
-      window.requestIdleCallback ? 
-        window.requestIdleCallback(() => updateScale()) : 
-        setTimeout(() => updateScale(), 0);
+      // Clear any existing timeout
+      if (timeoutId) {
+        window.clearTimeout(timeoutId);
+      }
+      
+      // Clear any existing animation frame
+      if (animationFrameId) {
+        window.cancelAnimationFrame(animationFrameId);
+      }
+
+      // Debounce the update using both setTimeout and requestAnimationFrame
+      timeoutId = window.setTimeout(() => {
+        animationFrameId = window.requestAnimationFrame(() => {
+          updateScale();
+        });
+      }, 100); // 100ms debounce time
     });
 
     // Observe the canvas parent element
@@ -39,12 +54,20 @@ export function useCanvasScale(
       resizeObserver.observe(canvas.parentElement);
     }
 
-    // Initial update
-    updateScale();
+    // Initial update with RAF to ensure smooth initial render
+    animationFrameId = window.requestAnimationFrame(() => {
+      updateScale();
+    });
     
     // Cleanup
     return () => {
       resizeObserver.disconnect();
+      if (timeoutId) {
+        window.clearTimeout(timeoutId);
+      }
+      if (animationFrameId) {
+        window.cancelAnimationFrame(animationFrameId);
+      }
     };
   }, [updateScale]);
 
