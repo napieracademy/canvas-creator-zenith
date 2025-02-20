@@ -8,7 +8,10 @@ import MobileWarning from '@/components/Layout/MobileWarning';
 import LoadingOverlay from '@/components/Layout/LoadingOverlay';
 import Sidebar from '@/components/Layout/Sidebar';
 import MainContent from '@/components/Layout/MainContent';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import FastAndCurious from '@/components/Layout/FastAndCurious';
+import { ChevronLeft, ChevronRight, Zap } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const IndexPage = () => {
   const getRandomTheme = () => {
@@ -36,6 +39,7 @@ const IndexPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [currentFont, setCurrentFont] = useState('');
   const [credits, setCredits] = useState('');
+  const [viewMode, setViewMode] = useState<'full' | 'fast'>('full');
 
   useEffect(() => {
     toast({
@@ -100,72 +104,98 @@ const IndexPage = () => {
   }
 
   return (
-    <div className="flex">
-      <div className={`relative transition-all duration-300 ${sidebarOpen ? 'w-[400px]' : 'w-0'}`}>
-        {sidebarOpen && (
-          <Sidebar
+    <div className="relative">
+      <div className="fixed top-3 left-3 z-50">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setViewMode(viewMode === 'full' ? 'fast' : 'full')}
+                className="bg-white/80 hover:bg-white/90 backdrop-blur-sm transition-all duration-200"
+              >
+                <Zap className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{viewMode === 'full' ? 'Passa alla modalità Fast and Curious' : 'Torna alla modalità completa'}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
+
+      {viewMode === 'full' ? (
+        <div className="flex">
+          <div className={`relative transition-all duration-300 ${sidebarOpen ? 'w-[400px]' : 'w-0'}`}>
+            {sidebarOpen && (
+              <Sidebar
+                text={text}
+                description={description}
+                textAlign={textAlign}
+                descriptionAlign={descriptionAlign}
+                backgroundColor={backgroundColor}
+                textColor={textColor}
+                fontSize={fontSize}
+                descriptionFontSize={descriptionFontSize}
+                spacing={spacing}
+                format={format}
+                currentFont={currentFont}
+                onFormatChange={setFormat}
+                onTextChange={setText}
+                onDescriptionChange={setDescription}
+                onTextAlignChange={setTextAlign}
+                onDescriptionAlignChange={setDescriptionAlign}
+                onFontSizeChange={setFontSize}
+                onDescriptionFontSizeChange={setDescriptionFontSize}
+                onSpacingChange={setSpacing}
+                disabled={isLoading}
+                onTitleExtracted={setText}
+                onDescriptionExtracted={setDescription}
+                onTabChange={setActiveTab}
+                onLoadingChange={setIsLoading}
+                onColorSelect={handleColorSelect}
+              />
+            )}
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="absolute -right-8 top-1/2 -translate-y-1/2 bg-white border rounded-r-lg p-1 hover:bg-gray-50"
+            >
+              {sidebarOpen ? <ChevronLeft className="w-6 h-6" /> : <ChevronRight className="w-6 h-6" />}
+            </button>
+          </div>
+          <MainContent
             text={text}
             description={description}
+            backgroundColor={backgroundColor}
             textAlign={textAlign}
             descriptionAlign={descriptionAlign}
-            backgroundColor={backgroundColor}
             textColor={textColor}
             fontSize={fontSize}
             descriptionFontSize={descriptionFontSize}
             spacing={spacing}
+            showSafeZone={showSafeZone}
             format={format}
             currentFont={currentFont}
-            onFormatChange={setFormat}
+            isLoading={isLoading}
+            credits={credits}
+            onEffectiveFontSizeChange={setEffectiveFontSize}
+            onShowSafeZoneChange={setShowSafeZone}
+            onSpacingChange={setSpacing}
+            onMagicOptimization={handleMagicOptimization}
+            onDownload={handleDownload}
             onTextChange={setText}
             onDescriptionChange={setDescription}
-            onTextAlignChange={setTextAlign}
-            onDescriptionAlignChange={setDescriptionAlign}
-            onFontSizeChange={setFontSize}
-            onDescriptionFontSizeChange={setDescriptionFontSize}
-            onSpacingChange={setSpacing}
-            disabled={isLoading}
             onTitleExtracted={setText}
             onDescriptionExtracted={setDescription}
             onTabChange={setActiveTab}
             onLoadingChange={setIsLoading}
-            onColorSelect={handleColorSelect}
+            onFormatChange={setFormat}
           />
-        )}
-        <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="absolute -right-8 top-1/2 -translate-y-1/2 bg-white border rounded-r-lg p-1 hover:bg-gray-50"
-        >
-          {sidebarOpen ? <ChevronLeft className="w-6 h-6" /> : <ChevronRight className="w-6 h-6" />}
-        </button>
-      </div>
-      <MainContent
-        text={text}
-        description={description}
-        backgroundColor={backgroundColor}
-        textAlign={textAlign}
-        descriptionAlign={descriptionAlign}
-        textColor={textColor}
-        fontSize={fontSize}
-        descriptionFontSize={descriptionFontSize}
-        spacing={spacing}
-        showSafeZone={showSafeZone}
-        format={format}
-        currentFont={currentFont}
-        isLoading={isLoading}
-        credits={credits}
-        onEffectiveFontSizeChange={setEffectiveFontSize}
-        onShowSafeZoneChange={setShowSafeZone}
-        onSpacingChange={setSpacing}
-        onMagicOptimization={handleMagicOptimization}
-        onDownload={handleDownload}
-        onTextChange={setText}
-        onDescriptionChange={setDescription}
-        onTitleExtracted={setText}
-        onDescriptionExtracted={setDescription}
-        onTabChange={setActiveTab}
-        onLoadingChange={setIsLoading}
-        onFormatChange={setFormat}
-      />
+        </div>
+      ) : (
+        <FastAndCurious format={format} onFormatChange={setFormat} />
+      )}
       {isLoading && <LoadingOverlay isLoading={isLoading} />}
     </div>
   );
