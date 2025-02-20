@@ -1,3 +1,4 @@
+
 interface MetadataResult {
   success: boolean;
   title?: string;
@@ -139,7 +140,8 @@ export class MetaService {
         }
       }
 
-      console.log('Extracted content:', content.slice(0, 200) + '...'); // Solo per debug
+      console.log('Extracted content:', content.slice(0, 200) + '...');
+      console.log('Content word count:', content.split(/\s+/).filter(word => word.length > 0).length);
       
       return {
         success: true,
