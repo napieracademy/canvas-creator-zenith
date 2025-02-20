@@ -24,7 +24,6 @@ const UrlInput: React.FC<UrlInputProps> = ({
   onLoadingChange 
 }) => {
   const [url, setUrl] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [isImageUrl, setIsImageUrl] = useState(false);
   const { toast } = useToast();
 
@@ -41,7 +40,6 @@ const UrlInput: React.FC<UrlInputProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     onLoadingChange?.(true);
 
     try {
@@ -121,19 +119,9 @@ const UrlInput: React.FC<UrlInputProps> = ({
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
       onLoadingChange?.(false);
     }
   };
-
-  if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center p-8 space-y-4">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="text-sm text-gray-600">Estrazione contenuti in corso...</p>
-      </div>
-    );
-  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-2">
