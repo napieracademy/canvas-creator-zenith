@@ -103,7 +103,7 @@ const Canvas: React.FC<CanvasProps> = ({
             ctx.font = `16px ${fontFamily}`;
             ctx.fillStyle = textColor;
             ctx.textAlign = 'left';
-            ctx.fillText(credits, SAFE_ZONE_MARGIN, ORIGINAL_HEIGHT - SAFE_ZONE_MARGIN + 8);
+            ctx.fillText(credits, SAFE_ZONE_MARGIN, ORIGINAL_HEIGHT - (SAFE_ZONE_MARGIN / 2));
           }
         };
         img.src = backgroundColor.slice(4, -1);
@@ -133,7 +133,7 @@ const Canvas: React.FC<CanvasProps> = ({
           ctx.font = `16px ${fontFamily}`;
           ctx.fillStyle = textColor;
           ctx.textAlign = 'left';
-          ctx.fillText(credits, SAFE_ZONE_MARGIN, ORIGINAL_HEIGHT - SAFE_ZONE_MARGIN + 8);
+          ctx.fillText(credits, SAFE_ZONE_MARGIN, ORIGINAL_HEIGHT - (SAFE_ZONE_MARGIN / 2));
         }
       }
     });
