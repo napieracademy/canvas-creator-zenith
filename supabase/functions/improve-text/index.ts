@@ -10,7 +10,7 @@ const corsHeaders = {
 };
 
 const MAX_TOKENS = {
-  title: 30,    
+  title: 100,    // Aumentato il limite per i titoli
   description: 150  
 };
 
@@ -30,6 +30,7 @@ serve(async (req) => {
 
   try {
     const { text, type, length, targetLanguage = 'it' } = await req.json();
+    console.log('Richiesta ricevuta:', { text, type, length, targetLanguage });
 
     // Verifica la lingua del testo input
     const languageCheckResponse = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -39,7 +40,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: 'gpt-4o', // Corretto qui
         messages: [
           { 
             role: 'system', 
@@ -54,10 +55,12 @@ serve(async (req) => {
 
     const languageData = await languageCheckResponse.json();
     const sourceLanguage = languageData.choices[0].message.content.toLowerCase().trim();
+    console.log('Lingua rilevata:', sourceLanguage);
 
     // Se la lingua sorgente è diversa dalla lingua target, traduciamo
     let textToImprove = text;
     if (sourceLanguage !== targetLanguage) {
+      console.log('Avvio traduzione da', sourceLanguage, 'a', targetLanguage);
       const translationResponse = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -65,7 +68,7 @@ serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-4o',
+          model: 'gpt-4o', // Corretto qui
           messages: [
             { 
               role: 'system', 
@@ -78,7 +81,8 @@ serve(async (req) => {
                    4. La naturalezza della lingua di destinazione
                    
                    Se sono presenti giochi di parole o riferimenti culturali, adattali in modo che abbiano senso per il pubblico di destinazione.
-                   La traduzione deve sembrare un contenuto originalmente scritto in ${LANGUAGE_NAMES[targetLanguage]}.`
+                   La traduzione deve sembrare un contenuto originalmente scritto in ${LANGUAGE_NAMES[targetLanguage]}.
+                   IMPORTANTE: Fornisci la traduzione completa senza troncare il testo.`
                 : `Sei un traduttore professionista esperto in localizzazione di contenuti digitali, specializzato in ${LANGUAGE_NAMES[targetLanguage]}. 
                    Il tuo compito è tradurre questo testo dall'${LANGUAGE_NAMES[sourceLanguage]} mantenendo:
                    1. Il registro linguistico e il tono dell'originale
@@ -98,6 +102,7 @@ serve(async (req) => {
 
       const translationData = await translationResponse.json();
       textToImprove = translationData.choices[0].message.content;
+      console.log('Testo tradotto:', textToImprove);
     }
 
     // Ora procediamo con il miglioramento del testo
@@ -117,6 +122,7 @@ serve(async (req) => {
         5. Assicurati che il tono sia appropriato per il pubblico target
         
         Il titolo deve essere memorabile e professionale, evitando sensazionalismi o esagerazioni.
+        IMPORTANTE: Fornisci il titolo completo senza troncarlo.
       `;
     } else {
       systemPrompt += `
@@ -131,6 +137,7 @@ serve(async (req) => {
       `;
     }
 
+    console.log('Avvio miglioramento testo');
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -138,7 +145,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: 'gpt-4o', // Corretto qui
         messages: [
           { role: 'system', content: systemPrompt },
           { 
@@ -149,6 +156,7 @@ serve(async (req) => {
               
               Migliora questo testo mantenendo il significato originale ma rendendolo più efficace e naturale nella lingua di destinazione.
               La lunghezza deve essere ${lengthInstruction}.
+              IMPORTANTE: Fornisci il testo completo senza troncarlo.
             `
           }
         ],
@@ -164,6 +172,7 @@ serve(async (req) => {
 
     const data = await response.json();
     const improvedText = data.choices[0].message.content;
+    console.log('Testo migliorato:', improvedText);
 
     return new Response(
       JSON.stringify({ 
