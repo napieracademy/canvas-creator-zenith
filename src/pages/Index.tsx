@@ -137,17 +137,14 @@ const IndexPage = () => {
         spacing={spacing}
         format={format}
         currentFont={currentFont}
+        onFormatChange={setFormat}
         onTextChange={setText}
         onDescriptionChange={setDescription}
         onTextAlignChange={setTextAlign}
         onDescriptionAlignChange={setDescriptionAlign}
-        onBackgroundColorChange={setBackgroundColor}
-        onTextColorChange={setTextColor}
         onFontSizeChange={setFontSize}
         onDescriptionFontSizeChange={setDescriptionFontSize}
         onSpacingChange={setSpacing}
-        onFormatChange={setFormat}
-        onFontChange={setCurrentFont}
         disabled={isLoading}
         onTitleExtracted={setText}
         onDescriptionExtracted={setDescription}
@@ -181,7 +178,7 @@ const IndexPage = () => {
         onTabChange={setActiveTab}
         onLoadingChange={setIsLoading}
       />
-      {isLoading && <LoadingOverlay />}
+      {isLoading && <LoadingOverlay isLoading={isLoading} />}
       <MobileWarning />
     </div>
   );
