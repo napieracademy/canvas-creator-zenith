@@ -11,7 +11,6 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
   currentText,
   featuredImage 
 }) => {
-  // Creiamo un tema per l'immagine featured se esiste
   const featuredTheme = featuredImage ? [{
     name: "Featured Image",
     background: `url(${featuredImage})`,
@@ -19,6 +18,10 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
     category: 'featured' as const,
     overlay: "rgba(0, 0, 0, 0.5)"
   }] : [];
+
+  const handleColorSelect = (background: string, text: string, overlay?: string, font?: string) => {
+    onSelectColors(background, text, overlay, font);
+  };
 
   return (
     <div className="space-y-4">
@@ -31,7 +34,7 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
             Cosmici
           </TabsTrigger>
           <TabsTrigger value="retro" className="text-xs px-1">
-            Retrò
+            C64
           </TabsTrigger>
           <TabsTrigger value="featured" className="text-xs px-1" disabled={!featuredImage}>
             Featured
@@ -42,7 +45,7 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
             colors={colorPairs.filter(pair => pair.category === 'classic')}
             currentBackground={currentBackground}
             currentText={currentText}
-            onSelectColors={onSelectColors}
+            onSelectColors={handleColorSelect}
           />
         </TabsContent>
         <TabsContent value="cosmic" className="mt-4">
@@ -50,7 +53,7 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
             colors={colorPairs.filter(pair => pair.category === 'cosmic')}
             currentBackground={currentBackground}
             currentText={currentText}
-            onSelectColors={onSelectColors}
+            onSelectColors={handleColorSelect}
           />
         </TabsContent>
         <TabsContent value="retro" className="mt-4">
@@ -58,7 +61,7 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
             colors={colorPairs.filter(pair => pair.category === 'retro')}
             currentBackground={currentBackground}
             currentText={currentText}
-            onSelectColors={onSelectColors}
+            onSelectColors={handleColorSelect}
           />
         </TabsContent>
         <TabsContent value="featured" className="mt-4">
@@ -67,7 +70,7 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
               colors={featuredTheme}
               currentBackground={currentBackground}
               currentText={currentText}
-              onSelectColors={onSelectColors}
+              onSelectColors={handleColorSelect}
             />
           )}
         </TabsContent>

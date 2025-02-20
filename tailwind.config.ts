@@ -21,6 +21,10 @@ export default {
     extend: {
       fontFamily: {
         inter: ["Inter", "sans-serif"],
+        'c64-system': ['Press Start 2P', 'cursive'],
+        'c64-bold': ['VT323', 'monospace'],
+        'c64-wide': ['Silkscreen', 'cursive'],
+        'c64-mono': ['Share Tech Mono', 'monospace'],
       },
       boxShadow: {
         '3xl': '0 35px 60px -15px rgba(0, 0, 0, 0.3)',
