@@ -4,30 +4,30 @@ import { ColorPresetPair } from "@/types/colorPresets";
 export const retroThemes: ColorPresetPair[] = [
   {
     name: "Classic C64",
-    background: "#3E31A2",  // Blu C64 classico
-    text: "#7ABDC5",       // Ciano chiaro C64
+    background: "#4040E0",  // Blu C64 più accurato
+    text: "#93FFD2",       // Verde chiaro C64 più accurato
     category: 'retro',
     font: 'font-c64-system'  // Press Start 2P
   },
   {
     name: "Terminal Verde",
-    background: "#000000",  // Nero classico
-    text: "#5FE36D",       // Verde fosforescente
+    background: "#000000",  
+    text: "#4CFF4C",       // Verde fosforescente più luminoso
     category: 'retro',
-    font: 'font-c64-mono'   // Share Tech Mono
+    font: 'font-c64-mono'   
   },
   {
     name: "BASIC Mode",
-    background: "#4F46BA", // Blu scuro C64
-    text: "#FFFFFF",      // Bianco puro
+    background: "#4040E0", 
+    text: "#FFFFFF",      
     category: 'retro',
-    font: 'font-c64-bold'   // VT323
+    font: 'font-c64-bold'   
   },
   {
     name: "PETSCII Art",
-    background: "#221F26", // Grigio scuro
-    text: "#9EF1D9",      // Verde acqua C64
+    background: "#2B2B2B", 
+    text: "#93FFD2",      
     category: 'retro',
-    font: 'font-c64-wide'   // Silkscreen
+    font: 'font-c64-wide'   
   }
 ];
