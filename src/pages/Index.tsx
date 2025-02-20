@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from '@/components/ui/use-toast';
@@ -9,7 +8,7 @@ import LoadingOverlay from '@/components/Layout/LoadingOverlay';
 import Sidebar from '@/components/Layout/Sidebar';
 import MainContent from '@/components/Layout/MainContent';
 
-const Index = () => {
+const IndexPage = () => {
   const getRandomTheme = () => {
     const randomIndex = Math.floor(Math.random() * colorPairs.length);
     return colorPairs[randomIndex];
@@ -125,55 +124,36 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen w-full grid grid-cols-[400px_1fr] bg-gray-50/50">
-      <LoadingOverlay isLoading={isLoading} />
-      
+    <div className="flex">
       <Sidebar
-        format={format}
         text={text}
         description={description}
         textAlign={textAlign}
         descriptionAlign={descriptionAlign}
+        backgroundColor={backgroundColor}
+        textColor={textColor}
         fontSize={fontSize}
         descriptionFontSize={descriptionFontSize}
         spacing={spacing}
-        backgroundColor={backgroundColor}
-        textColor={textColor}
-        isLoading={isLoading}
-        onFormatChange={setFormat}
+        format={format}
+        currentFont={currentFont}
         onTextChange={setText}
         onDescriptionChange={setDescription}
         onTextAlignChange={setTextAlign}
         onDescriptionAlignChange={setDescriptionAlign}
+        onBackgroundColorChange={setBackgroundColor}
+        onTextColorChange={setTextColor}
         onFontSizeChange={setFontSize}
         onDescriptionFontSizeChange={setDescriptionFontSize}
         onSpacingChange={setSpacing}
-        onColorSelect={handleColorSelect}
-        onTitleExtracted={(title) => {
-          setText(title);
-          toast({
-            title: "Titolo estratto",
-            description: "Il testo è stato aggiornato con il titolo della pagina",
-          });
-        }}
-        onDescriptionExtracted={(desc) => {
-          setDescription(desc);
-          toast({
-            title: "Descrizione estratta",
-            description: "Il testo secondario è stato aggiornato con la descrizione della pagina",
-          });
-        }}
+        onFormatChange={setFormat}
+        onFontChange={setCurrentFont}
+        disabled={isLoading}
+        onTitleExtracted={setText}
+        onDescriptionExtracted={setDescription}
         onTabChange={setActiveTab}
         onLoadingChange={setIsLoading}
-        onCreditsExtracted={(newCredits) => {
-          setCredits(newCredits);
-          toast({
-            title: "Credits estratti",
-            description: "I credits sono stati aggiornati",
-          });
-        }}
       />
-      
       <MainContent
         text={text}
         description={description}
@@ -196,9 +176,15 @@ const Index = () => {
         onDownload={handleDownload}
         onTextChange={setText}
         onDescriptionChange={setDescription}
+        onTitleExtracted={setText}
+        onDescriptionExtracted={setDescription}
+        onTabChange={setActiveTab}
+        onLoadingChange={setIsLoading}
       />
+      {isLoading && <LoadingOverlay />}
+      <MobileWarning />
     </div>
   );
 };
 
-export default Index;
+export default IndexPage;
