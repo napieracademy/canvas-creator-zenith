@@ -1,8 +1,6 @@
-
 import React from 'react';
 import TextInput from '@/components/TextInput';
 import SpacingControl from '@/components/SpacingControl';
-import TextTranslateControl from './TextControls/TextTranslateControl';
 
 interface TextEditorProps {
   text: string;
@@ -47,20 +45,9 @@ const TextEditor: React.FC<TextEditorProps> = ({
   onLoadingChange,
   disabled
 }) => {
-  const handleTranslate = ({ title, description }: { title: string; description: string }) => {
-    onTextChange(title);
-    onDescriptionChange(description);
-  };
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end mb-4">
-        <TextTranslateControl
-          texts={{ title: text, description }}
-          onTranslate={handleTranslate}
-          disabled={disabled}
-        />
-      </div>
       <div className="space-y-6">
         <TextInput 
           value={text} 
