@@ -2,10 +2,10 @@
 import React from 'react';
 import TextInput from '@/components/TextInput';
 import SpacingControl from '@/components/SpacingControl';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import UrlInput from '@/components/UrlInput';
-import { toast } from "@/components/ui/use-toast";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
+import { Button } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Download } from 'lucide-react';
 
 interface TextEditorProps {
   text: string;
@@ -50,90 +50,68 @@ const TextEditor: React.FC<TextEditorProps> = ({
   onLoadingChange,
   disabled
 }) => {
-  const renderTextControls = () => (
-    <div className="space-y-4">
-      <TextInput 
-        value={text} 
-        onChange={onTextChange} 
-        textAlign={textAlign}
-        onTextAlignChange={onTextAlignChange}
-        fontSize={fontSize}
-        onFontSizeChange={onFontSizeChange}
-        label="Titolo"
-        disabled={disabled}
-      />
-      
-      {description && (
-        <SpacingControl
-          value={spacing}
-          onChange={onSpacingChange}
-          disabled={disabled}
-        />
-      )}
-
-      <TextInput 
-        value={description} 
-        onChange={onDescriptionChange} 
-        textAlign={descriptionAlign}
-        onTextAlignChange={onDescriptionAlignChange}
-        fontSize={descriptionFontSize}
-        onFontSizeChange={onDescriptionFontSizeChange}
-        label="Descrizione"
-        disabled={disabled}
-      />
-    </div>
-  );
-
   return (
     <div className="space-y-4">
-      <Tabs defaultValue="manual" onValueChange={onTabChange}>
-        <TabsList className="grid grid-cols-2">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <TabsTrigger 
-                  value="manual" 
-                  disabled={disabled}
-                  aria-label="Inserisci manualmente il testo"
-                >
-                  Testo
-                </TabsTrigger>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Inserisci manualmente il testo</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <TabsTrigger 
-                  value="fetch" 
-                  disabled={disabled}
-                  aria-label="Estrai testo da un URL"
-                >
-                  Fetch
-                </TabsTrigger>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Estrai automaticamente il testo da un URL</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </TabsList>
-        <TabsContent value="manual">
-          {renderTextControls()}
-        </TabsContent>
-        <TabsContent value="fetch">
-          <UrlInput 
-            onTitleExtracted={onTitleExtracted}
-            onDescriptionExtracted={onDescriptionExtracted}
-            onTabChange={onTabChange}
-            onLoadingChange={onLoadingChange}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <div className="flex-1">
+            <TextInput 
+              value={text} 
+              onChange={onTextChange} 
+              textAlign={textAlign}
+              onTextAlignChange={onTextAlignChange}
+              fontSize={fontSize}
+              onFontSizeChange={onFontSizeChange}
+              label="Titolo"
+              disabled={disabled}
+            />
+          </div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button 
+                variant="outline" 
+                size="icon"
+                className="shrink-0"
+                disabled={disabled}
+              >
+                <Download className="h-4 w-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80">
+              <UrlInput 
+                onTitleExtracted={onTitleExtracted}
+                onDescriptionExtracted={onDescriptionExtracted}
+                onTabChange={onTabChange}
+                onLoadingChange={onLoadingChange}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+        
+        {description && (
+          <SpacingControl
+            value={spacing}
+            onChange={onSpacingChange}
+            disabled={disabled}
           />
-        </TabsContent>
-      </Tabs>
+        )}
+
+        <div className="flex items-center gap-2">
+          <div className="flex-1">
+            <TextInput 
+              value={description} 
+              onChange={onDescriptionChange} 
+              textAlign={descriptionAlign}
+              onTextAlignChange={onDescriptionAlignChange}
+              fontSize={descriptionFontSize}
+              onFontSizeChange={onDescriptionFontSizeChange}
+              label="Descrizione"
+              disabled={disabled}
+            />
+          </div>
+          <div className="w-9 h-9" /> {/* Spacer to align with title row */}
+        </div>
+      </div>
     </div>
   );
 };
