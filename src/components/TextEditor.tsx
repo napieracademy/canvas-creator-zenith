@@ -1,6 +1,6 @@
+
 import React from 'react';
 import TextInput from '@/components/TextInput';
-import SpacingControl from '@/components/SpacingControl';
 
 interface TextEditorProps {
   text: string;
@@ -31,21 +31,18 @@ const TextEditor: React.FC<TextEditorProps> = ({
   descriptionAlign,
   fontSize,
   descriptionFontSize,
-  spacing,
   onTextChange,
   onDescriptionChange,
   onTextAlignChange,
   onDescriptionAlignChange,
   onFontSizeChange,
   onDescriptionFontSizeChange,
-  onSpacingChange,
   onTitleExtracted,
   onDescriptionExtracted,
   onTabChange,
   onLoadingChange,
   disabled
 }) => {
-
   return (
     <div className="space-y-4">
       <div className="space-y-6">
@@ -64,14 +61,6 @@ const TextEditor: React.FC<TextEditorProps> = ({
           onLoadingChange={onLoadingChange}
           otherText={description}
         />
-        
-        {description && (
-          <SpacingControl
-            value={spacing}
-            onChange={onSpacingChange}
-            disabled={disabled}
-          />
-        )}
 
         <TextInput 
           value={description} 

@@ -5,6 +5,7 @@ import MagicButton from '@/components/MagicButton';
 import SafeZoneToggle from '@/components/SafeZoneToggle';
 import DownloadButton from '@/components/DownloadButton';
 import TextTranslateControl from '@/components/TextControls/TextTranslateControl';
+import SpacingControl from '@/components/SpacingControl';
 
 interface MainContentProps {
   text: string;
@@ -82,6 +83,11 @@ const MainContent: React.FC<MainContentProps> = ({
           <TextTranslateControl 
             texts={{ title: text, description }}
             onTranslate={handleTranslate}
+            disabled={isLoading}
+          />
+          <SpacingControl 
+            value={spacing} 
+            onChange={onSpacingChange} 
             disabled={isLoading}
           />
           <MagicButton onMagicOptimization={onMagicOptimization} disabled={isLoading} />
