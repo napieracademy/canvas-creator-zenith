@@ -10,7 +10,7 @@ const corsHeaders = {
 };
 
 const MAX_TOKENS = {
-  title: 100,    // Aumentato il limite per i titoli
+  title: 100,    
   description: 150  
 };
 
@@ -40,7 +40,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o', // Corretto qui
+        model: 'gpt-4o',
         messages: [
           { 
             role: 'system', 
@@ -60,7 +60,7 @@ serve(async (req) => {
     // Se la lingua sorgente è diversa dalla lingua target, traduciamo
     let textToImprove = text;
     if (sourceLanguage !== targetLanguage) {
-      console.log('Avvio traduzione da', sourceLanguage, 'a', targetLanguage);
+      console.log('Avvio parafrasi e traduzione da', sourceLanguage, 'a', targetLanguage);
       const translationResponse = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -68,30 +68,31 @@ serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-4o', // Corretto qui
+          model: 'gpt-4o',
           messages: [
             { 
               role: 'system', 
               content: type === 'title' 
-                ? `Sei un traduttore professionista esperto in localizzazione di contenuti digitali, specializzato in ${LANGUAGE_NAMES[targetLanguage]}. 
-                   Il tuo compito è tradurre questo titolo dall'${LANGUAGE_NAMES[sourceLanguage]} mantenendo:
-                   1. Il tono e lo stile originale
-                   2. Il contesto culturale appropriato per il pubblico di destinazione
-                   3. Le sfumature emotive e l'impatto del messaggio originale
-                   4. La naturalezza della lingua di destinazione
+                ? `Sei un esperto di comunicazione bilingue che parla perfettamente ${LANGUAGE_NAMES[sourceLanguage]} e ${LANGUAGE_NAMES[targetLanguage]}.
+                   Il tuo compito è capire il significato essenziale di questo titolo e ricrearlo in ${LANGUAGE_NAMES[targetLanguage]}.
                    
-                   Se sono presenti giochi di parole o riferimenti culturali, adattali in modo che abbiano senso per il pubblico di destinazione.
-                   La traduzione deve sembrare un contenuto originalmente scritto in ${LANGUAGE_NAMES[targetLanguage]}.
-                   IMPORTANTE: Fornisci la traduzione completa senza troncare il testo.`
-                : `Sei un traduttore professionista esperto in localizzazione di contenuti digitali, specializzato in ${LANGUAGE_NAMES[targetLanguage]}. 
-                   Il tuo compito è tradurre questo testo dall'${LANGUAGE_NAMES[sourceLanguage]} mantenendo:
-                   1. Il registro linguistico e il tono dell'originale
-                   2. La precisione tecnica e la terminologia specifica del settore
-                   3. La scorrevolezza e la naturalezza nella lingua di destinazione
-                   4. Le sfumature culturali appropriate per il pubblico target
+                   Non tradurre letteralmente, ma:
+                   1. Comprendi il messaggio chiave e il tono
+                   2. Considera il contesto culturale della lingua di destinazione
+                   3. Ricrea il messaggio con parole e strutture naturali in ${LANGUAGE_NAMES[targetLanguage]}
+                   4. Mantieni lo stesso impatto emotivo
                    
-                   La traduzione deve preservare il significato originale adattandolo al contesto culturale della lingua di destinazione.
-                   Il risultato deve sembrare un testo scritto originariamente in ${LANGUAGE_NAMES[targetLanguage]}.` 
+                   La versione finale deve sembrare pensata e scritta originariamente in ${LANGUAGE_NAMES[targetLanguage]}.`
+                : `Sei un esperto di comunicazione bilingue che parla perfettamente ${LANGUAGE_NAMES[sourceLanguage]} e ${LANGUAGE_NAMES[targetLanguage]}.
+                   Il tuo compito è capire il significato essenziale di questo testo e ricrearlo in ${LANGUAGE_NAMES[targetLanguage]}.
+                   
+                   Non tradurre letteralmente, ma:
+                   1. Comprendi il messaggio principale e i dettagli importanti
+                   2. Considera il contesto culturale e professionale
+                   3. Ricrea il contenuto con espressioni naturali in ${LANGUAGE_NAMES[targetLanguage]}
+                   4. Mantieni lo stesso livello di formalità e tono
+                   
+                   La versione finale deve sembrare pensata e scritta originariamente in ${LANGUAGE_NAMES[targetLanguage]}.`
             },
             { role: 'user', content: text }
           ],
@@ -102,38 +103,39 @@ serve(async (req) => {
 
       const translationData = await translationResponse.json();
       textToImprove = translationData.choices[0].message.content;
-      console.log('Testo tradotto:', textToImprove);
+      console.log('Testo parafrasato e tradotto:', textToImprove);
     }
 
     // Ora procediamo con il miglioramento del testo
-    let systemPrompt = `Sei un esperto copywriter e content strategist che scrive in ${LANGUAGE_NAMES[targetLanguage]} con un tono professionale e coinvolgente. `;
+    let systemPrompt = `Sei un esperto copywriter che scrive in ${LANGUAGE_NAMES[targetLanguage]}. `;
 
-    const lengthInstruction = length === 'shorter' ? 'più breve dell\'originale' : 
-                            length === 'longer' ? 'più lungo dell\'originale' : 
-                            'simile all\'originale';
+    const lengthInstruction = length === 'shorter' ? 'più conciso' : 
+                            length === 'longer' ? 'più dettagliato' : 
+                            'della stessa lunghezza circa';
     
     if (type === 'title') {
       systemPrompt += `
-        Migliora questo titolo seguendo queste linee guida:
-        1. Mantieni il messaggio chiave e l'essenza del contenuto
-        2. Usa un linguaggio preciso e d'impatto
-        3. Evita cliché e frasi fatte
-        4. Mantieni una lunghezza ${lengthInstruction}
-        5. Assicurati che il tono sia appropriato per il pubblico target
+        Riscrivi questo titolo in modo naturale e scorrevole.
         
-        Il titolo deve essere memorabile e professionale, evitando sensazionalismi o esagerazioni.
-        IMPORTANTE: Fornisci il titolo completo senza troncarlo.
+        Linee guida:
+        1. Mantieni il messaggio essenziale
+        2. Usa un linguaggio chiaro e diretto
+        3. Evita espressioni forzate o artificiose
+        4. Rendilo ${lengthInstruction}
+        
+        Il risultato deve essere naturale e convincente.
       `;
     } else {
       systemPrompt += `
-        Migliora questa descrizione seguendo queste linee guida:
-        1. Mantieni il focus sui dettagli distintivi e specifici
-        2. Usa un linguaggio chiaro e professionale
-        3. Struttura il testo in modo logico e scorrevole
-        4. Mantieni una lunghezza ${lengthInstruction}
-        5. Assicurati che ogni frase aggiunga valore al messaggio complessivo
+        Riscrivi questa descrizione in modo naturale e scorrevole.
         
-        La descrizione deve essere informativa e coinvolgente, evitando luoghi comuni e call-to-action generiche.
+        Linee guida:
+        1. Mantieni tutti i concetti chiave
+        2. Usa un linguaggio chiaro e professionale
+        3. Evita espressioni forzate o artificiose
+        4. Rendila ${lengthInstruction}
+        
+        Il risultato deve essere naturale e convincente.
       `;
     }
 
@@ -145,18 +147,16 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o', // Corretto qui
+        model: 'gpt-4o',
         messages: [
           { role: 'system', content: systemPrompt },
           { 
             role: 'user', 
             content: `
-              Testo originale: ${text}
               Testo da migliorare: ${textToImprove}
               
-              Migliora questo testo mantenendo il significato originale ma rendendolo più efficace e naturale nella lingua di destinazione.
-              La lunghezza deve essere ${lengthInstruction}.
-              IMPORTANTE: Fornisci il testo completo senza troncarlo.
+              Riscrivi questo testo in modo naturale e scorrevole, mantenendo il significato ma evitando forzature linguistiche.
+              Il risultato deve essere ${lengthInstruction} rispetto all'originale.
             `
           }
         ],
