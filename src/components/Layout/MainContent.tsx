@@ -8,6 +8,9 @@ import TextTranslateControl from '@/components/TextControls/TextTranslateControl
 import SpacingControl from '@/components/SpacingControl';
 import UrlFetchControl from '@/components/TextControls/UrlFetchControl';
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import { Square, RectangleVertical } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface MainContentProps {
   text: string;
@@ -35,6 +38,7 @@ interface MainContentProps {
   onDescriptionExtracted: (description: string) => void;
   onTabChange: (value: string) => void;
   onLoadingChange: (loading: boolean) => void;
+  onFormatChange: (format: 'post' | 'story') => void;
 }
 
 const MainContent: React.FC<MainContentProps> = ({
@@ -62,7 +66,8 @@ const MainContent: React.FC<MainContentProps> = ({
   onTitleExtracted,
   onDescriptionExtracted,
   onTabChange,
-  onLoadingChange
+  onLoadingChange,
+  onFormatChange
 }) => {
   return (
     <div className="h-screen p-6">
@@ -86,6 +91,47 @@ const MainContent: React.FC<MainContentProps> = ({
         />
         <div className="absolute top-3 right-3 flex items-center gap-2 p-2 rounded-lg bg-white/20 backdrop-blur-sm">
           <div className="flex items-center gap-2 ml-auto">
+            {/* Gruppo Formato */}
+            <div className="flex items-center gap-2">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant={format === 'post' ? 'default' : 'ghost'}
+                      size="sm"
+                      onClick={() => onFormatChange('post')}
+                      disabled={isLoading}
+                    >
+                      <Square className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Formato Post Instagram quadrato</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant={format === 'story' ? 'default' : 'ghost'}
+                      size="sm"
+                      onClick={() => onFormatChange('story')}
+                      disabled={isLoading}
+                    >
+                      <RectangleVertical className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Formato Story Instagram verticale</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+
+            <Separator orientation="vertical" className="h-8 bg-white/20" />
+
             {/* Gruppo Importazione/Input */}
             <div className="flex items-center gap-2">
               <UrlFetchControl

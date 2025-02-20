@@ -1,6 +1,5 @@
 
 import React from 'react';
-import FormatSelector from '@/components/FormatSelector';
 import TextEditor from '@/components/TextEditor';
 import ColorPresets from '@/components/ColorPresets';
 import Header from '@/components/Layout/Header';
@@ -34,7 +33,6 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
-  format,
   text,
   description,
   textAlign,
@@ -46,7 +44,6 @@ const Sidebar: React.FC<SidebarProps> = ({
   textColor,
   currentFont,
   disabled,
-  onFormatChange,
   onTextChange,
   onDescriptionChange,
   onTextAlignChange,
@@ -65,12 +62,6 @@ const Sidebar: React.FC<SidebarProps> = ({
       <div className="space-y-6">
         <Header />
         
-        <FormatSelector 
-          format={format}
-          onFormatChange={onFormatChange}
-          disabled={disabled}
-        />
-
         <TextEditor 
           text={text}
           description={description}
