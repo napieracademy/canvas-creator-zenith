@@ -27,14 +27,12 @@ export function calculateLines(context: CanvasContext, text: string, size: numbe
   
   ctx.font = `${type === 'title' ? 'bold' : ''} ${size}px ${fontFamily}`;
   
-  // Prima dividiamo per i ritorni a capo manuali
   const paragraphs = text.split('\n');
   const lines: string[] = [];
 
-  // Per ogni paragrafo, calcoliamo il word wrap
   for (const paragraph of paragraphs) {
     if (!paragraph.trim()) {
-      lines.push(''); // Manteniamo le linee vuote
+      lines.push('');
       continue;
     }
 
@@ -81,11 +79,7 @@ export function drawText(
   }
 
   ctx.save();
-  if (type === 'title') {
-    ctx.fillStyle = 'rgba(255, 0, 0, 0.1)';
-  } else {
-    ctx.fillStyle = 'rgba(0, 255, 0, 0.1)';
-  }
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
   const areaHeight = fontSize * 2;
   let areaY;
   if (type === 'title') {
