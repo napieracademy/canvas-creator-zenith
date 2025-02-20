@@ -27,13 +27,15 @@ interface TextImproveControlProps {
   onChange: (value: string) => void;
   label: string;
   disabled?: boolean;
+  otherText?: string; // Aggiungiamo questa prop per l'altro testo
 }
 
 const TextImproveControl: React.FC<TextImproveControlProps> = ({ 
   value, 
   onChange, 
   label, 
-  disabled 
+  disabled,
+  otherText 
 }) => {
   const [isImproving, setIsImproving] = React.useState(false);
   const [selectedLength, setSelectedLength] = React.useState<LengthType>('similar');
@@ -71,31 +73,34 @@ const TextImproveControl: React.FC<TextImproveControlProps> = ({
 
     setIsImproving(true);
     try {
-      console.log('Chiamata a improve-text con:', {
-        text: value,
-        type: label.toLowerCase() === 'titolo' ? 'title' : 'description',
+      const isTitle = label.toLowerCase() === 'titolo';
+      const requestBody = {
+        title: isTitle ? value : otherText || '',
+        description: isTitle ? otherText || '' : value,
         length: selectedLength,
         targetLanguage: selectedLanguage
-      });
+      };
+
+      console.log('Chiamata a improve-text con:', requestBody);
 
       const { data, error } = await supabase.functions.invoke('improve-text', {
-        body: {
-          text: value,
-          type: label.toLowerCase() === 'titolo' ? 'title' : 'description',
-          length: selectedLength,
-          targetLanguage: selectedLanguage
-        }
+        body: requestBody
       });
 
       console.log('Risposta della funzione:', { data, error });
 
       if (error) throw error;
-      if (!data?.improvedText) throw new Error('Nessun testo migliorato ricevuto');
 
-      onChange(data.improvedText);
+      // Estraiamo il testo migliorato appropriato dalla risposta
+      const improvedText = isTitle ? data?.title?.improvedText : data?.description?.improvedText;
+      const wasTranslated = isTitle ? data?.title?.wasTranslated : data?.description?.wasTranslated;
+
+      if (!improvedText) throw new Error('Nessun testo migliorato ricevuto');
+
+      onChange(improvedText);
       toast({
-        title: "Testo migliorato",
-        description: `Testo migliorato in ${getLanguageLabel(selectedLanguage).toLowerCase()} con lunghezza ${getLengthLabel(selectedLength).toLowerCase()}`
+        title: wasTranslated ? "Testo tradotto e migliorato" : "Testo migliorato",
+        description: `${wasTranslated ? 'Tradotto e migliorato' : 'Migliorato'} in ${getLanguageLabel(selectedLanguage).toLowerCase()} con lunghezza ${getLengthLabel(selectedLength).toLowerCase()}`
       });
     } catch (error) {
       console.error('Errore nel miglioramento del testo:', error);
