@@ -8,6 +8,7 @@ import MobileWarning from '@/components/Layout/MobileWarning';
 import LoadingOverlay from '@/components/Layout/LoadingOverlay';
 import Sidebar from '@/components/Layout/Sidebar';
 import MainContent from '@/components/Layout/MainContent';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const IndexPage = () => {
   const getRandomTheme = () => {
@@ -18,6 +19,7 @@ const IndexPage = () => {
   const randomTheme = getRandomTheme();
   const isMobile = useIsMobile();
 
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [text, setText] = useState('Social Image Creator');
   const [description, setDescription] = useState('Crea bellissime immagini per i social media in pochi secondi. Personalizza colori, font e layout per ottenere il massimo impatto visivo.');
   const [backgroundColor, setBackgroundColor] = useState(randomTheme.background);
@@ -99,33 +101,43 @@ const IndexPage = () => {
 
   return (
     <div className="flex">
-      <Sidebar
-        text={text}
-        description={description}
-        textAlign={textAlign}
-        descriptionAlign={descriptionAlign}
-        backgroundColor={backgroundColor}
-        textColor={textColor}
-        fontSize={fontSize}
-        descriptionFontSize={descriptionFontSize}
-        spacing={spacing}
-        format={format}
-        currentFont={currentFont}
-        onFormatChange={setFormat}
-        onTextChange={setText}
-        onDescriptionChange={setDescription}
-        onTextAlignChange={setTextAlign}
-        onDescriptionAlignChange={setDescriptionAlign}
-        onFontSizeChange={setFontSize}
-        onDescriptionFontSizeChange={setDescriptionFontSize}
-        onSpacingChange={setSpacing}
-        disabled={isLoading}
-        onTitleExtracted={setText}
-        onDescriptionExtracted={setDescription}
-        onTabChange={setActiveTab}
-        onLoadingChange={setIsLoading}
-        onColorSelect={handleColorSelect}
-      />
+      <div className={`relative transition-all duration-300 ${sidebarOpen ? 'w-[400px]' : 'w-0'}`}>
+        {sidebarOpen && (
+          <Sidebar
+            text={text}
+            description={description}
+            textAlign={textAlign}
+            descriptionAlign={descriptionAlign}
+            backgroundColor={backgroundColor}
+            textColor={textColor}
+            fontSize={fontSize}
+            descriptionFontSize={descriptionFontSize}
+            spacing={spacing}
+            format={format}
+            currentFont={currentFont}
+            onFormatChange={setFormat}
+            onTextChange={setText}
+            onDescriptionChange={setDescription}
+            onTextAlignChange={setTextAlign}
+            onDescriptionAlignChange={setDescriptionAlign}
+            onFontSizeChange={setFontSize}
+            onDescriptionFontSizeChange={setDescriptionFontSize}
+            onSpacingChange={setSpacing}
+            disabled={isLoading}
+            onTitleExtracted={setText}
+            onDescriptionExtracted={setDescription}
+            onTabChange={setActiveTab}
+            onLoadingChange={setIsLoading}
+            onColorSelect={handleColorSelect}
+          />
+        )}
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="absolute -right-8 top-1/2 -translate-y-1/2 bg-white border rounded-r-lg p-1 hover:bg-gray-50"
+        >
+          {sidebarOpen ? <ChevronLeft className="w-6 h-6" /> : <ChevronRight className="w-6 h-6" />}
+        </button>
+      </div>
       <MainContent
         text={text}
         description={description}
