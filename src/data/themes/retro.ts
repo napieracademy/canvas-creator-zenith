@@ -4,30 +4,30 @@ import { ColorPresetPair } from "@/types/colorPresets";
 export const retroThemes: ColorPresetPair[] = [
   {
     name: "Classic C64",
-    background: "#221F26",
-    text: "#F97316",
+    background: "#3E31A2",  // Blu C64 classico
+    text: "#7ABDC5",       // Ciano chiaro C64
     category: 'retro',
     font: 'font-c64-system'
   },
   {
-    name: "Bright Blue Burst",
-    background: "#0EA5E9",
-    text: "#221F26",
+    name: "Terminal Verde",
+    background: "#000000",  // Nero classico
+    text: "#5FE36D",       // Verde fosforescente
+    category: 'retro',
+    font: 'font-c64-mono'
+  },
+  {
+    name: "BASIC Mode",
+    background: "#4F46BA", // Blu scuro C64
+    text: "#FFFFFF",      // Bianco puro
     category: 'retro',
     font: 'font-c64-bold'
   },
   {
-    name: "Pastel 8-bit",
-    background: "#F2FCE2",
-    text: "#7E69AB",
+    name: "PETSCII Art",
+    background: "#221F26", // Grigio scuro
+    text: "#9EF1D9",      // Verde acqua C64
     category: 'retro',
     font: 'font-c64-wide'
-  },
-  {
-    name: "Monochrome Magic",
-    background: "#F1F1F1",
-    text: "#222222",
-    category: 'retro',
-    font: 'font-c64-mono'
   }
 ];
