@@ -39,7 +39,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4o',
         messages: [
           { 
             role: 'system', 
@@ -65,7 +65,7 @@ serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: 'gpt-4o',
           messages: [
             { 
               role: 'system', 
@@ -109,8 +109,8 @@ serve(async (req) => {
         1. Mantieni il messaggio chiave e l'essenza del contenuto
         2. Usa un linguaggio preciso e d'impatto
         3. Evita cliché e frasi fatte
-        4. Mantieni una lunghezza di circa ${targetWordCount} parole
-        5. Assicurati che il tono sia appropriato per il contesto e il pubblico target
+        4. Mantieni una lunghezza appropriata al contesto
+        5. Assicurati che il tono sia appropriato per il pubblico target
         
         Il titolo deve essere memorabile e professionale, evitando sensazionalismi o esagerazioni.
       `;
@@ -120,7 +120,7 @@ serve(async (req) => {
         1. Mantieni il focus sui dettagli distintivi e specifici
         2. Usa un linguaggio chiaro e professionale
         3. Struttura il testo in modo logico e scorrevole
-        4. Mantieni una lunghezza di circa ${targetWordCount} parole
+        4. Adatta la lunghezza in base al contesto e al tipo di contenuto
         5. Assicurati che ogni frase aggiunga valore al messaggio complessivo
         
         La descrizione deve essere informativa e coinvolgente, evitando luoghi comuni e call-to-action generiche.
@@ -134,7 +134,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4o',
         messages: [
           { role: 'system', content: systemPrompt },
           { 
@@ -144,7 +144,7 @@ serve(async (req) => {
               Testo da migliorare: ${textToImprove}
               
               Migliora questo testo mantenendo il significato originale ma rendendolo più efficace e naturale nella lingua di destinazione.
-              La lunghezza finale deve essere di circa ${targetWordCount} parole.
+              Lunghezza desiderata: ${length === 'shorter' ? 'più breve dell\'originale' : length === 'longer' ? 'più lungo dell\'originale' : 'simile all\'originale'}
             `
           }
         ],
