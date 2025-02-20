@@ -173,18 +173,18 @@ const Canvas: React.FC<CanvasProps> = ({
     <div className="flex flex-col w-full h-full">
       <div 
         ref={containerRef}
-        className="relative w-full h-full bg-white shadow-lg rounded-xl overflow-hidden"
+        className="relative w-full h-full"
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
       >
         <canvas
           ref={canvasRef}
-          className="w-full h-full object-contain"
+          className="w-full h-full rounded-xl"
           style={{
             maxWidth: '100%',
             maxHeight: '100%',
-            display: 'block'
+            objectFit: 'contain',
           }}
         />
         {description && (
