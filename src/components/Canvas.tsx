@@ -1,15 +1,13 @@
-
 import React, { useRef, useEffect, useState } from 'react';
 import { CanvasProps } from '@/types/canvas';
 import { useCanvasScale } from '@/hooks/useCanvasScale';
-import { GripVertical, X } from 'lucide-react';
+import { GripVertical } from 'lucide-react';
 import { 
   SAFE_ZONE_MARGIN,
   drawBackground,
   drawSafeZone,
   textFitsInSafeZone,
-  drawText,
-  calculateLines
+  drawText
 } from '@/utils/canvasUtils';
 
 const Canvas: React.FC<CanvasProps> = ({ 
@@ -35,9 +33,6 @@ const Canvas: React.FC<CanvasProps> = ({
   const lastYRef = useRef(0);
   const [showSpacingControl, setShowSpacingControl] = useState(false);
   const [localSpacing, setLocalSpacing] = useState(spacing);
-  const [editingText, setEditingText] = useState<'title' | 'description' | null>(null);
-  const [editorPosition, setEditorPosition] = useState({ x: 0, y: 0 });
-  const [editorValue, setEditorValue] = useState('');
   
   const ORIGINAL_WIDTH = 1080;
   const ORIGINAL_HEIGHT = format === 'post' ? 1350 : 1920;
@@ -47,38 +42,6 @@ const Canvas: React.FC<CanvasProps> = ({
   useEffect(() => {
     setLocalSpacing(spacing);
   }, [spacing]);
-
-  const handleCanvasClick = (e: React.MouseEvent) => {
-    if (!canvasRef.current || !containerRef.current) return;
-
-    const rect = canvasRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    
-    // Converti le coordinate del click in coordinate del canvas originale
-    const canvasX = (x * ORIGINAL_WIDTH) / rect.width;
-    const canvasY = (y * ORIGINAL_HEIGHT) / rect.height;
-
-    const ctx = canvasRef.current.getContext('2d');
-    if (!ctx) return;
-
-    // Determina se il click è sul titolo o sulla descrizione
-    const titleLines = calculateLines({ ctx, width: ORIGINAL_WIDTH, height: ORIGINAL_HEIGHT, safeZoneMargin: SAFE_ZONE_MARGIN, fontFamily: font || 'Inter' }, text, fontSize, 'title');
-    const descLines = description ? calculateLines({ ctx, width: ORIGINAL_WIDTH, height: ORIGINAL_HEIGHT, safeZoneMargin: SAFE_ZONE_MARGIN, fontFamily: font || 'Inter' }, description, descriptionFontSize, 'description') : [];
-
-    const titleY = (ORIGINAL_HEIGHT / 2) - (localSpacing / 2) - (titleLines.length * fontSize * 1.2);
-    const descY = (ORIGINAL_HEIGHT / 2) + (localSpacing / 2);
-
-    if (canvasY >= titleY && canvasY <= titleY + (titleLines.length * fontSize * 1.2)) {
-      setEditingText('title');
-      setEditorValue(text);
-      setEditorPosition({ x: e.clientX, y: e.clientY });
-    } else if (description && canvasY >= descY && canvasY <= descY + (descLines.length * descriptionFontSize * 1.2)) {
-      setEditingText('description');
-      setEditorValue(description);
-      setEditorPosition({ x: e.clientX, y: e.clientY });
-    }
-  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -95,6 +58,7 @@ const Canvas: React.FC<CanvasProps> = ({
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     const getFontFamily = () => {
+      console.log('Current font:', font); // Debug log
       switch (font) {
         case 'font-c64-system':
           return 'Press Start 2P';
@@ -110,6 +74,7 @@ const Canvas: React.FC<CanvasProps> = ({
     };
 
     const fontFamily = getFontFamily();
+    console.log('Selected font family:', fontFamily); // Debug log
 
     const context = {
       ctx,
@@ -120,6 +85,8 @@ const Canvas: React.FC<CanvasProps> = ({
     };
 
     document.fonts.ready.then(() => {
+      console.log('Fonts loaded, available fonts:', document.fonts.check(`12px ${fontFamily}`)); // Debug log
+
       if (backgroundColor.startsWith('url(')) {
         const img = new Image();
         img.onload = () => {
@@ -213,44 +180,13 @@ const Canvas: React.FC<CanvasProps> = ({
       >
         <canvas
           ref={canvasRef}
-          className="w-full h-full rounded-xl cursor-pointer"
+          className="w-full h-full rounded-xl"
           style={{
             maxWidth: '100%',
             maxHeight: '100%',
             objectFit: 'contain',
           }}
-          onClick={handleCanvasClick}
         />
-        {editingText && (
-          <div 
-            className="absolute z-50 bg-white rounded-lg shadow-xl p-4"
-            style={{ 
-              left: editorPosition.x, 
-              top: editorPosition.y,
-              transform: 'translate(-50%, -100%)',
-              minWidth: '300px'
-            }}
-          >
-            <div className="flex justify-between items-center mb-2">
-              <div className="text-sm font-medium text-gray-700">
-                {editingText === 'title' ? 'Modifica titolo' : 'Modifica descrizione'}
-              </div>
-              <button 
-                onClick={() => setEditingText(null)}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-            <textarea
-              value={editorValue}
-              onChange={(e) => setEditorValue(e.target.value)}
-              className="w-full p-2 border rounded-md"
-              rows={3}
-              autoFocus
-            />
-          </div>
-        )}
         {description && (
           <div 
             className={`absolute left-1/2 -translate-x-1/2 cursor-ns-resize transition-opacity duration-300 ${showSpacingControl ? 'opacity-100' : 'opacity-0'}`}
