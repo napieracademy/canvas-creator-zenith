@@ -1,7 +1,8 @@
+
 import React, { useRef, useEffect, useState } from 'react';
 import { CanvasProps } from '@/types/canvas';
 import { useCanvasScale } from '@/hooks/useCanvasScale';
-import { GripVertical } from 'lucide-react';
+import { GripVertical, Type } from 'lucide-react';
 import { 
   SAFE_ZONE_MARGIN,
   drawBackground,
@@ -25,14 +26,21 @@ const Canvas: React.FC<CanvasProps> = ({
   format = 'post',
   overlay,
   onSpacingChange,
-  font
+  font,
+  onFontSizeChange,
+  onDescriptionFontSizeChange
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const isDraggingRef = useRef(false);
+  const isResizingTitleRef = useRef(false);
+  const isResizingDescRef = useRef(false);
   const lastYRef = useRef(0);
   const [showSpacingControl, setShowSpacingControl] = useState(false);
+  const [showFontControls, setShowFontControls] = useState(false);
   const [localSpacing, setLocalSpacing] = useState(spacing);
+  const [localFontSize, setLocalFontSize] = useState(fontSize);
+  const [localDescFontSize, setLocalDescFontSize] = useState(descriptionFontSize);
   
   const ORIGINAL_WIDTH = 1080;
   const ORIGINAL_HEIGHT = format === 'post' ? 1350 : 1920;
@@ -42,6 +50,78 @@ const Canvas: React.FC<CanvasProps> = ({
   useEffect(() => {
     setLocalSpacing(spacing);
   }, [spacing]);
+
+  useEffect(() => {
+    setLocalFontSize(fontSize);
+  }, [fontSize]);
+
+  useEffect(() => {
+    setLocalDescFontSize(descriptionFontSize);
+  }, [descriptionFontSize]);
+
+  const handleMouseDown = (e: React.MouseEvent, type: 'spacing' | 'title-font' | 'desc-font') => {
+    if (!containerRef.current) return;
+    
+    const rect = containerRef.current.getBoundingClientRect();
+    const y = e.clientY - rect.top;
+    
+    switch(type) {
+      case 'spacing':
+        isDraggingRef.current = true;
+        setShowSpacingControl(true);
+        break;
+      case 'title-font':
+        isResizingTitleRef.current = true;
+        setShowFontControls(true);
+        break;
+      case 'desc-font':
+        isResizingDescRef.current = true;
+        setShowFontControls(true);
+        break;
+    }
+    
+    lastYRef.current = y;
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!containerRef.current) return;
+    
+    const rect = containerRef.current.getBoundingClientRect();
+    const y = e.clientY - rect.top;
+    const delta = Math.round((lastYRef.current - y) / 2);
+    
+    if (isDraggingRef.current) {
+      const newSpacing = Math.max(0, Math.min(200, localSpacing + delta));
+      setLocalSpacing(newSpacing);
+      if (onSpacingChange) {
+        onSpacingChange(newSpacing);
+      }
+    } else if (isResizingTitleRef.current) {
+      const newSize = Math.max(32, Math.min(120, localFontSize + delta));
+      setLocalFontSize(newSize);
+      if (onFontSizeChange) {
+        onFontSizeChange(newSize);
+      }
+    } else if (isResizingDescRef.current) {
+      const newSize = Math.max(32, Math.min(120, localDescFontSize + delta));
+      setLocalDescFontSize(newSize);
+      if (onDescriptionFontSizeChange) {
+        onDescriptionFontSizeChange(newSize);
+      }
+    }
+    
+    lastYRef.current = y;
+  };
+
+  const handleMouseUp = () => {
+    isDraggingRef.current = false;
+    isResizingTitleRef.current = false;
+    isResizingDescRef.current = false;
+    setTimeout(() => {
+      setShowSpacingControl(false);
+      setShowFontControls(false);
+    }, 1500);
+  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -58,7 +138,6 @@ const Canvas: React.FC<CanvasProps> = ({
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     const getFontFamily = () => {
-      console.log('Current font:', font); // Debug log
       switch (font) {
         case 'font-c64-system':
           return 'Press Start 2P';
@@ -74,7 +153,6 @@ const Canvas: React.FC<CanvasProps> = ({
     };
 
     const fontFamily = getFontFamily();
-    console.log('Selected font family:', fontFamily); // Debug log
 
     const context = {
       ctx,
@@ -85,8 +163,6 @@ const Canvas: React.FC<CanvasProps> = ({
     };
 
     document.fonts.ready.then(() => {
-      console.log('Fonts loaded, available fonts:', document.fonts.check(`12px ${fontFamily}`)); // Debug log
-
       if (backgroundColor.startsWith('url(')) {
         const img = new Image();
         img.onload = () => {
@@ -105,9 +181,9 @@ const Canvas: React.FC<CanvasProps> = ({
             drawSafeZone(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
           }
 
-          drawText(context, text, textAlign, textColor, fontSize, 'title', localSpacing);
+          drawText(context, text, textAlign, textColor, localFontSize, 'title', localSpacing);
           if (description) {
-            drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', localSpacing);
+            drawText(context, description, descriptionAlign, textColor, localDescFontSize, 'description', localSpacing);
           }
         };
         img.src = backgroundColor.slice(4, -1);
@@ -129,45 +205,13 @@ const Canvas: React.FC<CanvasProps> = ({
           drawSafeZone(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
         }
 
-        drawText(context, text, textAlign, textColor, fontSize, 'title', localSpacing);
+        drawText(context, text, textAlign, textColor, localFontSize, 'title', localSpacing);
         if (description) {
-          drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', localSpacing);
+          drawText(context, description, descriptionAlign, textColor, localDescFontSize, 'description', localSpacing);
         }
       }
     });
-  }, [text, description, backgroundColor, textAlign, descriptionAlign, textColor, fontSize, descriptionFontSize, localSpacing, onEffectiveFontSizeChange, showSafeZone, format, overlay, font]);
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (!containerRef.current) return;
-    
-    const rect = containerRef.current.getBoundingClientRect();
-    const y = e.clientY - rect.top;
-    
-    isDraggingRef.current = true;
-    lastYRef.current = y;
-    setShowSpacingControl(true);
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDraggingRef.current || !containerRef.current) return;
-    
-    const rect = containerRef.current.getBoundingClientRect();
-    const y = e.clientY - rect.top;
-    const delta = (y - lastYRef.current) * 2;
-    
-    const newSpacing = Math.max(0, Math.min(200, localSpacing + delta));
-    setLocalSpacing(newSpacing);
-    if (onSpacingChange) {
-      onSpacingChange(newSpacing);
-    }
-    
-    lastYRef.current = y;
-  };
-
-  const handleMouseUp = () => {
-    isDraggingRef.current = false;
-    setTimeout(() => setShowSpacingControl(false), 1500);
-  };
+  }, [text, description, backgroundColor, textAlign, descriptionAlign, textColor, localFontSize, localDescFontSize, localSpacing, onEffectiveFontSizeChange, showSafeZone, format, overlay, font]);
 
   return (
     <div className="flex flex-col w-full h-full">
@@ -187,6 +231,23 @@ const Canvas: React.FC<CanvasProps> = ({
             objectFit: 'contain',
           }}
         />
+        {/* Controllo dimensione font titolo */}
+        <div 
+          className={`absolute left-1/2 -translate-x-1/2 cursor-ns-resize transition-opacity duration-300 ${showFontControls ? 'opacity-100' : 'opacity-0'}`}
+          style={{ 
+            top: `calc(50% - ${localSpacing}px - 40px)`,
+            transform: 'translateX(-50%)',
+            zIndex: 10 
+          }}
+          onMouseDown={(e) => handleMouseDown(e, 'title-font')}
+        >
+          <div className="bg-black/50 backdrop-blur-sm text-white px-2 py-1 rounded-full flex items-center gap-2 select-none">
+            <Type className="h-4 w-4" />
+            <span className="text-sm">{Math.round(localFontSize)}px</span>
+          </div>
+        </div>
+
+        {/* Controllo spaziatura */}
         {description && (
           <div 
             className={`absolute left-1/2 -translate-x-1/2 cursor-ns-resize transition-opacity duration-300 ${showSpacingControl ? 'opacity-100' : 'opacity-0'}`}
@@ -195,11 +256,29 @@ const Canvas: React.FC<CanvasProps> = ({
               transform: 'translateX(-50%)',
               zIndex: 10 
             }}
-            onMouseDown={handleMouseDown}
+            onMouseDown={(e) => handleMouseDown(e, 'spacing')}
           >
             <div className="bg-black/50 backdrop-blur-sm text-white px-2 py-1 rounded-full flex items-center gap-2 select-none">
               <GripVertical className="h-4 w-4" />
               <span className="text-sm">{Math.round(localSpacing)}px</span>
+            </div>
+          </div>
+        )}
+
+        {/* Controllo dimensione font descrizione */}
+        {description && (
+          <div 
+            className={`absolute left-1/2 -translate-x-1/2 cursor-ns-resize transition-opacity duration-300 ${showFontControls ? 'opacity-100' : 'opacity-0'}`}
+            style={{ 
+              top: `calc(50% + ${localSpacing}px + 40px)`,
+              transform: 'translateX(-50%)',
+              zIndex: 10 
+            }}
+            onMouseDown={(e) => handleMouseDown(e, 'desc-font')}
+          >
+            <div className="bg-black/50 backdrop-blur-sm text-white px-2 py-1 rounded-full flex items-center gap-2 select-none">
+              <Type className="h-4 w-4" />
+              <span className="text-sm">{Math.round(localDescFontSize)}px</span>
             </div>
           </div>
         )}

@@ -1,4 +1,3 @@
-
 export interface CanvasProps {
   text: string;
   description: string;
@@ -15,6 +14,8 @@ export interface CanvasProps {
   overlay?: string;
   onSpacingChange?: (spacing: number) => void;
   font?: string;
+  onFontSizeChange?: (size: number) => void;
+  onDescriptionFontSizeChange?: (size: number) => void;
 }
 
 export interface CanvasSize {
