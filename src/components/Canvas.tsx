@@ -9,8 +9,6 @@ import {
   textFitsInSafeZone,
   drawText
 } from '@/utils/canvasUtils';
-import FontSizeControl from './Canvas/FontSizeControl';
-import SpacingControl from './Canvas/SpacingControl';
 import CanvasRender from './Canvas/CanvasRender';
 
 const Canvas: React.FC<CanvasProps> = ({ 
@@ -34,12 +32,6 @@ const Canvas: React.FC<CanvasProps> = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const isDraggingRef = useRef(false);
-  const isResizingTitleRef = useRef(false);
-  const isResizingDescRef = useRef(false);
-  const lastYRef = useRef(0);
-  const [showSpacingControl, setShowSpacingControl] = useState(false);
-  const [showFontControls, setShowFontControls] = useState(false);
   const [localSpacing, setLocalSpacing] = useState(spacing);
   const [localFontSize, setLocalFontSize] = useState(fontSize);
   const [localDescFontSize, setLocalDescFontSize] = useState(descriptionFontSize);
@@ -60,66 +52,6 @@ const Canvas: React.FC<CanvasProps> = ({
   useEffect(() => {
     setLocalDescFontSize(descriptionFontSize);
   }, [descriptionFontSize]);
-
-  const handleMouseDown = (e: React.MouseEvent, type: 'spacing' | 'title-font' | 'desc-font') => {
-    if (!containerRef.current) return;
-    
-    const rect = containerRef.current.getBoundingClientRect();
-    const y = e.clientY - rect.top;
-    
-    switch(type) {
-      case 'spacing':
-        isDraggingRef.current = true;
-        setShowSpacingControl(true);
-        break;
-      case 'title-font':
-        isResizingTitleRef.current = true;
-        setShowFontControls(true);
-        break;
-      case 'desc-font':
-        isResizingDescRef.current = true;
-        setShowFontControls(true);
-        break;
-    }
-    
-    lastYRef.current = y;
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!containerRef.current) return;
-    
-    const rect = containerRef.current.getBoundingClientRect();
-    const y = e.clientY - rect.top;
-    const delta = Math.round((lastYRef.current - y) / 2);
-    
-    if (isDraggingRef.current) {
-      const newSpacing = Math.max(0, Math.min(200, localSpacing + delta));
-      setLocalSpacing(newSpacing);
-      if (onSpacingChange) {
-        onSpacingChange(newSpacing);
-      }
-    } else if (isResizingTitleRef.current) {
-      const newSize = Math.max(32, Math.min(120, localFontSize + delta));
-      setLocalFontSize(newSize);
-      if (onFontSizeChange) {
-        onFontSizeChange(newSize);
-      }
-    } else if (isResizingDescRef.current) {
-      const newSize = Math.max(32, Math.min(120, localDescFontSize + delta));
-      setLocalDescFontSize(newSize);
-      if (onDescriptionFontSizeChange) {
-        onDescriptionFontSizeChange(newSize);
-      }
-    }
-    
-    lastYRef.current = y;
-  };
-
-  const handleMouseUp = () => {
-    isDraggingRef.current = false;
-    isResizingTitleRef.current = false;
-    isResizingDescRef.current = false;
-  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -213,48 +145,8 @@ const Canvas: React.FC<CanvasProps> = ({
 
   return (
     <div className="flex flex-col w-full h-full">
-      <div 
-        ref={containerRef}
-        className="relative w-full h-full"
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-      >
+      <div ref={containerRef} className="relative w-full h-full">
         <CanvasRender canvasRef={canvasRef} />
-        
-        <FontSizeControl
-          fontSize={localFontSize}
-          showControl={showFontControls}
-          position="top"
-          spacing={localSpacing}
-          onMouseDown={handleMouseDown}
-          type="title-font"
-          onMouseEnter={() => setShowFontControls(true)}
-          onMouseLeave={() => setTimeout(() => setShowFontControls(false), 1500)}
-        />
-
-        {description && (
-          <>
-            <SpacingControl
-              spacing={localSpacing}
-              showControl={showSpacingControl}
-              onMouseDown={handleMouseDown}
-              onMouseEnter={() => setShowSpacingControl(true)}
-              onMouseLeave={() => setTimeout(() => setShowSpacingControl(false), 1500)}
-            />
-
-            <FontSizeControl
-              fontSize={localDescFontSize}
-              showControl={showFontControls}
-              position="bottom"
-              spacing={localSpacing}
-              onMouseDown={handleMouseDown}
-              type="desc-font"
-              onMouseEnter={() => setShowFontControls(true)}
-              onMouseLeave={() => setTimeout(() => setShowFontControls(false), 1500)}
-            />
-          </>
-        )}
       </div>
       <div className="mt-2 flex justify-end gap-2 text-sm text-gray-500">
         <div>{scale}%</div>
