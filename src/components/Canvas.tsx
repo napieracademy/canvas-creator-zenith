@@ -38,6 +38,8 @@ const Canvas: React.FC<CanvasProps> = ({
   const { scale, updateScale } = useCanvasScale(canvasRef, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
 
   useEffect(() => {
+    console.log('Credits value:', credits); // Debug log
+    
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -76,6 +78,29 @@ const Canvas: React.FC<CanvasProps> = ({
       fontFamily
     };
 
+    const drawCredits = () => {
+      if (!credits || !ctx) return;
+      
+      console.log('Drawing credits:', {
+        text: credits,
+        y: ORIGINAL_HEIGHT - SAFE_ZONE_MARGIN - 20,
+        align: textAlign
+      });
+
+      ctx.save();
+      ctx.font = `12px ${fontFamily}`;
+      ctx.fillStyle = textColor;
+      ctx.textAlign = textAlign;
+      
+      const creditsY = ORIGINAL_HEIGHT - SAFE_ZONE_MARGIN - 20;
+      const x = textAlign === 'left' ? SAFE_ZONE_MARGIN : 
+               textAlign === 'right' ? ORIGINAL_WIDTH - SAFE_ZONE_MARGIN : 
+               ORIGINAL_WIDTH / 2;
+               
+      ctx.fillText(credits, x, creditsY);
+      ctx.restore();
+    };
+
     document.fonts.ready.then(() => {
       if (backgroundColor.startsWith('url(')) {
         const img = new Image();
@@ -99,18 +124,7 @@ const Canvas: React.FC<CanvasProps> = ({
           if (description) {
             drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', spacing);
           }
-
-          // Draw credits at the bottom
-          if (credits) {
-            ctx.font = `12px ${fontFamily}`;
-            ctx.fillStyle = textColor;
-            ctx.textAlign = textAlign;
-            const creditsY = ORIGINAL_HEIGHT - SAFE_ZONE_MARGIN - 20;
-            const x = textAlign === 'left' ? SAFE_ZONE_MARGIN : 
-                     textAlign === 'right' ? ORIGINAL_WIDTH - SAFE_ZONE_MARGIN : 
-                     ORIGINAL_WIDTH / 2;
-            ctx.fillText(credits, x, creditsY);
-          }
+          drawCredits();
         };
         img.src = backgroundColor.slice(4, -1);
       } else {
@@ -135,18 +149,7 @@ const Canvas: React.FC<CanvasProps> = ({
         if (description) {
           drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', spacing);
         }
-
-        // Draw credits at the bottom
-        if (credits) {
-          ctx.font = `12px ${fontFamily}`;
-          ctx.fillStyle = textColor;
-          ctx.textAlign = textAlign;
-          const creditsY = ORIGINAL_HEIGHT - SAFE_ZONE_MARGIN - 20;
-          const x = textAlign === 'left' ? SAFE_ZONE_MARGIN : 
-                   textAlign === 'right' ? ORIGINAL_WIDTH - SAFE_ZONE_MARGIN : 
-                   ORIGINAL_WIDTH / 2;
-          ctx.fillText(credits, x, creditsY);
-        }
+        drawCredits();
       }
     });
   }, [text, description, backgroundColor, textAlign, descriptionAlign, textColor, fontSize, descriptionFontSize, spacing, showSafeZone, format, overlay, font, credits]);
