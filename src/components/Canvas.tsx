@@ -230,60 +230,84 @@ const Canvas: React.FC<CanvasProps> = ({
             objectFit: 'contain',
           }}
         />
-        {/* Controllo dimensione font titolo - Area più grande */}
+        {/* Area sensibile per il titolo */}
         <div 
-          className={`absolute left-1/2 -translate-x-1/2 cursor-ns-resize transition-opacity duration-300 ${showFontControls ? 'opacity-100' : 'opacity-0'}`}
+          className={`absolute left-0 right-0 cursor-ns-resize transition-opacity duration-300`}
           style={{ 
-            top: `calc(50% - ${localSpacing}px - 40px)`,
-            transform: 'translateX(-50%)',
+            top: `calc(50% - ${localSpacing}px - 120px)`,
+            height: '160px',
             zIndex: 10,
-            padding: '20px', // Area di click più grande
-            cursor: 'ns-resize'
           }}
-          onMouseDown={(e) => handleMouseDown(e, 'title-font')}
+          onMouseEnter={() => setShowFontControls(true)}
+          onMouseLeave={() => setTimeout(() => setShowFontControls(false), 1500)}
         >
-          <div className="bg-black/50 backdrop-blur-sm text-white px-4 py-2 rounded-full flex items-center gap-3 select-none hover:bg-black/60 transition-colors">
-            <Type className="h-6 w-6" />
-            <span className="text-base font-medium">{Math.round(localFontSize)}px</span>
+          <div 
+            className={`absolute left-1/2 -translate-x-1/2 transition-opacity duration-300 ${showFontControls ? 'opacity-100' : 'opacity-0'}`}
+            style={{ 
+              bottom: '0',
+              transform: 'translateX(-50%)',
+            }}
+            onMouseDown={(e) => handleMouseDown(e, 'title-font')}
+          >
+            <div className="bg-black/50 backdrop-blur-sm text-white px-4 py-2 rounded-full flex items-center gap-3 select-none hover:bg-black/60 transition-colors">
+              <Type className="h-6 w-6" />
+              <span className="text-base font-medium">{Math.round(localFontSize)}px</span>
+            </div>
           </div>
         </div>
 
-        {/* Controllo spaziatura - Area più grande */}
+        {/* Area sensibile per lo spacing */}
         {description && (
           <div 
-            className={`absolute left-1/2 -translate-x-1/2 cursor-ns-resize transition-opacity duration-300 ${showSpacingControl ? 'opacity-100' : 'opacity-0'}`}
+            className={`absolute left-0 right-0 cursor-ns-resize transition-opacity duration-300`}
             style={{ 
-              top: `calc(50% - ${localSpacing/2}px)`,
-              transform: 'translateX(-50%)',
+              top: `calc(50% - ${localSpacing/2 + 40}px)`,
+              height: '80px',
               zIndex: 10,
-              padding: '20px', // Area di click più grande
-              cursor: 'ns-resize'
             }}
-            onMouseDown={(e) => handleMouseDown(e, 'spacing')}
+            onMouseEnter={() => setShowSpacingControl(true)}
+            onMouseLeave={() => setTimeout(() => setShowSpacingControl(false), 1500)}
           >
-            <div className="bg-black/50 backdrop-blur-sm text-white px-4 py-2 rounded-full flex items-center gap-3 select-none hover:bg-black/60 transition-colors">
-              <GripVertical className="h-6 w-6" />
-              <span className="text-base font-medium">{Math.round(localSpacing)}px</span>
+            <div 
+              className={`absolute left-1/2 -translate-x-1/2 transition-opacity duration-300 ${showSpacingControl ? 'opacity-100' : 'opacity-0'}`}
+              style={{ 
+                top: '50%',
+                transform: 'translate(-50%, -50%)',
+              }}
+              onMouseDown={(e) => handleMouseDown(e, 'spacing')}
+            >
+              <div className="bg-black/50 backdrop-blur-sm text-white px-4 py-2 rounded-full flex items-center gap-3 select-none hover:bg-black/60 transition-colors">
+                <GripVertical className="h-6 w-6" />
+                <span className="text-base font-medium">{Math.round(localSpacing)}px</span>
+              </div>
             </div>
           </div>
         )}
 
-        {/* Controllo dimensione font descrizione - Area più grande */}
+        {/* Area sensibile per la descrizione */}
         {description && (
           <div 
-            className={`absolute left-1/2 -translate-x-1/2 cursor-ns-resize transition-opacity duration-300 ${showFontControls ? 'opacity-100' : 'opacity-0'}`}
+            className={`absolute left-0 right-0 cursor-ns-resize transition-opacity duration-300`}
             style={{ 
-              top: `calc(50% + ${localSpacing}px + 40px)`,
-              transform: 'translateX(-50%)',
+              top: `calc(50% + ${localSpacing}px - 40px)`,
+              height: '160px',
               zIndex: 10,
-              padding: '20px', // Area di click più grande
-              cursor: 'ns-resize'
             }}
-            onMouseDown={(e) => handleMouseDown(e, 'desc-font')}
+            onMouseEnter={() => setShowFontControls(true)}
+            onMouseLeave={() => setTimeout(() => setShowFontControls(false), 1500)}
           >
-            <div className="bg-black/50 backdrop-blur-sm text-white px-4 py-2 rounded-full flex items-center gap-3 select-none hover:bg-black/60 transition-colors">
-              <Type className="h-6 w-6" />
-              <span className="text-base font-medium">{Math.round(localDescFontSize)}px</span>
+            <div 
+              className={`absolute left-1/2 -translate-x-1/2 transition-opacity duration-300 ${showFontControls ? 'opacity-100' : 'opacity-0'}`}
+              style={{ 
+                top: '50%',
+                transform: 'translate(-50%, -50%)',
+              }}
+              onMouseDown={(e) => handleMouseDown(e, 'desc-font')}
+            >
+              <div className="bg-black/50 backdrop-blur-sm text-white px-4 py-2 rounded-full flex items-center gap-3 select-none hover:bg-black/60 transition-colors">
+                <Type className="h-6 w-6" />
+                <span className="text-base font-medium">{Math.round(localDescFontSize)}px</span>
+              </div>
             </div>
           </div>
         )}
