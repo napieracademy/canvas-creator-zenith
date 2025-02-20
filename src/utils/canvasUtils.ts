@@ -115,40 +115,41 @@ export function drawCredits(
   credits: string,
   textAlign: 'left' | 'center' | 'right',
   textColor: string,
-  fontSize: number,
-  spacing: number = 40
+  fontSize: number
 ) {
   const { ctx, width, height, fontFamily = 'Inter' } = context;
   
   if (!credits?.trim()) return;
 
-  // Imposta un font size più piccolo per i credits
-  const creditsFontSize = Math.min(fontSize * 0.6, 32);
+  // Calcolo dimensioni e posizioni
+  const creditsFontSize = Math.min(24, fontSize * 0.4); // Ridotto il font size massimo
+  const padding = SAFE_ZONE_MARGIN / 2;
+  const bottomMargin = SAFE_ZONE_MARGIN + padding;
   
+  // Configurazione stile
   ctx.save();
-  
-  // Area dei credits (zona in basso)
-  const areaHeight = creditsFontSize * 1.5;
-  const areaY = height - (SAFE_ZONE_MARGIN + areaHeight);
-  
-  // Debug area
-  ctx.fillStyle = 'rgba(0, 0, 255, 0.1)';
-  ctx.fillRect(SAFE_ZONE_MARGIN, areaY, width - (2 * SAFE_ZONE_MARGIN), areaHeight);
-  
-  // Imposta il font e lo stile
   ctx.font = `${creditsFontSize}px ${fontFamily}`;
   ctx.fillStyle = textColor;
   ctx.textAlign = textAlign;
-  ctx.textBaseline = 'middle';
-
-  // Calcola la posizione X in base all'allineamento
+  ctx.textBaseline = 'bottom'; // Cambiato da 'middle' a 'bottom'
+  
+  // Calcolo posizione X
   const x = textAlign === 'left' ? SAFE_ZONE_MARGIN : 
            textAlign === 'right' ? width - SAFE_ZONE_MARGIN : 
            width / 2;
-
-  // Disegna i credits
-  const startY = areaY + (areaHeight / 2);
-  ctx.fillText(credits, x, startY);
+           
+  // Disegno i credits
+  ctx.fillText(credits, x, height - bottomMargin);
+  
+  // Debug area
+  ctx.fillStyle = 'rgba(0, 0, 255, 0.1)';
+  const textMetrics = ctx.measureText(credits);
+  const textHeight = creditsFontSize;
+  const debugY = height - bottomMargin - textHeight;
+  const debugWidth = textAlign === 'center' ? textMetrics.width + padding * 2 : width - (SAFE_ZONE_MARGIN * 2);
+  const debugX = textAlign === 'center' ? x - (debugWidth / 2) : SAFE_ZONE_MARGIN;
+  
+  ctx.fillRect(debugX, debugY, debugWidth, textHeight + padding);
   
   ctx.restore();
 }
