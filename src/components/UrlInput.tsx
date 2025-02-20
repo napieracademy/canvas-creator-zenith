@@ -126,6 +126,15 @@ const UrlInput: React.FC<UrlInputProps> = ({
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center p-8 space-y-4">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <p className="text-sm text-gray-600">Estrazione contenuti in corso...</p>
+      </div>
+    );
+  }
+
   return (
     <form onSubmit={handleSubmit} className="space-y-2">
       <Label className="text-sm font-medium text-gray-700">
@@ -139,28 +148,18 @@ const UrlInput: React.FC<UrlInputProps> = ({
           placeholder={isImageUrl ? "https://example.com/image.jpg" : "https://example.com/article"}
           className="flex-1"
           required
-          disabled={isLoading}
         />
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? (
+              <Button type="submit">
+                {isImageUrl ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Caricamento...
+                    <ImageIcon className="mr-2 h-4 w-4" />
+                    Carica immagine
                   </>
                 ) : (
-                  <>
-                    {isImageUrl ? (
-                      <>
-                        <ImageIcon className="mr-2 h-4 w-4" />
-                        Carica immagine
-                      </>
-                    ) : (
-                      "Estrai contenuti"
-                    )}
-                  </>
+                  "Estrai contenuti"
                 )}
               </Button>
             </TooltipTrigger>
