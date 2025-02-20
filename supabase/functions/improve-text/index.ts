@@ -50,11 +50,11 @@ serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-4o',
+          model: 'gpt-4o-mini',
           messages: [
             { 
               role: 'system', 
-              content: `Sei un esperto linguista. Rispondi solo con il codice della lingua del testo tra: ${Object.keys(LANGUAGE_NAMES).join(', ')}` 
+              content: 'Sei un esperto linguista. Rispondi solo con il codice della lingua in cui è scritto il testo tra: it, en, fr, de, pt, zh'
             },
             { role: 'user', content: text }
           ],
@@ -86,25 +86,26 @@ serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-4o',
+          model: 'gpt-4o-mini',
           messages: [
             { 
               role: 'system', 
-              content: `Sei un esperto di comunicazione bilingue che parla perfettamente ${LANGUAGE_NAMES[sourceLanguage]} e ${LANGUAGE_NAMES[targetLanguage]}.
-                       Il tuo compito è capire il significato essenziale di questo testo e ricrearlo in ${LANGUAGE_NAMES[targetLanguage]}.
+              content: `Sei un traduttore professionale esperto tra ${LANGUAGE_NAMES[sourceLanguage]} e ${LANGUAGE_NAMES[targetLanguage]}.
+                       Il tuo compito è tradurre questo testo in ${LANGUAGE_NAMES[targetLanguage]} in modo accurato ma sintetico.
                        
-                       Non tradurre letteralmente, ma:
-                       1. Comprendi il messaggio chiave
-                       2. Considera il contesto culturale
-                       3. Ricrea il contenuto con espressioni naturali
-                       4. Mantieni lo stesso tono e stile
-                       
-                       La versione finale deve sembrare scritta originariamente in ${LANGUAGE_NAMES[targetLanguage]}.`
+                       Linee guida:
+                       1. Mantieni il significato esatto del testo originale
+                       2. Usa un linguaggio preciso e conciso
+                       3. Evita giri di parole o espressioni ridondanti
+                       4. Assicurati che la traduzione suoni naturale
+                       5. Non aggiungere o omettere informazioni`
             },
             { role: 'user', content: text }
           ],
-          temperature: 0.3,
-          max_tokens: MAX_TOKENS.description
+          temperature: 0.1,
+          max_tokens: MAX_TOKENS.description,
+          presence_penalty: -0.5, // Scoraggia l'aggiunta di contenuti non necessari
+          frequency_penalty: 0.3  // Incoraggia leggermente la variazione del linguaggio per naturalezza
         }),
       });
 
@@ -128,25 +129,25 @@ serve(async (req) => {
 
       const systemPrompt = type === 'title' 
         ? `Sei un esperto copywriter che scrive in ${LANGUAGE_NAMES[targetLanguage]}.
-           Riscrivi questo titolo in modo naturale e scorrevole.
+           Migliora questo titolo mantenendolo chiaro e diretto.
            
            Linee guida:
-           1. Mantieni il messaggio essenziale
-           2. Usa un linguaggio chiaro e diretto
-           3. Evita espressioni forzate o artificiose
+           1. Mantieni il messaggio principale
+           2. Usa un linguaggio preciso
+           3. Evita parole superflue
            4. Rendilo ${lengthInstruction}
            
-           Il risultato deve essere naturale e convincente.`
+           La versione finale deve essere naturale e efficace.`
         : `Sei un esperto copywriter che scrive in ${LANGUAGE_NAMES[targetLanguage]}.
-           Riscrivi questa descrizione in modo naturale e scorrevole.
+           Migliora questa descrizione mantenendola chiara e diretta.
            
            Linee guida:
-           1. Mantieni tutti i concetti chiave
-           2. Usa un linguaggio chiaro e professionale
-           3. Evita espressioni forzate o artificiose
+           1. Mantieni tutti i punti chiave
+           2. Usa un linguaggio preciso
+           3. Evita parole superflue
            4. Rendila ${lengthInstruction}
            
-           Il risultato deve essere naturale e convincente.`;
+           La versione finale deve essere naturale e efficace.`;
 
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -155,21 +156,15 @@ serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-4o',
+          model: 'gpt-4o-mini',
           messages: [
             { role: 'system', content: systemPrompt },
-            { 
-              role: 'user', 
-              content: `
-                Testo da migliorare: ${text}
-                
-                Riscrivi questo testo in modo naturale e scorrevole, mantenendo il significato ma evitando forzature linguistiche.
-                Il risultato deve essere ${lengthInstruction} rispetto all'originale.
-              `
-            }
+            { role: 'user', content: text }
           ],
-          temperature: type === 'title' ? 0.4 : 0.6,
-          max_tokens: type === 'title' ? MAX_TOKENS.title : MAX_TOKENS.description
+          temperature: type === 'title' ? 0.2 : 0.3,
+          max_tokens: type === 'title' ? MAX_TOKENS.title : MAX_TOKENS.description,
+          presence_penalty: -0.5,
+          frequency_penalty: 0.3
         }),
       });
 
