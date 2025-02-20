@@ -46,6 +46,8 @@ const SuperButton: React.FC<SuperButtonProps> = ({
   };
 
   const detectLanguage = async (text: string) => {
+    if (!text.trim()) return 'it'; // Se il testo è vuoto, assumiamo sia italiano
+
     const { data, error } = await supabase.functions.invoke('translate-text', {
       body: {
         texts: { title: text, description: '' },
@@ -58,12 +60,19 @@ const SuperButton: React.FC<SuperButtonProps> = ({
   };
 
   const translateTexts = async (title: string, desc: string) => {
-    // Controllo della lingua per il titolo
-    const titleLang = await detectLanguage(title);
-    const descLang = await detectLanguage(desc);
+    // Se entrambi i testi sono vuoti, non c'è niente da tradurre
+    if (!title.trim() && !desc.trim()) {
+      return { title, description: desc };
+    }
 
-    // Se entrambi i testi sono già in italiano, ritorna i testi originali
-    if (titleLang === 'it' && descLang === 'it') {
+    // Controllo della lingua solo per i testi non vuoti
+    const titleLang = title.trim() ? await detectLanguage(title) : 'it';
+    const descLang = desc.trim() ? await detectLanguage(desc) : 'it';
+
+    console.log('Lingua rilevata - Titolo:', titleLang, 'Descrizione:', descLang);
+
+    // Se entrambi i testi sono in italiano o vuoti, non tradurre
+    if ((titleLang === 'it' || !title.trim()) && (descLang === 'it' || !desc.trim())) {
       toast({
         title: "Informazione",
         description: "I testi sono già in italiano, nessuna traduzione necessaria"
@@ -71,16 +80,24 @@ const SuperButton: React.FC<SuperButtonProps> = ({
       return { title, description: desc };
     }
 
-    // Altrimenti procedi con la traduzione
+    // Altrimenti procedi con la traduzione solo dei testi necessari
     const { data, error } = await supabase.functions.invoke('translate-text', {
       body: {
-        texts: { title, description: desc },
+        texts: { 
+          title: titleLang !== 'it' ? title : '',
+          description: descLang !== 'it' ? desc : ''
+        },
         targetLanguage: 'it'
       }
     });
 
     if (error) throw error;
-    return { title: data.title, description: data.description };
+
+    // Ritorna il testo tradotto solo per le parti che necessitavano traduzione
+    return { 
+      title: titleLang !== 'it' ? data.title : title,
+      description: descLang !== 'it' ? data.description : desc
+    };
   };
 
   const suggestTheme = async (title: string, description: string) => {
