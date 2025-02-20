@@ -4,8 +4,6 @@ interface MetadataResult {
   title?: string;
   description?: string;
   image?: string;
-  author?: string;
-  publisher?: string;
   error?: string;
 }
 
@@ -33,7 +31,7 @@ export class MetaService {
         doc.querySelector('meta[property="og:title"]')?.getAttribute('content') ||
         doc.querySelector('title')?.textContent || '';
 
-      let description = 
+      const description = 
         doc.querySelector('meta[property="og:description"]')?.getAttribute('content') ||
         doc.querySelector('meta[name="description"]')?.getAttribute('content') || '';
 
@@ -41,39 +39,13 @@ export class MetaService {
         doc.querySelector('meta[property="og:image"]')?.getAttribute('content') ||
         doc.querySelector('meta[name="twitter:image"]')?.getAttribute('content') || '';
 
-      // Estrazione dell'autore
-      const author = 
-        doc.querySelector('meta[name="author"]')?.getAttribute('content') ||
-        doc.querySelector('meta[property="article:author"]')?.getAttribute('content') ||
-        doc.querySelector('meta[property="og:article:author"]')?.getAttribute('content') ||
-        doc.querySelector('a[rel="author"]')?.textContent || '';
-
-      // Estrazione della testata/publisher
-      const publisher = 
-        doc.querySelector('meta[property="og:site_name"]')?.getAttribute('content') ||
-        doc.querySelector('meta[name="publisher"]')?.getAttribute('content') ||
-        doc.querySelector('meta[property="publisher"]')?.getAttribute('content') || '';
-
-      // Aggiungiamo autore e testata alla descrizione se presenti
-      if (author || publisher) {
-        description = description.trim();
-        if (author) {
-          description += `\n\nAutore: ${author}`;
-        }
-        if (publisher) {
-          description += `\n${publisher}`;
-        }
-      }
-
-      console.log('Extracted metadata:', { title, description, image, author, publisher });
+      console.log('Extracted metadata:', { title, description, image });
 
       return {
         success: true,
         title: title.trim(),
         description: description.trim(),
-        image: image.trim(),
-        author: author.trim(),
-        publisher: publisher.trim()
+        image: image.trim()
       };
 
     } catch (error) {
