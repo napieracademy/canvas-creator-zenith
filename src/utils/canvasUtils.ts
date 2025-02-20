@@ -78,22 +78,6 @@ export function drawText(
     return;
   }
 
-  ctx.save();
-  if (type === 'title') {
-    ctx.fillStyle = 'rgba(135, 140, 150, 0.15)'; // Grigio bluastro per il titolo
-  } else {
-    ctx.fillStyle = 'rgba(145, 145, 155, 0.15)'; // Grigio leggermente più chiaro per la descrizione
-  }
-  const areaHeight = fontSize * 2;
-  let areaY;
-  if (type === 'title') {
-    areaY = (height / 2) - (spacing / 2) - areaHeight;
-  } else {
-    areaY = (height / 2) + (spacing / 2);
-  }
-  ctx.fillRect(SAFE_ZONE_MARGIN, areaY, width - (2 * SAFE_ZONE_MARGIN), areaHeight);
-  ctx.restore();
-
   ctx.font = `${type === 'title' ? 'bold' : ''} ${fontSize}px ${fontFamily}`;
   ctx.fillStyle = textColor;
   ctx.textAlign = textAlign;
