@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,7 @@ import FormatSelector from "@/components/FormatSelector";
 import { Separator } from "@/components/ui/separator";
 import { Image } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
+import TextEditor from '@/components/TextEditor';
 
 interface SidebarProps {
   text: string;
@@ -80,7 +82,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      if (file.size > 1024 * 1024) { // 1MB limit
+      if (file.size > 1024 * 1024) {
         toast({
           title: "File troppo grande",
           description: "Il file non deve superare 1MB",
@@ -142,9 +144,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
           <Separator />
           
-          <div className="space-y-6">
-            <Header />
-            
+          <div className="space-y-6">            
             <TextEditor 
               text={text}
               description={description}
