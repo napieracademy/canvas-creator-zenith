@@ -3,9 +3,6 @@ import React from 'react';
 import TextInput from '@/components/TextInput';
 import SpacingControl from '@/components/SpacingControl';
 import UrlInput from '@/components/UrlInput';
-import { Button } from '@/components/ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Download } from 'lucide-react';
 
 interface TextEditorProps {
   text: string;
@@ -53,40 +50,20 @@ const TextEditor: React.FC<TextEditorProps> = ({
   return (
     <div className="space-y-4">
       <div className="space-y-4">
-        <div className="flex items-center gap-2">
-          <div className="flex-1">
-            <TextInput 
-              value={text} 
-              onChange={onTextChange} 
-              textAlign={textAlign}
-              onTextAlignChange={onTextAlignChange}
-              fontSize={fontSize}
-              onFontSizeChange={onFontSizeChange}
-              label="Titolo"
-              disabled={disabled}
-            />
-          </div>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button 
-                variant="outline" 
-                size="icon"
-                className="shrink-0"
-                disabled={disabled}
-              >
-                <Download className="h-4 w-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-80">
-              <UrlInput 
-                onTitleExtracted={onTitleExtracted}
-                onDescriptionExtracted={onDescriptionExtracted}
-                onTabChange={onTabChange}
-                onLoadingChange={onLoadingChange}
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
+        <TextInput 
+          value={text} 
+          onChange={onTextChange} 
+          textAlign={textAlign}
+          onTextAlignChange={onTextAlignChange}
+          fontSize={fontSize}
+          onFontSizeChange={onFontSizeChange}
+          label="Titolo"
+          disabled={disabled}
+          onTitleExtracted={onTitleExtracted}
+          onDescriptionExtracted={onDescriptionExtracted}
+          onTabChange={onTabChange}
+          onLoadingChange={onLoadingChange}
+        />
         
         {description && (
           <SpacingControl
@@ -96,21 +73,16 @@ const TextEditor: React.FC<TextEditorProps> = ({
           />
         )}
 
-        <div className="flex items-center gap-2">
-          <div className="flex-1">
-            <TextInput 
-              value={description} 
-              onChange={onDescriptionChange} 
-              textAlign={descriptionAlign}
-              onTextAlignChange={onDescriptionAlignChange}
-              fontSize={descriptionFontSize}
-              onFontSizeChange={onDescriptionFontSizeChange}
-              label="Descrizione"
-              disabled={disabled}
-            />
-          </div>
-          <div className="w-9 h-9" /> {/* Spacer to align with title row */}
-        </div>
+        <TextInput 
+          value={description} 
+          onChange={onDescriptionChange} 
+          textAlign={descriptionAlign}
+          onTextAlignChange={onDescriptionAlignChange}
+          fontSize={descriptionFontSize}
+          onFontSizeChange={onDescriptionFontSize}
+          label="Descrizione"
+          disabled={disabled}
+        />
       </div>
     </div>
   );
