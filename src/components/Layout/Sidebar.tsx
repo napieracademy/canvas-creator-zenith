@@ -31,7 +31,6 @@ interface SidebarProps {
   onTabChange: (value: string) => void;
   onLoadingChange: (loading: boolean) => void;
   onColorSelect: (background: string, text: string) => void;
-  onFontChange: (font: string) => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -59,8 +58,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   onDescriptionExtracted,
   onTabChange,
   onLoadingChange,
-  onColorSelect,
-  onFontChange
+  onColorSelect
 }) => {
   return (
     <div className="h-screen p-6 border-r bg-white overflow-y-auto">
@@ -81,7 +79,6 @@ const Sidebar: React.FC<SidebarProps> = ({
           fontSize={fontSize}
           descriptionFontSize={descriptionFontSize}
           spacing={spacing}
-          currentFont={currentFont}
           onTextChange={onTextChange}
           onDescriptionChange={onDescriptionChange}
           onTextAlignChange={onTextAlignChange}
@@ -93,7 +90,6 @@ const Sidebar: React.FC<SidebarProps> = ({
           onDescriptionExtracted={onDescriptionExtracted}
           onTabChange={onTabChange}
           onLoadingChange={onLoadingChange}
-          onFontChange={onFontChange}
           disabled={disabled}
         />
 
