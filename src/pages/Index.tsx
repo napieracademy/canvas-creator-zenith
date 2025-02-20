@@ -2,16 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from '@/components/ui/use-toast';
-import { Loader2 } from 'lucide-react';
-import ColorPresets from '@/components/ColorPresets';
-import DownloadButton from '@/components/DownloadButton';
-import FormatSelector from '@/components/FormatSelector';
-import SafeZoneToggle from '@/components/SafeZoneToggle';
-import TextEditor from '@/components/TextEditor';
-import CanvasPreview from '@/components/CanvasPreview';
-import MagicButton from '@/components/MagicButton';
 import { colorPairs } from '@/data/colorPairs';
 import { calculateOptimalSizes } from '@/utils/fontSizeCalculator';
+import MobileWarning from '@/components/Layout/MobileWarning';
+import LoadingOverlay from '@/components/Layout/LoadingOverlay';
+import Sidebar from '@/components/Layout/Sidebar';
+import MainContent from '@/components/Layout/MainContent';
 
 const Index = () => {
   const getRandomTheme = () => {
@@ -20,6 +16,7 @@ const Index = () => {
   };
 
   const randomTheme = getRandomTheme();
+  const isMobile = useIsMobile();
 
   const [text, setText] = useState('Social Image Creator');
   const [description, setDescription] = useState('Crea bellissime immagini per i social media in pochi secondi. Personalizza colori, font e layout per ottenere il massimo impatto visivo.');
@@ -36,7 +33,6 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState('manual');
   const [isLoading, setIsLoading] = useState(false);
   const [currentFont, setCurrentFont] = useState('');
-  const isMobile = useIsMobile();
 
   useEffect(() => {
     toast({
@@ -75,22 +71,6 @@ const Index = () => {
           setCurrentFont('Inter');
       }
     }
-  };
-
-  const handleTitleExtracted = (extractedTitle: string) => {
-    setText(extractedTitle);
-    toast({
-      title: "Titolo estratto",
-      description: "Il testo è stato aggiornato con il titolo della pagina",
-    });
-  };
-
-  const handleDescriptionExtracted = (extractedDescription: string) => {
-    setDescription(extractedDescription);
-    toast({
-      title: "Descrizione estratta",
-      description: "Il testo secondario è stato aggiornato con la descrizione della pagina",
-    });
   };
 
   const handleDownload = () => {
@@ -140,104 +120,72 @@ const Index = () => {
   };
 
   if (isMobile) {
-    return (
-      <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-6">
-        <div className="glass-panel p-8 rounded-2xl max-w-md text-center space-y-4">
-          <h1 className="text-2xl font-bold text-gray-900">Versione Desktop Raccomandata</h1>
-          <p className="text-gray-600">
-            Questa app è ottimizzata per l'utilizzo su desktop. Per la migliore esperienza, ti preghiamo di accedere da un computer.
-          </p>
-          <div className="text-sm text-gray-500">
-            💻 Torna a visitarci dal tuo computer!
-          </div>
-        </div>
-      </div>
-    );
+    return <MobileWarning />;
   }
 
   return (
     <div className="min-h-screen w-full grid grid-cols-[400px_1fr] bg-gray-50/50">
-      {isLoading && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg p-6 flex flex-col items-center gap-4">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <p className="text-gray-700">Estrazione contenuti in corso...</p>
-          </div>
-        </div>
-      )}
+      <LoadingOverlay isLoading={isLoading} />
       
-      <div className="h-screen p-6 border-r bg-white overflow-y-auto">
-        <div className="space-y-6">
-          <div className="space-y-1.5">
-            <h1 className="text-xl font-semibold text-gray-900">Social Image Creator</h1>
-            <p className="text-sm text-gray-500">Create beautiful social media images in seconds</p>
-          </div>
-
-          <FormatSelector 
-            format={format}
-            onFormatChange={setFormat}
-            disabled={isLoading}
-          />
-
-          <TextEditor 
-            text={text}
-            description={description}
-            textAlign={textAlign}
-            descriptionAlign={descriptionAlign}
-            fontSize={fontSize}
-            descriptionFontSize={descriptionFontSize}
-            spacing={spacing}
-            onTextChange={setText}
-            onDescriptionChange={setDescription}
-            onTextAlignChange={setTextAlign}
-            onDescriptionAlignChange={setDescriptionAlign}
-            onFontSizeChange={setFontSize}
-            onDescriptionFontSizeChange={setDescriptionFontSize}
-            onSpacingChange={setSpacing}
-            onTitleExtracted={handleTitleExtracted}
-            onDescriptionExtracted={handleDescriptionExtracted}
-            onTabChange={setActiveTab}
-            onLoadingChange={setIsLoading}
-            disabled={isLoading}
-          />
-
-          <ColorPresets 
-            onSelectColors={handleColorSelect}
-            currentBackground={backgroundColor}
-            currentText={textColor}
-          />
-        </div>
-      </div>
+      <Sidebar
+        format={format}
+        text={text}
+        description={description}
+        textAlign={textAlign}
+        descriptionAlign={descriptionAlign}
+        fontSize={fontSize}
+        descriptionFontSize={descriptionFontSize}
+        spacing={spacing}
+        backgroundColor={backgroundColor}
+        textColor={textColor}
+        isLoading={isLoading}
+        onFormatChange={setFormat}
+        onTextChange={setText}
+        onDescriptionChange={setDescription}
+        onTextAlignChange={setTextAlign}
+        onDescriptionAlignChange={setDescriptionAlign}
+        onFontSizeChange={setFontSize}
+        onDescriptionFontSizeChange={setDescriptionFontSize}
+        onSpacingChange={setSpacing}
+        onColorSelect={handleColorSelect}
+        onTitleExtracted={(title) => {
+          setText(title);
+          toast({
+            title: "Titolo estratto",
+            description: "Il testo è stato aggiornato con il titolo della pagina",
+          });
+        }}
+        onDescriptionExtracted={(desc) => {
+          setDescription(desc);
+          toast({
+            title: "Descrizione estratta",
+            description: "Il testo secondario è stato aggiornato con la descrizione della pagina",
+          });
+        }}
+        onTabChange={setActiveTab}
+        onLoadingChange={setIsLoading}
+      />
       
-      <div className="h-screen p-6">
-        <div className="relative">
-          <CanvasPreview 
-            text={text}
-            description={description}
-            backgroundColor={backgroundColor}
-            textAlign={textAlign}
-            descriptionAlign={descriptionAlign}
-            textColor={textColor}
-            fontSize={fontSize}
-            descriptionFontSize={descriptionFontSize}
-            spacing={spacing}
-            onEffectiveFontSizeChange={setEffectiveFontSize}
-            showSafeZone={showSafeZone}
-            format={format}
-            onSpacingChange={setSpacing}
-            font={currentFont}
-          />
-          <div className="absolute top-3 right-3 flex gap-2">
-            <MagicButton onMagicOptimization={handleMagicOptimization} disabled={isLoading} />
-            <SafeZoneToggle 
-              showSafeZone={showSafeZone}
-              onShowSafeZoneChange={setShowSafeZone}
-              disabled={isLoading}
-            />
-            <DownloadButton onDownload={handleDownload} />
-          </div>
-        </div>
-      </div>
+      <MainContent
+        text={text}
+        description={description}
+        backgroundColor={backgroundColor}
+        textAlign={textAlign}
+        descriptionAlign={descriptionAlign}
+        textColor={textColor}
+        fontSize={fontSize}
+        descriptionFontSize={descriptionFontSize}
+        spacing={spacing}
+        showSafeZone={showSafeZone}
+        format={format}
+        currentFont={currentFont}
+        isLoading={isLoading}
+        onEffectiveFontSizeChange={setEffectiveFontSize}
+        onShowSafeZoneChange={setShowSafeZone}
+        onSpacingChange={setSpacing}
+        onMagicOptimization={handleMagicOptimization}
+        onDownload={handleDownload}
+      />
     </div>
   );
 };
