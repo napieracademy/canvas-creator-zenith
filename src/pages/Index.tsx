@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from '@/components/ui/use-toast';
@@ -165,6 +166,7 @@ const IndexPage = () => {
         onLoadingChange={setIsLoading}
       />
       {isLoading && <LoadingOverlay isLoading={isLoading} />}
+      <MobileWarning />
     </div>
   );
 };
