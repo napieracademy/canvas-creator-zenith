@@ -22,7 +22,7 @@ const FontSelector: React.FC<FontSelectorProps> = ({ currentFont, onFontChange, 
           <SelectValue placeholder="Seleziona un font" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">Default</SelectItem>
+          <SelectItem value="default">Default</SelectItem>
           <SelectItem value="font-c64-system">Press Start 2P</SelectItem>
           <SelectItem value="font-c64-mono">Share Tech Mono</SelectItem>
           <SelectItem value="font-c64-bold">VT323</SelectItem>

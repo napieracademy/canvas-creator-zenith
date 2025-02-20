@@ -1,46 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { toast } from '@/components/ui/use-toast';
-import { colorPairs } from '@/data/colorPairs';
-import { calculateOptimalSizes } from '@/utils/fontSizeCalculator';
-import MobileWarning from '@/components/Layout/MobileWarning';
-import LoadingOverlay from '@/components/Layout/LoadingOverlay';
 import Sidebar from '@/components/Layout/Sidebar';
 import MainContent from '@/components/Layout/MainContent';
+import MobileWarning from '@/components/MobileWarning';
+import { calculateOptimalSizes } from '@/lib/utils';
+import { useToast } from "@/components/ui/use-toast"
+import { LoadingOverlay } from '@/components/LoadingOverlay';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const IndexPage = () => {
-  const getRandomTheme = () => {
-    const randomIndex = Math.floor(Math.random() * colorPairs.length);
-    return colorPairs[randomIndex];
-  };
-
-  const randomTheme = getRandomTheme();
-  const isMobile = useIsMobile();
-
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [text, setText] = useState('Social Image Creator');
-  const [description, setDescription] = useState('Crea bellissime immagini per i social media in pochi secondi. Personalizza colori, font e layout per ottenere il massimo impatto visivo.');
-  const [backgroundColor, setBackgroundColor] = useState(randomTheme.background);
-  const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right'>('left');
-  const [descriptionAlign, setDescriptionAlign] = useState<'left' | 'center' | 'right'>('left');
-  const [fontSize, setFontSize] = useState(111);
-  const [descriptionFontSize, setDescriptionFontSize] = useState(56);
+  const [text, setText] = useState('Titolo');
+  const [description, setDescription] = useState('Descrizione');
+  const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right'>('center');
+  const [descriptionAlign, setDescriptionAlign] = useState<'left' | 'center' | 'right'>('center');
+  const [fontSize, setFontSize] = useState(120);
+  const [effectiveFontSize, setEffectiveFontSize] = useState(120);
+  const [descriptionFontSize, setDescriptionFontSize] = useState(30);
   const [spacing, setSpacing] = useState(100);
-  const [effectiveFontSize, setEffectiveFontSize] = useState(111);
-  const [textColor, setTextColor] = useState(randomTheme.text);
+  const [backgroundColor, setBackgroundColor] = useState('#ffffff');
+  const [textColor, setTextColor] = useState('#000000');
   const [showSafeZone, setShowSafeZone] = useState(false);
   const [format, setFormat] = useState<'post' | 'story'>('post');
-  const [activeTab, setActiveTab] = useState('manual');
+	const [currentFont, setCurrentFont] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
-  const [currentFont, setCurrentFont] = useState('');
-  const [credits, setCredits] = useState('');
+  const [activeTab, setActiveTab] = useState<string>('title');
+  const [credits, setCredits] = useState<boolean>(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const { toast } = useToast()
+
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
   useEffect(() => {
-    toast({
-      title: "Tema selezionato",
-      description: `Tema: ${randomTheme.name}`,
-    });
+    if (typeof window !== 'undefined') {
+      setCredits(localStorage.getItem('credits') === 'true');
+    }
   }, []);
 
   const handleColorSelect = (background: string, text: string) => {
@@ -49,48 +41,15 @@ const IndexPage = () => {
   };
 
   const handleMagicOptimization = () => {
-    if (!text && !description) {
-      toast({
-        title: "Contenuto mancante",
-        description: "Inserisci del testo prima di utilizzare l'ottimizzazione automatica",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    const { titleFontSize, descriptionFontSize: newDescFontSize, spacing: newSpacing } = calculateOptimalSizes(text, description);
-    
-    setFontSize(titleFontSize);
-    setDescriptionFontSize(newDescFontSize);
-    setSpacing(newSpacing);
-
-    toast({
-      title: "Layout ottimizzato",
-      description: "Le dimensioni sono state ottimizzate in base al contenuto"
-    });
+    const { titleSize, descriptionSize } = calculateOptimalSizes(text, description);
+    setFontSize(titleSize);
+    setDescriptionFontSize(descriptionSize);
   };
 
   const handleDownload = () => {
-    const canvas = document.querySelector('canvas');
-    if (!canvas) return;
-
-    const tempCanvas = document.createElement('canvas');
-    const ctx = tempCanvas.getContext('2d');
-    if (!ctx) return;
-
-    tempCanvas.width = 1080;
-    tempCanvas.height = format === 'post' ? 1350 : 1920;
-
-    ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, tempCanvas.width, tempCanvas.height);
-
-    const link = document.createElement('a');
-    link.download = `social-image-${format}.png`;
-    link.href = tempCanvas.toDataURL('image/png');
-    link.click();
-
     toast({
-      title: "Immagine scaricata",
-      description: `L'immagine è stata salvata nel formato ${format === 'post' ? 'post (1080x1350)' : 'story (1080x1920)'}`,
+      title: "Download iniziato",
+      description: "L'immagine verrà scaricata a breve"
     });
   };
 
@@ -128,6 +87,7 @@ const IndexPage = () => {
             onTabChange={setActiveTab}
             onLoadingChange={setIsLoading}
             onColorSelect={handleColorSelect}
+            onFontChange={setCurrentFont}
           />
         )}
         <button
