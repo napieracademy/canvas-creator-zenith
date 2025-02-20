@@ -17,6 +17,29 @@ const StickerPicker: React.FC<StickerPickerProps> = ({ onStickerSelect }) => {
     { icon: <Ghost className="w-6 h-6" />, name: "ghost" },
   ];
 
+  const stickers = [
+    {
+      id: 1,
+      url: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
+      alt: "Orange and white tabby cat"
+    },
+    {
+      id: 2,
+      url: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
+      alt: "Grey tabby kitten"
+    },
+    {
+      id: 3,
+      url: "https://images.unsplash.com/photo-1485833077593-4278bba3f11f",
+      alt: "Brown deer"
+    },
+    {
+      id: 4,
+      url: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
+      alt: "Cat sticker"
+    }
+  ];
+
   return (
     <div className="w-full">
       <Tabs defaultValue="emoji" className="w-full">
@@ -42,16 +65,16 @@ const StickerPicker: React.FC<StickerPickerProps> = ({ onStickerSelect }) => {
         
         <TabsContent value="stickers" className="mt-4">
           <div className="grid grid-cols-2 gap-4">
-            {[1, 2, 3, 4].map((id) => (
+            {stickers.map((sticker) => (
               <Button
-                key={id}
+                key={sticker.id}
                 variant="outline"
-                className="aspect-square hover:bg-gray-100"
-                onClick={() => onStickerSelect(`sticker-${id}`)}
+                className="aspect-square hover:bg-gray-100 p-2"
+                onClick={() => onStickerSelect(`sticker-${sticker.id}`)}
               >
                 <img 
-                  src={`photo-${id}`} 
-                  alt={`Sticker ${id}`}
+                  src={sticker.url} 
+                  alt={sticker.alt}
                   className="w-full h-full object-cover rounded"
                 />
               </Button>
