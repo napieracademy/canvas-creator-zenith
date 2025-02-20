@@ -6,12 +6,16 @@ interface SpacingControlProps {
   spacing: number;
   showControl: boolean;
   onMouseDown: (e: React.MouseEvent, type: 'spacing') => void;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
 }
 
 const SpacingControl: React.FC<SpacingControlProps> = ({
   spacing,
   showControl,
-  onMouseDown
+  onMouseDown,
+  onMouseEnter,
+  onMouseLeave
 }) => {
   return (
     <div 
@@ -21,6 +25,8 @@ const SpacingControl: React.FC<SpacingControlProps> = ({
         height: '80px',
         zIndex: 10,
       }}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
       <div 
         className={`absolute left-8 transition-opacity duration-300 ${showControl ? 'opacity-100' : 'opacity-0'}`}

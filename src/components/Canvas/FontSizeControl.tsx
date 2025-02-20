@@ -9,6 +9,8 @@ interface FontSizeControlProps {
   spacing: number;
   onMouseDown: (e: React.MouseEvent, type: 'title-font' | 'desc-font') => void;
   type: 'title-font' | 'desc-font';
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
 }
 
 const FontSizeControl: React.FC<FontSizeControlProps> = ({
@@ -17,7 +19,9 @@ const FontSizeControl: React.FC<FontSizeControlProps> = ({
   position,
   spacing,
   onMouseDown,
-  type
+  type,
+  onMouseEnter,
+  onMouseLeave
 }) => {
   return (
     <div 
@@ -29,6 +33,8 @@ const FontSizeControl: React.FC<FontSizeControlProps> = ({
         height: '160px',
         zIndex: 10,
       }}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
       <div 
         className={`absolute right-8 transition-opacity duration-300 ${showControl ? 'opacity-100' : 'opacity-0'}`}

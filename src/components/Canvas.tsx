@@ -118,10 +118,6 @@ const Canvas: React.FC<CanvasProps> = ({
     isDraggingRef.current = false;
     isResizingTitleRef.current = false;
     isResizingDescRef.current = false;
-    setTimeout(() => {
-      setShowSpacingControl(false);
-      setShowFontControls(false);
-    }, 1500);
   };
 
   useEffect(() => {
@@ -232,6 +228,8 @@ const Canvas: React.FC<CanvasProps> = ({
           spacing={localSpacing}
           onMouseDown={handleMouseDown}
           type="title-font"
+          onMouseEnter={() => setShowFontControls(true)}
+          onMouseLeave={() => setTimeout(() => setShowFontControls(false), 1500)}
         />
 
         {description && (
@@ -240,6 +238,8 @@ const Canvas: React.FC<CanvasProps> = ({
               spacing={localSpacing}
               showControl={showSpacingControl}
               onMouseDown={handleMouseDown}
+              onMouseEnter={() => setShowSpacingControl(true)}
+              onMouseLeave={() => setTimeout(() => setShowSpacingControl(false), 1500)}
             />
 
             <FontSizeControl
@@ -249,6 +249,8 @@ const Canvas: React.FC<CanvasProps> = ({
               spacing={localSpacing}
               onMouseDown={handleMouseDown}
               type="desc-font"
+              onMouseEnter={() => setShowFontControls(true)}
+              onMouseLeave={() => setTimeout(() => setShowFontControls(false), 1500)}
             />
           </>
         )}
