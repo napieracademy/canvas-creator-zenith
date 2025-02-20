@@ -45,34 +45,24 @@ const SuperButton: React.FC<SuperButtonProps> = ({
     return isTitle ? data?.title?.improvedText : data?.description?.improvedText;
   };
 
-  const detectLanguage = async (text: string) => {
-    if (!text.trim()) return 'it'; // Se il testo è vuoto, assumiamo sia italiano
-
-    const { data, error } = await supabase.functions.invoke('translate-text', {
-      body: {
-        texts: { title: text, description: '' },
-        mode: 'detect'
-      }
-    });
-
-    if (error) throw error;
-    return data.detectedLanguage;
-  };
-
   const translateTexts = async (title: string, desc: string) => {
     // Se entrambi i testi sono vuoti, non c'è niente da tradurre
     if (!title.trim() && !desc.trim()) {
       return { title, description: desc };
     }
 
-    // Controllo della lingua solo per i testi non vuoti
-    const titleLang = title.trim() ? await detectLanguage(title) : 'it';
-    const descLang = desc.trim() ? await detectLanguage(desc) : 'it';
+    // Prima controlliamo la lingua dei testi insieme
+    const { data: detectionData, error: detectionError } = await supabase.functions.invoke('translate-text', {
+      body: {
+        texts: { title, description: desc },
+        mode: 'detect'
+      }
+    });
 
-    console.log('Lingua rilevata - Titolo:', titleLang, 'Descrizione:', descLang);
+    if (detectionError) throw detectionError;
 
-    // Se entrambi i testi sono in italiano o vuoti, non tradurre
-    if ((titleLang === 'it' || !title.trim()) && (descLang === 'it' || !desc.trim())) {
+    // Se i testi sono già in italiano, non tradurre
+    if (detectionData.detectedLanguage === 'it') {
       toast({
         title: "Informazione",
         description: "I testi sono già in italiano, nessuna traduzione necessaria"
@@ -80,23 +70,19 @@ const SuperButton: React.FC<SuperButtonProps> = ({
       return { title, description: desc };
     }
 
-    // Altrimenti procedi con la traduzione solo dei testi necessari
+    // Altrimenti procedi con la traduzione di entrambi i testi
     const { data, error } = await supabase.functions.invoke('translate-text', {
       body: {
-        texts: { 
-          title: titleLang !== 'it' ? title : '',
-          description: descLang !== 'it' ? desc : ''
-        },
+        texts: { title, description: desc },
         targetLanguage: 'it'
       }
     });
 
     if (error) throw error;
 
-    // Ritorna il testo tradotto solo per le parti che necessitavano traduzione
     return { 
-      title: titleLang !== 'it' ? data.title : title,
-      description: descLang !== 'it' ? data.description : desc
+      title: data.title,
+      description: data.description
     };
   };
 
