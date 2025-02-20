@@ -124,7 +124,7 @@ const TextImproveControl: React.FC<TextImproveControlProps> = ({
                 disabled={disabled || isImproving}
                 aria-label="Migliora automaticamente il testo"
               >
-                <Sparkles className="h-4 w-4 text-yellow-500" />
+                <Sparkles className="h-4 w-4 text-[#403E43]" />
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-72">
