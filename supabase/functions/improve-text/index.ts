@@ -27,11 +27,13 @@ serve(async (req) => {
       }
     };
 
-    const promptTitle = title ? `Migliora questo titolo ${getToneInstruction(tone)}. Rendilo ${length === 'shorter' ? 'più conciso' : length === 'longer' ? 'più dettagliato' : 'della stessa lunghezza circa'}:
+    const promptTitle = title ? `Migliora questo titolo ${getToneInstruction(tone)}. Rendilo ${length === 'shorter' ? 'più conciso' : length === 'longer' ? 'più dettagliato' : 'della stessa lunghezza circa'}. Non aggiungere MAI virgolette o apici al testo:
 ${title}` : '';
 
-    const promptDescription = description ? `Migliora questa descrizione ${getToneInstruction(tone)}. Rendila ${length === 'shorter' ? 'più concisa' : length === 'longer' ? 'più dettagliata' : 'della stessa lunghezza circa'}:
+    const promptDescription = description ? `Migliora questa descrizione ${getToneInstruction(tone)}. Rendila ${length === 'shorter' ? 'più concisa' : length === 'longer' ? 'più dettagliata' : 'della stessa lunghezza circa'}. Non aggiungere MAI virgolette o apici al testo:
 ${description}` : '';
+
+    console.log('Invio richiesta a OpenAI:', { promptTitle, promptDescription });
 
     const results = await Promise.all([
       title ? fetch('https://api.openai.com/v1/chat/completions', {
@@ -45,10 +47,14 @@ ${description}` : '';
           messages: [
             { 
               role: 'system', 
-              content: 'Sei un esperto copywriter. Migliora il testo seguendo le istruzioni di tono e lunghezza. Non modificare informazioni fattuali.' 
+              content: 'Sei un esperto copywriter. Migliora il testo seguendo le istruzioni di tono e lunghezza. Non modificare informazioni fattuali. Non aggiungere mai virgolette o apici al testo.' 
             },
             { role: 'user', content: promptTitle }
           ],
+          temperature: 0.7, // Aggiungiamo un po' di creatività ma non troppa
+          max_tokens: 150,  // Limitiamo la lunghezza della risposta
+          presence_penalty: 0.3, // Incoraggiamo leggermente la varietà nel testo
+          frequency_penalty: 0.3 // Evitiamo ripetizioni eccessive
         }),
       }).then(r => r.json()) : null,
       
@@ -63,13 +69,19 @@ ${description}` : '';
           messages: [
             { 
               role: 'system', 
-              content: 'Sei un esperto copywriter. Migliora il testo seguendo le istruzioni di tono e lunghezza. Non modificare informazioni fattuali.' 
+              content: 'Sei un esperto copywriter. Migliora il testo seguendo le istruzioni di tono e lunghezza. Non modificare informazioni fattuali. Non aggiungere mai virgolette o apici al testo.' 
             },
             { role: 'user', content: promptDescription }
           ],
+          temperature: 0.7,
+          max_tokens: 250, // Permettiamo una risposta più lunga per le descrizioni
+          presence_penalty: 0.3,
+          frequency_penalty: 0.3
         }),
       }).then(r => r.json()) : null
     ]);
+
+    console.log('Risposta da OpenAI:', results);
 
     return new Response(
       JSON.stringify({
