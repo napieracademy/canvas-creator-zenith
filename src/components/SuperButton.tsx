@@ -28,11 +28,16 @@ const SuperButton: React.FC<SuperButtonProps> = ({
 }) => {
   const [isProcessing, setIsProcessing] = useState(false);
 
+  // Funzione per rimuovere le virgolette dal testo
+  const removeQuotes = (text: string) => {
+    return text.replace(/["""'']/g, '').trim();
+  };
+
   const improveText = async (content: string, isTitle: boolean) => {
     const requestBody = {
       title: isTitle ? content : '',
       description: isTitle ? '' : content,
-      length: 'shorter',  // Impostiamo sempre 'shorter' per avere testi più concisi
+      length: 'shorter',
       tone: 'professional'
     };
 
@@ -42,16 +47,15 @@ const SuperButton: React.FC<SuperButtonProps> = ({
 
     if (error) throw error;
 
-    return isTitle ? data?.title?.improvedText : data?.description?.improvedText;
+    const improvedText = isTitle ? data?.title?.improvedText : data?.description?.improvedText;
+    return improvedText ? removeQuotes(improvedText) : improvedText;
   };
 
   const translateTexts = async (title: string, desc: string) => {
-    // Se entrambi i testi sono vuoti, non c'è niente da tradurre
     if (!title.trim() && !desc.trim()) {
       return { title, description: desc };
     }
 
-    // Prima controlliamo la lingua dei testi insieme
     const { data: detectionData, error: detectionError } = await supabase.functions.invoke('translate-text', {
       body: {
         texts: { title, description: desc },
@@ -61,7 +65,6 @@ const SuperButton: React.FC<SuperButtonProps> = ({
 
     if (detectionError) throw detectionError;
 
-    // Se i testi sono già in italiano, non tradurre
     if (detectionData.detectedLanguage === 'it') {
       toast({
         title: "Informazione",
@@ -70,20 +73,19 @@ const SuperButton: React.FC<SuperButtonProps> = ({
       return { title, description: desc };
     }
 
-    // Altrimenti procedi con la traduzione di entrambi i testi
     const { data, error } = await supabase.functions.invoke('translate-text', {
       body: {
         texts: { title, description: desc },
         targetLanguage: 'it',
-        length: 'shorter'  // Impostiamo sempre 'shorter' per avere traduzioni più concise
+        length: 'shorter'
       }
     });
 
     if (error) throw error;
 
     return { 
-      title: data.title,
-      description: data.description
+      title: removeQuotes(data.title),
+      description: removeQuotes(data.description)
     };
   };
 
