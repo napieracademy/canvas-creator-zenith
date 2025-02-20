@@ -1,5 +1,5 @@
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useCallback } from 'react';
 import { CanvasProps } from '@/types/canvas';
 import { useCanvasScale } from '@/hooks/useCanvasScale';
 import { 
@@ -38,18 +38,30 @@ const Canvas: React.FC<CanvasProps> = ({
   
   const { scale, updateScale } = useCanvasScale(canvasRef, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
 
-  useEffect(() => {
+  const renderCanvas = useCallback(async () => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) {
+      console.warn('Canvas element not found');
+      return;
+    }
 
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      console.warn('Canvas context not found');
+      return;
+    }
+
+    console.log('Starting canvas render with dimensions:', {
+      width: ORIGINAL_WIDTH,
+      height: ORIGINAL_HEIGHT
+    });
 
     canvas.width = ORIGINAL_WIDTH;
     canvas.height = ORIGINAL_HEIGHT;
     
     updateScale();
 
+    // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     const getFontFamily = () => {
@@ -68,6 +80,7 @@ const Canvas: React.FC<CanvasProps> = ({
     };
 
     const fontFamily = getFontFamily();
+    console.log('Using font family:', fontFamily);
 
     const context = {
       ctx,
@@ -77,66 +90,96 @@ const Canvas: React.FC<CanvasProps> = ({
       fontFamily
     };
 
-    document.fonts.ready.then(() => {
-      if (backgroundColor.startsWith('url(')) {
-        const img = new Image();
-        img.onload = () => {
-          const scale = Math.max(canvas.width / img.width, canvas.height / img.height);
-          const x = (canvas.width - img.width * scale) / 2;
-          const y = (canvas.height - img.height * scale) / 2;
-          
-          ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+    // Wait for fonts to load
+    await document.fonts.ready;
+    console.log('Fonts loaded');
 
-          if (overlay) {
-            ctx.fillStyle = overlay;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-          }
-
-          if (logo) {
-            drawLogo(context, logo);
-          }
-
-          if (showSafeZone) {
-            drawSafeZone(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
-          }
-
-          drawText(context, text, textAlign, textColor, fontSize, 'title', spacing);
-          
-          if (description) {
-            drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', spacing);
-          }
-        };
+    // Draw background
+    if (backgroundColor.startsWith('url(')) {
+      console.log('Drawing background image');
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
         img.src = backgroundColor.slice(4, -1);
-      } else {
-        if (backgroundColor.includes('gradient')) {
-          const gradient = ctx.createLinearGradient(0, 0, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
-          const colors = backgroundColor.match(/#[a-fA-F0-9]{6}/g);
-          if (colors && colors.length >= 2) {
-            gradient.addColorStop(0, colors[0]);
-            gradient.addColorStop(1, colors[1]);
-          }
-          ctx.fillStyle = gradient;
-        } else {
-          ctx.fillStyle = backgroundColor;
-        }
-        ctx.fillRect(0, 0, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
+      });
 
-        if (logo) {
-          drawLogo(context, logo);
-        }
+      const scale = Math.max(canvas.width / img.width, canvas.height / img.height);
+      const x = (canvas.width - img.width * scale) / 2;
+      const y = (canvas.height - img.height * scale) / 2;
+      
+      ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
 
-        if (showSafeZone) {
-          drawSafeZone(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
-        }
-
-        drawText(context, text, textAlign, textColor, fontSize, 'title', spacing);
-        
-        if (description) {
-          drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', spacing);
-        }
+      if (overlay) {
+        console.log('Applying overlay');
+        ctx.fillStyle = overlay;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
+    } else {
+      console.log('Drawing background color/gradient');
+      if (backgroundColor.includes('gradient')) {
+        const gradient = ctx.createLinearGradient(0, 0, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
+        const colors = backgroundColor.match(/#[a-fA-F0-9]{6}/g);
+        if (colors && colors.length >= 2) {
+          gradient.addColorStop(0, colors[0]);
+          gradient.addColorStop(1, colors[1]);
+        }
+        ctx.fillStyle = gradient;
+      } else {
+        ctx.fillStyle = backgroundColor;
+      }
+      ctx.fillRect(0, 0, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
+    }
+
+    // Draw logo if provided
+    if (logo) {
+      console.log('Drawing logo:', logo);
+      drawLogo(context, logo);
+    }
+
+    // Draw safe zone if enabled
+    if (showSafeZone) {
+      console.log('Drawing safe zone');
+      drawSafeZone(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
+    }
+
+    // Draw main text
+    console.log('Drawing main text');
+    drawText(context, text, textAlign, textColor, fontSize, 'title', spacing);
+    
+    // Draw description if provided
+    if (description) {
+      console.log('Drawing description');
+      drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', spacing);
+    }
+  }, [
+    text,
+    description,
+    backgroundColor,
+    textAlign,
+    descriptionAlign,
+    textColor,
+    fontSize,
+    descriptionFontSize,
+    spacing,
+    showSafeZone,
+    format,
+    overlay,
+    font,
+    logo,
+    ORIGINAL_HEIGHT,
+    ORIGINAL_WIDTH,
+    updateScale
+  ]);
+
+  useEffect(() => {
+    console.log('Canvas effect triggered with dependencies');
+    renderCanvas().catch(error => {
+      console.error('Error rendering canvas:', error);
     });
-  }, [text, description, backgroundColor, textAlign, descriptionAlign, textColor, fontSize, descriptionFontSize, spacing, showSafeZone, format, overlay, font, logo]);
+  }, [renderCanvas]);
 
   useEffect(() => {
     if (onEffectiveFontSizeChange) {
