@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from '@/components/ui/use-toast';
@@ -34,6 +35,7 @@ const Index = () => {
   const [format, setFormat] = useState<'post' | 'story'>('post');
   const [activeTab, setActiveTab] = useState('manual');
   const [isLoading, setIsLoading] = useState(false);
+  const [currentFont, setCurrentFont] = useState('');
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -43,9 +45,36 @@ const Index = () => {
     });
   }, []);
 
-  const handleColorSelect = (background: string, text: string) => {
+  const handleColorSelect = (background: string, text: string, overlay?: string, font?: string) => {
     setBackgroundColor(background);
     setTextColor(text);
+    
+    if (font) {
+      console.log("Font selezionato:", font);
+      const fontClass = document.documentElement.style;
+      
+      switch (font) {
+        case 'font-c64-system':
+          fontClass.setProperty('--font-family', '"Press Start 2P", cursive');
+          setCurrentFont('"Press Start 2P"');
+          break;
+        case 'font-c64-mono':
+          fontClass.setProperty('--font-family', '"Share Tech Mono", monospace');
+          setCurrentFont('"Share Tech Mono"');
+          break;
+        case 'font-c64-bold':
+          fontClass.setProperty('--font-family', 'VT323, monospace');
+          setCurrentFont('VT323');
+          break;
+        case 'font-c64-wide':
+          fontClass.setProperty('--font-family', 'Silkscreen, cursive');
+          setCurrentFont('Silkscreen');
+          break;
+        default:
+          fontClass.setProperty('--font-family', 'Inter, sans-serif');
+          setCurrentFont('Inter');
+      }
+    }
   };
 
   const handleTitleExtracted = (extractedTitle: string) => {
@@ -196,6 +225,7 @@ const Index = () => {
             showSafeZone={showSafeZone}
             format={format}
             onSpacingChange={setSpacing}
+            font={currentFont}
           />
           <div className="absolute top-3 right-3 flex gap-2">
             <MagicButton onMagicOptimization={handleMagicOptimization} disabled={isLoading} />
