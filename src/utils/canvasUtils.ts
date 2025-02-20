@@ -120,31 +120,35 @@ export function drawCredits(
 ) {
   const { ctx, width, height, fontFamily = 'Inter' } = context;
   
-  console.log('drawCredits called with:', { credits, textAlign, textColor, fontSize });
+  if (!credits?.trim()) return;
+
+  // Imposta un font size più piccolo per i credits
+  const creditsFontSize = Math.min(fontSize * 0.6, 32);
   
-  if (!credits?.trim()) {
-    console.log('Credits check failed:', { credits, trimmed: credits?.trim() });
-    return;
-  }
-
   ctx.save();
+  
+  // Area dei credits (zona in basso)
+  const areaHeight = creditsFontSize * 1.5;
+  const areaY = height - (SAFE_ZONE_MARGIN + areaHeight);
+  
+  // Debug area
   ctx.fillStyle = 'rgba(0, 0, 255, 0.1)';
-  const areaHeight = fontSize;
-  const areaY = height - (SAFE_ZONE_MARGIN * 1.5);
-  console.log('Drawing credits area at:', { areaY, areaHeight });
   ctx.fillRect(SAFE_ZONE_MARGIN, areaY, width - (2 * SAFE_ZONE_MARGIN), areaHeight);
-  ctx.restore();
-
-  ctx.font = `${fontSize}px ${fontFamily}`;
+  
+  // Imposta il font e lo stile
+  ctx.font = `${creditsFontSize}px ${fontFamily}`;
   ctx.fillStyle = textColor;
   ctx.textAlign = textAlign;
   ctx.textBaseline = 'middle';
 
-  const startY = areaY + (areaHeight / 2);
+  // Calcola la posizione X in base all'allineamento
   const x = textAlign === 'left' ? SAFE_ZONE_MARGIN : 
            textAlign === 'right' ? width - SAFE_ZONE_MARGIN : 
            width / 2;
 
-  console.log('Drawing credits text at:', { x, startY, text: credits });
+  // Disegna i credits
+  const startY = areaY + (areaHeight / 2);
   ctx.fillText(credits, x, startY);
+  
+  ctx.restore();
 }
