@@ -23,6 +23,7 @@ interface TextInputProps {
   onLoadingChange?: (loading: boolean) => void;
   otherText?: string;
   extractedContent?: string;
+  onContentExtracted?: (content: string) => void;
 }
 
 const TextInput: React.FC<TextInputProps> = ({ 
@@ -35,7 +36,8 @@ const TextInput: React.FC<TextInputProps> = ({
   label,
   disabled,
   otherText,
-  extractedContent
+  extractedContent,
+  onContentExtracted
 }) => {
   const isDescription = label.toLowerCase() === 'descrizione';
   const hasTitle = isDescription && otherText && otherText.trim().length > 0;
