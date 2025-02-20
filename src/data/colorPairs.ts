@@ -1,4 +1,3 @@
-
 import { ColorPresetPair } from "@/types/colorPresets";
 
 export const colorPairs: ColorPresetPair[] = [
@@ -69,7 +68,7 @@ export const colorPairs: ColorPresetPair[] = [
     text: "#E0AAFF",
     category: 'classic'
   },
-  // Temi Cosmici
+  // Temi Cosmici Esistenti
   {
     name: "Aurora Borealis",
     background: "linear-gradient(135deg, #8B5CF6 0%, #D946EF 100%)",
@@ -116,6 +115,43 @@ export const colorPairs: ColorPresetPair[] = [
     name: "Quantum Realm",
     background: "linear-gradient(135deg, #1A2980 0%, #26D0CE 100%)",
     text: "#FF1493",
+    category: 'cosmic'
+  },
+  // Nuovi Temi Cosmici
+  {
+    name: "Pulsar Symphony",
+    background: "linear-gradient(135deg, #590696 0%, #37B5B6 100%)",
+    text: "#FFE162",
+    category: 'cosmic'
+  },
+  {
+    name: "Dark Matter",
+    background: "linear-gradient(135deg, #0F172A 0%, #3B0764 100%)",
+    text: "#22D3EE",
+    category: 'cosmic'
+  },
+  {
+    name: "Stellar Nova",
+    background: "linear-gradient(135deg, #DC2626 0%, #7C3AED 100%)",
+    text: "#FBBF24",
+    category: 'cosmic'
+  },
+  {
+    name: "Cosmic Dust",
+    background: "linear-gradient(135deg, #4F46E5 0%, #EC4899 100%)",
+    text: "#A5F3FC",
+    category: 'cosmic'
+  },
+  {
+    name: "Astral Horizon",
+    background: "linear-gradient(135deg, #0369A1 0%, #4C1D95 100%)",
+    text: "#FDE68A",
+    category: 'cosmic'
+  },
+  {
+    name: "Interstellar Voyage",
+    background: "linear-gradient(135deg, #1D4ED8 0%, #4F46E5 100%)",
+    text: "#F472B6",
     category: 'cosmic'
   }
 ];
