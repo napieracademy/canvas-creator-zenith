@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ColorPresetsProps, ColorPresetPair } from '@/types/colorPresets';
@@ -132,7 +133,7 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
   return (
     <div className="space-y-4">
       <Tabs defaultValue="classic" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="classic" className="text-xs px-1">
             Classici
           </TabsTrigger>
@@ -141,6 +142,9 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
           </TabsTrigger>
           <TabsTrigger value="retro" className="text-xs px-1">
             C64
+          </TabsTrigger>
+          <TabsTrigger value="avengers" className="text-xs px-1">
+            Avengers
           </TabsTrigger>
           <TabsTrigger value="featured" className="text-xs px-1" disabled={!featuredImage}>
             Featured
@@ -154,6 +158,9 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
         </TabsContent>
         <TabsContent value="retro" className="mt-4">
           <ColorGrid colors={colorPairs.filter(pair => pair.category === 'retro')} />
+        </TabsContent>
+        <TabsContent value="avengers" className="mt-4">
+          <ColorGrid colors={colorPairs.filter(pair => pair.category === 'avengers')} />
         </TabsContent>
         <TabsContent value="featured" className="mt-4">
           {featuredImage && <ColorGrid colors={featuredTheme} />}
