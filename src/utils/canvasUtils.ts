@@ -122,13 +122,18 @@ export function drawCredits(
 ) {
   const { ctx, width, height, fontFamily = 'Inter' } = context;
   
-  if (!credits?.trim()) return;
+  console.log('Drawing credits:', credits); // Debug log
+  
+  if (!credits?.trim()) {
+    console.log('Credits are empty, returning'); // Debug log
+    return;
+  }
 
   // Disegna un rettangolo per visualizzare l'area dei credits
   ctx.save();
   ctx.fillStyle = 'rgba(0, 0, 255, 0.1)';
   const areaHeight = fontSize * 2;
-  const areaY = (height / 2) + (spacing / 2) + fontSize;
+  const areaY = height - SAFE_ZONE_MARGIN - areaHeight - 20; // Posiziona l'area più in basso
   ctx.fillRect(SAFE_ZONE_MARGIN, areaY, width - (2 * SAFE_ZONE_MARGIN), areaHeight);
   ctx.restore();
 
@@ -138,7 +143,7 @@ export function drawCredits(
   ctx.textAlign = textAlign;
   ctx.textBaseline = 'middle';
 
-  const startY = (height / 2) + (spacing / 2) + (fontSize * 1.5);
+  const startY = height - SAFE_ZONE_MARGIN - (fontSize * 0.5) - 20; // Posiziona il testo più in basso
   const x = textAlign === 'left' ? SAFE_ZONE_MARGIN : 
            textAlign === 'right' ? width - SAFE_ZONE_MARGIN : 
            width / 2;
