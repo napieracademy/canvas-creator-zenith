@@ -28,6 +28,7 @@ interface MainContentProps {
   currentFont: string;
   isLoading: boolean;
   credits: string;
+  viewMode: 'full' | 'fast';
   onEffectiveFontSizeChange: (size: number) => void;
   onShowSafeZoneChange: (show: boolean) => void;
   onSpacingChange: (spacing: number) => void;
@@ -57,6 +58,7 @@ const MainContent: React.FC<MainContentProps> = ({
   currentFont,
   isLoading,
   credits,
+  viewMode,
   onEffectiveFontSizeChange,
   onShowSafeZoneChange,
   onSpacingChange,
@@ -92,7 +94,7 @@ const MainContent: React.FC<MainContentProps> = ({
         />
         <div className="absolute top-3 right-3 flex items-center gap-2 p-2 rounded-lg bg-white/20 backdrop-blur-sm">
           <div className="flex items-center gap-2 ml-auto">
-            {/* Gruppo Formato */}
+            {/* Gruppo Formato - sempre visibile */}
             <div className="flex items-center gap-2">
               <TooltipProvider>
                 <Tooltip>
@@ -133,7 +135,7 @@ const MainContent: React.FC<MainContentProps> = ({
 
             <Separator orientation="vertical" className="h-8 bg-white/20" />
 
-            {/* Gruppo Importazione/Input */}
+            {/* Gruppo Importazione/Input - sempre visibile */}
             <div className="flex items-center gap-2">
               <UrlFetchControl
                 onTitleExtracted={onTitleExtracted}
@@ -142,36 +144,6 @@ const MainContent: React.FC<MainContentProps> = ({
                 onLoadingChange={onLoadingChange}
                 disabled={isLoading}
               />
-              <TextTranslateControl 
-                texts={{ title: text, description }}
-                onTranslate={({ title, description }) => {
-                  onTextChange(title);
-                  onDescriptionChange(description);
-                }}
-                disabled={isLoading}
-              />
-            </div>
-
-            <Separator orientation="vertical" className="h-8 bg-white/20" />
-
-            {/* Gruppo Layout */}
-            <div className="flex items-center gap-2">
-              <SpacingControl 
-                value={spacing} 
-                onChange={onSpacingChange} 
-                disabled={isLoading}
-              />
-              <SafeZoneToggle 
-                showSafeZone={showSafeZone}
-                onShowSafeZoneChange={onShowSafeZoneChange}
-                disabled={isLoading}
-              />
-            </div>
-
-            <Separator orientation="vertical" className="h-8 bg-white/20" />
-
-            {/* Gruppo Azioni */}
-            <div className="flex items-center gap-2">
               <SuperButton 
                 text={text}
                 description={description}
@@ -180,12 +152,50 @@ const MainContent: React.FC<MainContentProps> = ({
                 onMagicOptimization={onMagicOptimization}
                 disabled={isLoading}
               />
-              <MagicButton 
-                onMagicOptimization={onMagicOptimization} 
-                disabled={isLoading} 
-              />
               <DownloadButton onDownload={onDownload} />
             </div>
+
+            {viewMode === 'full' && (
+              <>
+                <Separator orientation="vertical" className="h-8 bg-white/20" />
+
+                {/* Funzionalità avanzate - visibili solo in modalità full */}
+                <div className="flex items-center gap-2 animate-fade-in">
+                  <TextTranslateControl 
+                    texts={{ title: text, description }}
+                    onTranslate={({ title, description }) => {
+                      onTextChange(title);
+                      onDescriptionChange(description);
+                    }}
+                    disabled={isLoading}
+                  />
+                </div>
+
+                <Separator orientation="vertical" className="h-8 bg-white/20" />
+
+                <div className="flex items-center gap-2 animate-fade-in">
+                  <SpacingControl 
+                    value={spacing} 
+                    onChange={onSpacingChange} 
+                    disabled={isLoading}
+                  />
+                  <SafeZoneToggle 
+                    showSafeZone={showSafeZone}
+                    onShowSafeZoneChange={onShowSafeZoneChange}
+                    disabled={isLoading}
+                  />
+                </div>
+
+                <Separator orientation="vertical" className="h-8 bg-white/20" />
+
+                <div className="flex items-center gap-2 animate-fade-in">
+                  <MagicButton 
+                    onMagicOptimization={onMagicOptimization} 
+                    disabled={isLoading} 
+                  />
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
