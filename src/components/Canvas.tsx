@@ -95,21 +95,21 @@ const Canvas: React.FC<CanvasProps> = ({
             drawSafeZone(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
           }
 
-          // Draw credits above title
+          drawText(context, text, textAlign, textColor, fontSize, 'title', spacing);
+          if (description) {
+            drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', spacing);
+          }
+
+          // Draw credits at the bottom
           if (credits) {
             ctx.font = `12px ${fontFamily}`;
             ctx.fillStyle = textColor;
             ctx.textAlign = textAlign;
-            const creditsY = (ORIGINAL_HEIGHT / 2) - (spacing / 2) - fontSize * 1.2 - 20;
+            const creditsY = ORIGINAL_HEIGHT - SAFE_ZONE_MARGIN - 20;
             const x = textAlign === 'left' ? SAFE_ZONE_MARGIN : 
                      textAlign === 'right' ? ORIGINAL_WIDTH - SAFE_ZONE_MARGIN : 
                      ORIGINAL_WIDTH / 2;
             ctx.fillText(credits, x, creditsY);
-          }
-
-          drawText(context, text, textAlign, textColor, fontSize, 'title', spacing);
-          if (description) {
-            drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', spacing);
           }
         };
         img.src = backgroundColor.slice(4, -1);
@@ -131,21 +131,21 @@ const Canvas: React.FC<CanvasProps> = ({
           drawSafeZone(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
         }
 
-        // Draw credits above title
+        drawText(context, text, textAlign, textColor, fontSize, 'title', spacing);
+        if (description) {
+          drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', spacing);
+        }
+
+        // Draw credits at the bottom
         if (credits) {
           ctx.font = `12px ${fontFamily}`;
           ctx.fillStyle = textColor;
           ctx.textAlign = textAlign;
-          const creditsY = (ORIGINAL_HEIGHT / 2) - (spacing / 2) - fontSize * 1.2 - 20;
+          const creditsY = ORIGINAL_HEIGHT - SAFE_ZONE_MARGIN - 20;
           const x = textAlign === 'left' ? SAFE_ZONE_MARGIN : 
                    textAlign === 'right' ? ORIGINAL_WIDTH - SAFE_ZONE_MARGIN : 
                    ORIGINAL_WIDTH / 2;
           ctx.fillText(credits, x, creditsY);
-        }
-
-        drawText(context, text, textAlign, textColor, fontSize, 'title', spacing);
-        if (description) {
-          drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', spacing);
         }
       }
     });
