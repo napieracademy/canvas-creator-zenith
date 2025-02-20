@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Sparkles } from 'lucide-react';
+import { MagicWand } from 'lucide-react';
 import { Button } from '../ui/button';
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -67,7 +67,7 @@ const DescriptionGenerateControl: React.FC<DescriptionGenerateControlProps> = ({
             onClick={handleGenerateDescription}
             disabled={disabled || isGenerating}
           >
-            <Sparkles className={`h-4 w-4 ${isGenerating ? 'animate-spin' : ''}`} />
+            <MagicWand className={`h-4 w-4 ${isGenerating ? 'animate-spin' : ''}`} />
           </Button>
         </TooltipTrigger>
         <TooltipContent>
