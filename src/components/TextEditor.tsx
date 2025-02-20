@@ -70,23 +70,26 @@ const TextEditor: React.FC<TextEditorProps> = ({
         const parts = credits.split(' · ');
         if (parts.length > 0) {
           setAuthorName(parts[0]);
+          if (onCreditsExtracted) {
+            onCreditsExtracted(`${parts[0]} | ${OUTLET_NAME}`);
+          }
         }
       }
     };
 
-    // Registra un listener per gli eventi di estrazione dei credits
-    const handleCreditsExtraction = (event: CustomEvent) => {
-      if (event.detail?.credits) {
-        updateFromCredits(event.detail.credits);
+    const handleExtraction = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      if (customEvent.detail?.credits) {
+        updateFromCredits(customEvent.detail.credits);
       }
     };
 
-    window.addEventListener('creditsExtracted' as any, handleCreditsExtraction);
+    document.addEventListener('creditsExtracted', handleExtraction as EventListener);
 
     return () => {
-      window.removeEventListener('creditsExtracted' as any, handleCreditsExtraction);
+      document.removeEventListener('creditsExtracted', handleExtraction as EventListener);
     };
-  }, []);
+  }, [onCreditsExtracted]);
 
   return (
     <div className="space-y-4">

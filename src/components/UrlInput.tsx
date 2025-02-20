@@ -86,6 +86,13 @@ const UrlInput: React.FC<UrlInputProps> = ({
             });
             extracted = true;
           }
+          if (result.credits) {
+            // Emettiamo l'evento credits
+            const creditsEvent = new CustomEvent('creditsExtracted', {
+              detail: { credits: result.credits }
+            });
+            document.dispatchEvent(creditsEvent);
+          }
 
           if (extracted) {
             toast({
