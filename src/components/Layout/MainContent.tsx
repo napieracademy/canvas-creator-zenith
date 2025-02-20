@@ -6,6 +6,7 @@ import SafeZoneToggle from '@/components/SafeZoneToggle';
 import DownloadButton from '@/components/DownloadButton';
 import TextTranslateControl from '@/components/TextControls/TextTranslateControl';
 import SpacingControl from '@/components/SpacingControl';
+import UrlFetchControl from '@/components/TextControls/UrlFetchControl';
 
 interface MainContentProps {
   text: string;
@@ -29,6 +30,10 @@ interface MainContentProps {
   onDownload: () => void;
   onTextChange: (text: string) => void;
   onDescriptionChange: (description: string) => void;
+  onTitleExtracted: (title: string) => void;
+  onDescriptionExtracted: (description: string) => void;
+  onTabChange: (value: string) => void;
+  onLoadingChange: (loading: boolean) => void;
 }
 
 const MainContent: React.FC<MainContentProps> = ({
@@ -52,7 +57,11 @@ const MainContent: React.FC<MainContentProps> = ({
   onMagicOptimization,
   onDownload,
   onTextChange,
-  onDescriptionChange
+  onDescriptionChange,
+  onTitleExtracted,
+  onDescriptionExtracted,
+  onTabChange,
+  onLoadingChange
 }) => {
   const handleTranslate = ({ title, description }: { title: string; description: string }) => {
     onTextChange(title);
@@ -80,6 +89,13 @@ const MainContent: React.FC<MainContentProps> = ({
           credits={credits}
         />
         <div className="absolute top-3 right-3 flex gap-2">
+          <UrlFetchControl
+            onTitleExtracted={onTitleExtracted}
+            onDescriptionExtracted={onDescriptionExtracted}
+            onTabChange={onTabChange}
+            onLoadingChange={onLoadingChange}
+            disabled={isLoading}
+          />
           <TextTranslateControl 
             texts={{ title: text, description }}
             onTranslate={handleTranslate}
