@@ -22,13 +22,14 @@ const Canvas: React.FC<CanvasProps> = ({
   showSafeZone = false,
   format = 'post',
   overlay,
-  font
+  font,
+  onFontSizeChange,
+  onDescriptionFontSizeChange,
+  onSpacingChange,
+  onEffectiveFontSizeChange
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [localSpacing] = useState(spacing);
-  const [localFontSize] = useState(fontSize);
-  const [localDescFontSize] = useState(descriptionFontSize);
   
   const ORIGINAL_WIDTH = 1080;
   const ORIGINAL_HEIGHT = format === 'post' ? 1350 : 1920;
@@ -93,9 +94,9 @@ const Canvas: React.FC<CanvasProps> = ({
             drawSafeZone(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
           }
 
-          drawText(context, text, textAlign, textColor, localFontSize, 'title', localSpacing);
+          drawText(context, text, textAlign, textColor, fontSize, 'title', spacing);
           if (description) {
-            drawText(context, description, descriptionAlign, textColor, localDescFontSize, 'description', localSpacing);
+            drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', spacing);
           }
         };
         img.src = backgroundColor.slice(4, -1);
@@ -117,13 +118,20 @@ const Canvas: React.FC<CanvasProps> = ({
           drawSafeZone(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
         }
 
-        drawText(context, text, textAlign, textColor, localFontSize, 'title', localSpacing);
+        drawText(context, text, textAlign, textColor, fontSize, 'title', spacing);
         if (description) {
-          drawText(context, description, descriptionAlign, textColor, localDescFontSize, 'description', localSpacing);
+          drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', spacing);
         }
       }
     });
-  }, [text, description, backgroundColor, textAlign, descriptionAlign, textColor, localFontSize, localDescFontSize, localSpacing, showSafeZone, format, overlay, font]);
+  }, [text, description, backgroundColor, textAlign, descriptionAlign, textColor, fontSize, descriptionFontSize, spacing, showSafeZone, format, overlay, font]);
+
+  // Effetto per aggiornare il font size effettivo quando cambia il font size
+  useEffect(() => {
+    if (onEffectiveFontSizeChange) {
+      onEffectiveFontSizeChange(fontSize);
+    }
+  }, [fontSize, onEffectiveFontSizeChange]);
 
   return (
     <div className="flex flex-col w-full h-full">
