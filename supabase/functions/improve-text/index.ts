@@ -102,6 +102,10 @@ serve(async (req) => {
 
     // Ora procediamo con il miglioramento del testo
     let systemPrompt = `Sei un esperto copywriter e content strategist che scrive in ${LANGUAGE_NAMES[targetLanguage]} con un tono professionale e coinvolgente. `;
+
+    const lengthInstruction = length === 'shorter' ? 'più breve dell\'originale' : 
+                            length === 'longer' ? 'più lungo dell\'originale' : 
+                            'simile all\'originale';
     
     if (type === 'title') {
       systemPrompt += `
@@ -109,7 +113,7 @@ serve(async (req) => {
         1. Mantieni il messaggio chiave e l'essenza del contenuto
         2. Usa un linguaggio preciso e d'impatto
         3. Evita cliché e frasi fatte
-        4. Mantieni una lunghezza appropriata al contesto
+        4. Mantieni una lunghezza ${lengthInstruction}
         5. Assicurati che il tono sia appropriato per il pubblico target
         
         Il titolo deve essere memorabile e professionale, evitando sensazionalismi o esagerazioni.
@@ -120,7 +124,7 @@ serve(async (req) => {
         1. Mantieni il focus sui dettagli distintivi e specifici
         2. Usa un linguaggio chiaro e professionale
         3. Struttura il testo in modo logico e scorrevole
-        4. Adatta la lunghezza in base al contesto e al tipo di contenuto
+        4. Mantieni una lunghezza ${lengthInstruction}
         5. Assicurati che ogni frase aggiunga valore al messaggio complessivo
         
         La descrizione deve essere informativa e coinvolgente, evitando luoghi comuni e call-to-action generiche.
@@ -144,7 +148,7 @@ serve(async (req) => {
               Testo da migliorare: ${textToImprove}
               
               Migliora questo testo mantenendo il significato originale ma rendendolo più efficace e naturale nella lingua di destinazione.
-              Lunghezza desiderata: ${length === 'shorter' ? 'più breve dell\'originale' : length === 'longer' ? 'più lungo dell\'originale' : 'simile all\'originale'}
+              La lunghezza deve essere ${lengthInstruction}.
             `
           }
         ],
