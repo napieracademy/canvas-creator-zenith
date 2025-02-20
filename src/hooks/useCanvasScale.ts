@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 export function useCanvasScale(
   canvasRef: React.RefObject<HTMLCanvasElement>,
@@ -7,66 +7,65 @@ export function useCanvasScale(
   originalHeight: number
 ) {
   const [scale, setScale] = useState(100);
+  const rafId = useRef<number>();
+  const resizeTimeoutId = useRef<NodeJS.Timeout>();
 
   const updateScale = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const container = canvas.parentElement;
-    if (container) {
-      const containerWidth = container.clientWidth;
-      const containerHeight = container.clientHeight;
-      const scaleFactor = Math.min(
-        containerWidth / originalWidth,
-        containerHeight / originalHeight
-      );
-      setScale(Math.round(scaleFactor * 100));
-    }
+    if (!container) return;
+
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
+    const scaleFactor = Math.min(
+      containerWidth / originalWidth,
+      containerHeight / originalHeight
+    );
+    setScale(Math.round(scaleFactor * 100));
   }, [canvasRef, originalWidth, originalHeight]);
 
   useEffect(() => {
-    let timeoutId: number;
-    let animationFrameId: number;
-
-    // Create a ResizeObserver instance with debounced update
-    const resizeObserver = new ResizeObserver((entries) => {
+    // Create a more efficient resize observer with throttling
+    const resizeObserver = new ResizeObserver(() => {
       // Clear any existing timeout
-      if (timeoutId) {
-        window.clearTimeout(timeoutId);
-      }
-      
-      // Clear any existing animation frame
-      if (animationFrameId) {
-        window.cancelAnimationFrame(animationFrameId);
+      if (resizeTimeoutId.current) {
+        clearTimeout(resizeTimeoutId.current);
       }
 
-      // Debounce the update using both setTimeout and requestAnimationFrame
-      timeoutId = window.setTimeout(() => {
-        animationFrameId = window.requestAnimationFrame(() => {
+      // Clear any existing animation frame
+      if (rafId.current) {
+        cancelAnimationFrame(rafId.current);
+      }
+
+      // Throttle updates to prevent excessive calculations
+      resizeTimeoutId.current = setTimeout(() => {
+        rafId.current = requestAnimationFrame(() => {
           updateScale();
         });
-      }, 100); // 100ms debounce time
+      }, 150); // Increased throttle time to 150ms
     });
 
-    // Observe the canvas parent element
+    // Observe the canvas container
     const canvas = canvasRef.current;
-    if (canvas && canvas.parentElement) {
+    if (canvas?.parentElement) {
       resizeObserver.observe(canvas.parentElement);
     }
 
-    // Initial update with RAF to ensure smooth initial render
-    animationFrameId = window.requestAnimationFrame(() => {
-      updateScale();
-    });
-    
-    // Cleanup
+    // Initial scale calculation
+    rafId.current = requestAnimationFrame(updateScale);
+
+    // Cleanup function
     return () => {
       resizeObserver.disconnect();
-      if (timeoutId) {
-        window.clearTimeout(timeoutId);
+      
+      if (resizeTimeoutId.current) {
+        clearTimeout(resizeTimeoutId.current);
       }
-      if (animationFrameId) {
-        window.cancelAnimationFrame(animationFrameId);
+      
+      if (rafId.current) {
+        cancelAnimationFrame(rafId.current);
       }
     };
   }, [updateScale]);
