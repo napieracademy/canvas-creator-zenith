@@ -63,6 +63,31 @@ const TextEditor: React.FC<TextEditorProps> = ({
     }
   };
 
+  // Funzione per aggiornare l'autore quando viene estratto dall'articolo
+  React.useEffect(() => {
+    const updateFromCredits = (credits: string) => {
+      if (credits) {
+        const parts = credits.split(' · ');
+        if (parts.length > 0) {
+          setAuthorName(parts[0]);
+        }
+      }
+    };
+
+    // Registra un listener per gli eventi di estrazione dei credits
+    const handleCreditsExtraction = (event: CustomEvent) => {
+      if (event.detail?.credits) {
+        updateFromCredits(event.detail.credits);
+      }
+    };
+
+    window.addEventListener('creditsExtracted' as any, handleCreditsExtraction);
+
+    return () => {
+      window.removeEventListener('creditsExtracted' as any, handleCreditsExtraction);
+    };
+  }, []);
+
   return (
     <div className="space-y-4">
       <div className="space-y-6">
