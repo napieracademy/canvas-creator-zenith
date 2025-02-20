@@ -38,8 +38,14 @@ const CanvasPreview: React.FC<CanvasPreviewProps> = ({
   font
 }) => {
   return (
-    <div className="preview-container">
-      <div className="canvas-wrapper" style={{ aspectRatio: format === 'post' ? '1080/1350' : '1080/1920' }}>
+    <div className="preview-container w-full h-full flex items-center justify-center">
+      <div 
+        className="canvas-wrapper relative w-full h-full max-h-[calc(100vh-120px)] flex items-center justify-center"
+        style={{ 
+          aspectRatio: format === 'post' ? '1080/1350' : '1080/1920',
+          maxWidth: format === 'post' ? 'calc((100vh - 120px) * 0.8)' : 'calc((100vh - 120px) * 0.5625)'
+        }}
+      >
         <Canvas
           text={text}
           description={description}
