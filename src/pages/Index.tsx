@@ -38,6 +38,7 @@ const IndexPage = () => {
   const [credits, setCredits] = useState('');
   const [viewMode, setViewMode] = useState<'full' | 'fast'>('full');
   const [extractedContent, setExtractedContent] = useState('');
+  const [logo, setLogo] = useState('/placeholder.svg'); // Aggiungiamo lo stato per il logo
 
   useEffect(() => {
     toast({
@@ -171,6 +172,7 @@ const IndexPage = () => {
           isLoading={isLoading}
           credits={credits}
           viewMode={viewMode}
+          logo={logo} // Aggiungiamo la prop logo
           onEffectiveFontSizeChange={setEffectiveFontSize}
           onShowSafeZoneChange={setShowSafeZone}
           onSpacingChange={setSpacing}
