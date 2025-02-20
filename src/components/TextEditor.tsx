@@ -1,4 +1,3 @@
-
 import React from 'react';
 import TextInput from '@/components/TextInput';
 import SpacingControl from '@/components/SpacingControl';
@@ -53,7 +52,6 @@ const TextEditor: React.FC<TextEditorProps> = ({
 }) => {
   const [credits, setCredits] = React.useState("");
 
-  // Funzione per formattare i credits con le iniziali maiuscole
   const formatCredits = (text: string): string => {
     return text
       .split(' · ')
@@ -62,10 +60,8 @@ const TextEditor: React.FC<TextEditorProps> = ({
           .split(' ')
           .map(word => {
             if (word === word.toUpperCase() && word.length > 1) {
-              // Se la parola è tutta in maiuscolo, converti in Title Case
               return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
             }
-            // Altrimenti, rendi maiuscola solo la prima lettera
             return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
           })
           .join(' ')
@@ -73,12 +69,13 @@ const TextEditor: React.FC<TextEditorProps> = ({
       .join(' · ');
   };
 
-  // Funzione per aggiornare i credits quando viene estratto dall'articolo
   React.useEffect(() => {
     const handleExtraction = (event: Event) => {
       const customEvent = event as CustomEvent;
       if (customEvent.detail?.credits) {
+        console.log('Credits extraction event received:', customEvent.detail.credits); // Debug log
         const formattedCredits = formatCredits(customEvent.detail.credits);
+        console.log('Formatted credits:', formattedCredits); // Debug log
         setCredits(formattedCredits);
         if (onCreditsExtracted) {
           onCreditsExtracted(formattedCredits);
@@ -95,6 +92,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
 
   const handleCreditsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newCredits = formatCredits(e.target.value);
+    console.log('Credits changed:', newCredits); // Debug log
     setCredits(newCredits);
     if (onCreditsExtracted) {
       onCreditsExtracted(newCredits);
