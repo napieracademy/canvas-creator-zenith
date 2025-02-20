@@ -23,6 +23,7 @@ interface TextInputProps {
   onDescriptionExtracted?: (description: string) => void;
   onTabChange?: (value: string) => void;
   onLoadingChange?: (loading: boolean) => void;
+  otherText?: string;
 }
 
 const TextInput: React.FC<TextInputProps> = ({ 
@@ -37,7 +38,8 @@ const TextInput: React.FC<TextInputProps> = ({
   onTitleExtracted,
   onDescriptionExtracted,
   onTabChange,
-  onLoadingChange
+  onLoadingChange,
+  otherText
 }) => {
   const showFetchControl = label === "Titolo" && onTitleExtracted && onDescriptionExtracted;
 
@@ -82,7 +84,8 @@ const TextInput: React.FC<TextInputProps> = ({
             value={value} 
             onChange={onChange} 
             label={label} 
-            disabled={disabled} 
+            disabled={disabled}
+            otherText={otherText}
           />
         </div>
       </div>

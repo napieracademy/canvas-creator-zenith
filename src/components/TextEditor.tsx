@@ -2,7 +2,6 @@
 import React from 'react';
 import TextInput from '@/components/TextInput';
 import SpacingControl from '@/components/SpacingControl';
-import UrlInput from '@/components/UrlInput';
 
 interface TextEditorProps {
   text: string;
@@ -63,6 +62,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
           onDescriptionExtracted={onDescriptionExtracted}
           onTabChange={onTabChange}
           onLoadingChange={onLoadingChange}
+          otherText={description}
         />
         
         {description && (
@@ -82,6 +82,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
           onFontSizeChange={onDescriptionFontSizeChange}
           label="Descrizione"
           disabled={disabled}
+          otherText={text}
         />
       </div>
     </div>
