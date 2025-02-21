@@ -7,78 +7,88 @@ export function useCanvasScale(
   originalHeight: number
 ) {
   const [scale, setScale] = useState(100);
-  const rafId = useRef<number>();
-  const resizeTimeoutId = useRef<NodeJS.Timeout>();
+  const isUpdating = useRef(false);
   const observer = useRef<ResizeObserver | null>(null);
+  const timeoutId = useRef<NodeJS.Timeout>();
+  
+  const calculateScale = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas?.parentElement) return;
+
+    const container = canvas.parentElement;
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
+
+    if (containerWidth === 0 || containerHeight === 0) return;
+
+    const scaleFactor = Math.min(
+      containerWidth / originalWidth,
+      containerHeight / originalHeight
+    );
+    
+    const newScale = Math.round(scaleFactor * 100);
+    
+    // Evita aggiornamenti non necessari
+    if (newScale !== scale) {
+      setScale(newScale);
+    }
+  }, [canvasRef, originalWidth, originalHeight, scale]);
 
   const updateScale = useCallback(() => {
-    if (rafId.current) {
-      cancelAnimationFrame(rafId.current);
-    }
-
-    rafId.current = requestAnimationFrame(() => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-
-      const container = canvas.parentElement;
-      if (!container) return;
-
-      const containerWidth = container.clientWidth;
-      const containerHeight = container.clientHeight;
-      const scaleFactor = Math.min(
-        containerWidth / originalWidth,
-        containerHeight / originalHeight
-      );
-      
-      setScale(Math.round(scaleFactor * 100));
+    if (isUpdating.current) return;
+    
+    isUpdating.current = true;
+    
+    // Usa requestAnimationFrame per sincronizzarsi con il browser
+    requestAnimationFrame(() => {
+      calculateScale();
+      isUpdating.current = false;
     });
-  }, [canvasRef, originalWidth, originalHeight]);
+  }, [calculateScale]);
 
   useEffect(() => {
-    // Cleanup previous observer if it exists
-    if (observer.current) {
-      observer.current.disconnect();
-    }
+    // Cleanup function per la pulizia delle risorse
+    const cleanup = () => {
+      if (observer.current) {
+        observer.current.disconnect();
+        observer.current = null;
+      }
+      if (timeoutId.current) {
+        clearTimeout(timeoutId.current);
+      }
+      isUpdating.current = false;
+    };
 
-    // Create a new observer with debouncing
+    // Crea un nuovo observer con debouncing migliorato
     observer.current = new ResizeObserver((entries) => {
-      // Clear any existing timeout
-      if (resizeTimeoutId.current) {
-        clearTimeout(resizeTimeoutId.current);
+      // Ignora le notifiche se non ci sono entries valide
+      if (!entries.length) return;
+      
+      // Pulisci il timeout precedente se esiste
+      if (timeoutId.current) {
+        clearTimeout(timeoutId.current);
       }
 
-      // Debounce the resize updates
-      resizeTimeoutId.current = setTimeout(() => {
-        if (!entries.length) return;
-        
-        updateScale();
-      }, 250); // Increased debounce time to 250ms
+      // Usa un debounce con timeout più lungo per ridurre gli aggiornamenti
+      timeoutId.current = setTimeout(() => {
+        if (!isUpdating.current) {
+          updateScale();
+        }
+      }, 150); // Aumentato a 150ms per ridurre la frequenza degli aggiornamenti
     });
 
-    // Start observing
+    // Osserva il container del canvas
     const canvas = canvasRef.current;
     if (canvas?.parentElement) {
       observer.current.observe(canvas.parentElement);
+      
+      // Calcolo iniziale della scala
+      updateScale();
     }
 
-    // Initial scale calculation with RAF
-    rafId.current = requestAnimationFrame(updateScale);
-
-    // Cleanup
-    return () => {
-      if (observer.current) {
-        observer.current.disconnect();
-      }
-      
-      if (resizeTimeoutId.current) {
-        clearTimeout(resizeTimeoutId.current);
-      }
-      
-      if (rafId.current) {
-        cancelAnimationFrame(rafId.current);
-      }
-    };
-  }, [updateScale]);
+    // Cleanup quando il componente viene smontato
+    return cleanup;
+  }, [canvasRef, updateScale]);
 
   return { scale, updateScale };
 }
