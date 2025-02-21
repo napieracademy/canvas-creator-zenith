@@ -136,6 +136,9 @@ const ExtractedContent = () => {
           Torna indietro
         </Button>
         <div className="flex gap-2">
+          <Button variant="outline" onClick={() => navigate('/saved-content')}>
+            Visualizza Contenuti Salvati
+          </Button>
           <Button variant="outline" onClick={handleExportCSV}>
             Esporta CSV
           </Button>
