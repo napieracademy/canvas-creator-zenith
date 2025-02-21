@@ -1,10 +1,10 @@
-
 interface MetadataResult {
   success: boolean;
   title?: string;
   description?: string;
   credits?: string;
   content?: string;
+  image?: string;
   error?: string;
   extractionDate?: string;
   url?: string;
@@ -65,6 +65,13 @@ export class MetaService {
         doc.querySelector('meta[property="og:description"]')?.getAttribute('content') ||
         doc.querySelector('meta[name="description"]')?.getAttribute('content') || '';
       console.log('📝 [MetaService] Descrizione estratta:', description);
+
+      // Estrazione immagine
+      const image = 
+        doc.querySelector('meta[property="og:image"]')?.getAttribute('content') ||
+        doc.querySelector('meta[property="twitter:image"]')?.getAttribute('content') ||
+        doc.querySelector('link[rel="image_src"]')?.getAttribute('href') || '';
+      console.log('🖼️ [MetaService] Immagine estratta:', image);
 
       // Estrazione autore e publisher
       const author = 
@@ -163,6 +170,7 @@ export class MetaService {
         description: description.trim(),
         credits: credits,
         content: cleanContent,
+        image: image,
         extractionDate: new Date().toISOString(),
         url: url
       };
