@@ -1,4 +1,3 @@
-
 interface MetadataResult {
   success: boolean;
   title?: string;
@@ -9,6 +8,8 @@ interface MetadataResult {
   error?: string;
   extractionDate?: string;
   url?: string;
+  publicationDate?: string;
+  modificationDate?: string;
 }
 
 export class MetaService {
@@ -54,6 +55,24 @@ export class MetaService {
       const text = await response.text();
       const parser = new DOMParser();
       const doc = parser.parseFromString(text, 'text/html');
+
+      // Estrazione date di pubblicazione e modifica
+      const publicationDate = 
+        doc.querySelector('meta[property="article:published_time"]')?.getAttribute('content') ||
+        doc.querySelector('meta[property="og:article:published_time"]')?.getAttribute('content') ||
+        doc.querySelector('meta[property="publication_date"]')?.getAttribute('content') ||
+        doc.querySelector('time[pubdate]')?.getAttribute('datetime') ||
+        doc.querySelector('.published-date')?.getAttribute('datetime') ||
+        doc.querySelector('time[class*="publish"]')?.getAttribute('datetime');
+
+      const modificationDate = 
+        doc.querySelector('meta[property="article:modified_time"]')?.getAttribute('content') ||
+        doc.querySelector('meta[property="og:article:modified_time"]')?.getAttribute('content') ||
+        doc.querySelector('meta[property="last-modified"]')?.getAttribute('content') ||
+        doc.querySelector('time[class*="modified"]')?.getAttribute('datetime');
+
+      console.log('📅 [MetaService] Data pubblicazione:', publicationDate);
+      console.log('📅 [MetaService] Data modifica:', modificationDate);
 
       // Estrazione titolo
       const title = 
@@ -200,7 +219,9 @@ export class MetaService {
         content: cleanContent,
         image: image,
         extractionDate: new Date().toISOString(),
-        url: url
+        url: url,
+        publicationDate: publicationDate || undefined,
+        modificationDate: modificationDate || undefined
       };
 
       console.log('✅ [MetaService] Estrazione completata con successo', result);
@@ -213,5 +234,29 @@ export class MetaService {
         error: error instanceof Error ? error.message : 'Errore durante l\'estrazione dei metadati'
       };
     }
+  }
+
+  static shouldAllowDuplicate(existingContent: any, newMetadata: MetadataResult): boolean {
+    // Se non abbiamo date di riferimento, non permettiamo la duplicazione
+    if (!existingContent.publication_date && !existingContent.modification_date) {
+      return false;
+    }
+
+    // Se abbiamo una nuova data di modifica, confrontiamola
+    if (newMetadata.modificationDate && existingContent.modification_date) {
+      const existingDate = new Date(existingContent.modification_date);
+      const newDate = new Date(newMetadata.modificationDate);
+      return newDate > existingDate;
+    }
+
+    // Se abbiamo solo la data di pubblicazione, confrontiamola
+    if (newMetadata.publicationDate && existingContent.publication_date) {
+      const existingDate = new Date(existingContent.publication_date);
+      const newDate = new Date(newMetadata.publicationDate);
+      return newDate > existingDate;
+    }
+
+    // Se non possiamo fare confronti validi, non permettiamo la duplicazione
+    return false;
   }
 }

@@ -76,34 +76,41 @@ const UrlInput: React.FC<UrlInputProps> = ({
     credits?: string;
     image_url?: string;
     extraction_date?: string;
+    publication_date?: string;
+    modification_date?: string;
   }) => {
     try {
       // Verifica se esiste già un contenuto con lo stesso URL
       const existingContent = await checkExistingContent(data.url);
 
       if (existingContent) {
-        console.log('🔄 [UrlInput] Contenuto esistente trovato, verifica aggiornamento immagine');
+        console.log('🔄 [UrlInput] Contenuto esistente trovato, verifica date di modifica');
         
-        // Se il contenuto esiste ma non ha un'immagine e noi ne abbiamo una nuova
-        if (!existingContent.image_url && data.image_url) {
-          console.log('🖼️ [UrlInput] Aggiornamento immagine per contenuto esistente');
+        const result = await MetaService.extractMetadata(data.url);
+        
+        if (result.success && MetaService.shouldAllowDuplicate(existingContent, result)) {
+          console.log('📅 [UrlInput] Contenuto modificato, procedo con il salvataggio');
+          
           const { error } = await supabase
             .from('extracted_content')
-            .update({ image_url: data.image_url })
-            .eq('url', data.url);
+            .insert([{
+              ...data,
+              publication_date: result.publicationDate,
+              modification_date: result.modificationDate
+            }]);
 
           if (error) throw error;
           
           toast({
-            title: "Immagine aggiornata",
-            description: "L'immagine è stata aggiunta al contenuto esistente",
+            title: "Contenuto aggiornato",
+            description: "È stata trovata una versione più recente del contenuto",
           });
           return true;
         }
 
         toast({
           title: "Contenuto già presente",
-          description: "Questo URL è già stato salvato nel database",
+          description: "Questo URL è già stato salvato e non ci sono modifiche",
         });
         return false;
       }
