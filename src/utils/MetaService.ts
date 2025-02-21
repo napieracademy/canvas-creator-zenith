@@ -51,7 +51,32 @@ export class MetaService {
         doc.querySelector('meta[name="publisher"]')?.getAttribute('content') || 
         new URL(url).hostname.replace('www.', '');
 
-      // Estrazione contenuto principale
+      // Selettori da rimuovere, aggiornati per includere elementi specifici
+      const unwantedSelectors = [
+        // Elementi di base
+        'script', 'style', 'iframe', 'nav', 'header', 'footer', 'aside',
+        'form', '.social', '.share', '.comments', '.related', '.sidebar',
+        '.advertisement', '.newsletter', '.subscription',
+        
+        // Menu e navigazione
+        '.tabs-nav', '[data-mrf-recirculation]', '.overtitle-art-logo',
+        '.title-art-hp', '.nav-section', '.menu-section',
+        
+        // Link correlati e evidenza
+        '[data-type="related"]', '[data-type="highlights"]',
+        '[data-mrf-recirculation="In Evidenza"]',
+        '.related-articles', '.highlighted-content',
+        
+        // Altri elementi di navigazione
+        '.breadcrumbs', '.pagination', '.article-navigation',
+        '.article-footer', '.article-header', '.article-meta',
+        
+        // Elementi specifici del sito
+        '.has-text-black', '#article-navigation',
+        '.is-pastone', '.is-small-medium'
+      ];
+
+      // Cerca il contenuto principale
       const mainContentSelectors = [
         'article',
         '[role="main"]',
@@ -79,12 +104,6 @@ export class MetaService {
         mainElement = doc.body;
       }
 
-      const unwantedSelectors = [
-        'script', 'style', 'iframe', 'nav', 'header', 'footer', 'aside',
-        'form', '.social', '.share', '.comments', '.related', '.sidebar',
-        '.advertisement', '.newsletter', '.subscription'
-      ];
-
       const clone = mainElement.cloneNode(true) as HTMLElement;
 
       // Rimuovi elementi non desiderati
@@ -93,11 +112,35 @@ export class MetaService {
         elements.forEach(el => el.remove());
       });
 
+      // Rimuovi specificamente elementi con data-mrf-recirculation="In Evidenza"
+      const evidenzaElements = clone.querySelectorAll('[data-mrf-recirculation="In Evidenza"]');
+      evidenzaElements.forEach(el => el.remove());
+
+      // Rimuovi elementi con classi specifiche
+      const classesToRemove = ['tabs-nav', 'overtitle-art-logo', 'title-art-hp'];
+      classesToRemove.forEach(className => {
+        const elements = clone.getElementsByClassName(className);
+        while (elements.length > 0) {
+          elements[0].remove();
+        }
+      });
+
       // Estrai solo i paragrafi con contenuto significativo
       const paragraphs = Array.from(clone.querySelectorAll('p'))
         .map(p => p.textContent?.trim())
         .filter(text => text && text.length > 20)  // Filtra paragrafi troppo corti
-        .filter(text => !text.match(/^(cookie|privacy|copyright|share|follow|subscribe)/i));  // Filtra testo non rilevante
+        .filter(text => {
+          // Filtra elementi non desiderati
+          const unwantedPatterns = [
+            /^in evidenza$/i,
+            /^ultime notizie$/i,
+            /^leggi anche$/i,
+            /^potrebbe interessarti$/i,
+            /^correlati$/i,
+            /^articoli correlati$/i
+          ];
+          return !unwantedPatterns.some(pattern => pattern.test(text || ''));
+        });
 
       const cleanContent = paragraphs.join('\n\n');
       console.log('📄 [MetaService] Contenuto pulito estratto');
