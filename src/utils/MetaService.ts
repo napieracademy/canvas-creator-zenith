@@ -1,4 +1,3 @@
-
 import { MetadataResult } from './metadata/types';
 import { extractDates } from './metadata/dateUtils';
 import { parseMetadata } from './metadata/parserUtils';
@@ -184,5 +183,13 @@ export class MetaService {
     }
 
     return false;
+  }
+
+  // Aggiungiamo una funzione di test
+  static async test() {
+    console.log('🧪 [MetaService] Avvio test di fetch...');
+    const result = await MetaService.extractMetadata('https://firecrawl.betteruptime.com/');
+    console.log('📊 [MetaService] Risultato del test:', result);
+    return result;
   }
 }
