@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { AlignVerticalDistribute } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
 interface SpacingControlProps {
@@ -27,9 +26,9 @@ const SpacingControl: React.FC<SpacingControlProps> = ({ value, onChange, disabl
 
   const getSpacingIconStyle = (value: number) => {
     let gap;
-    if (value <= 40) gap = "gap-0.5";
-    else if (value <= 100) gap = "gap-2";
-    else gap = "gap-4";
+    if (value <= 40) gap = "gap-[2px]";
+    else if (value <= 100) gap = "gap-[3px]";
+    else gap = "gap-[6px]";
 
     return gap;
   };
