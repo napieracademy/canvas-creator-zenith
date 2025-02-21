@@ -9,6 +9,16 @@ import { MetaService } from '@/utils/MetaService';
 import { Loader2, Image as ImageIcon } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import { supabase } from '@/integrations/supabase/client';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface UrlInputProps {
   onTitleExtracted: (title: string) => void;
@@ -30,6 +40,8 @@ const UrlInput: React.FC<UrlInputProps> = ({
   const [url, setUrl] = useState('');
   const [isImageUrl, setIsImageUrl] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [showDuplicateDialog, setShowDuplicateDialog] = useState(false);
+  const [tempContent, setTempContent] = useState<any>(null);
   const { toast } = useToast();
 
   const simulateProgress = () => {
@@ -68,6 +80,20 @@ const UrlInput: React.FC<UrlInputProps> = ({
     return existingContent;
   };
 
+  const updateEditor = (result: any) => {
+    if (result.title) onTitleExtracted(result.title);
+    if (result.description) onDescriptionExtracted(result.description);
+    if (result.content && onContentExtracted) onContentExtracted(result.content);
+    if (result.image && onImageExtracted) onImageExtracted(result.image);
+    
+    if (result.credits) {
+      const creditsEvent = new CustomEvent('creditsExtracted', {
+        detail: { credits: result.credits }
+      });
+      document.dispatchEvent(creditsEvent);
+    }
+  };
+
   const saveToDatabase = async (data: {
     url: string;
     title?: string;
@@ -80,7 +106,6 @@ const UrlInput: React.FC<UrlInputProps> = ({
     modification_date?: string;
   }) => {
     try {
-      // Verifica se esiste già un contenuto con lo stesso URL
       const existingContent = await checkExistingContent(data.url);
 
       if (existingContent) {
@@ -88,34 +113,17 @@ const UrlInput: React.FC<UrlInputProps> = ({
         
         const result = await MetaService.extractMetadata(data.url);
         
-        if (result.success && MetaService.shouldAllowDuplicate(existingContent, result)) {
-          console.log('📅 [UrlInput] Contenuto modificato, procedo con il salvataggio');
-          
-          const { error } = await supabase
-            .from('extracted_content')
-            .insert([{
-              ...data,
-              publication_date: result.publicationDate,
-              modification_date: result.modificationDate
-            }]);
-
-          if (error) throw error;
-          
-          toast({
-            title: "Contenuto aggiornato",
-            description: "È stata trovata una versione più recente del contenuto",
+        if (result.success) {
+          setTempContent({
+            ...data,
+            publication_date: result.publicationDate,
+            modification_date: result.modificationDate
           });
-          return true;
+          setShowDuplicateDialog(true);
+          return false;
         }
-
-        toast({
-          title: "Contenuto già presente",
-          description: "Questo URL è già stato salvato e non ci sono modifiche",
-        });
-        return false;
       }
 
-      // Se il contenuto non esiste, lo salviamo
       const { error } = await supabase
         .from('extracted_content')
         .insert([data]);
@@ -160,14 +168,12 @@ const UrlInput: React.FC<UrlInputProps> = ({
         const result = await MetaService.extractMetadata(url);
         
         if (result.success) {
-          // Se non c'è una descrizione, usiamo le prime due frasi del contenuto
           let description = result.description;
           if (!description && result.content) {
             const sentences = result.content.split(/[.!?]+/).filter(Boolean);
             description = sentences.slice(0, 2).join('. ') + '.';
           }
           
-          // Salva nel database
           const saved = await saveToDatabase({
             url: url,
             title: result.title,
@@ -175,30 +181,18 @@ const UrlInput: React.FC<UrlInputProps> = ({
             content: result.content,
             credits: result.credits,
             image_url: result.image,
-            extraction_date: result.extractionDate
+            extraction_date: result.extractionDate,
+            publication_date: result.publicationDate,
+            modification_date: result.modificationDate
           });
 
           if (saved) {
-            // Aggiorna i campi nella UI
-            if (result.title) onTitleExtracted(result.title);
-            if (description) onDescriptionExtracted(description);
-            if (result.content && onContentExtracted) onContentExtracted(result.content);
-            if (result.image && onImageExtracted) onImageExtracted(result.image);
-            
-            if (result.credits) {
-              const creditsEvent = new CustomEvent('creditsExtracted', {
-                detail: { credits: result.credits }
-              });
-              document.dispatchEvent(creditsEvent);
-            }
-
+            updateEditor(result);
             setProgress(100);
             toast({
               title: "Contenuto estratto",
               description: "Il contenuto è stato estratto e salvato con successo",
             });
-
-            // Resetta l'URL dopo il successo
             setUrl('');
           }
         } else {
@@ -220,6 +214,27 @@ const UrlInput: React.FC<UrlInputProps> = ({
       onLoadingChange?.(false);
       stopProgress();
     }
+  };
+
+  const handleUseDuplicate = () => {
+    if (tempContent) {
+      const result = {
+        title: tempContent.title,
+        description: tempContent.description,
+        content: tempContent.content,
+        image: tempContent.image_url,
+        credits: tempContent.credits
+      };
+      updateEditor(result);
+      setProgress(100);
+      toast({
+        title: "Contenuto utilizzato",
+        description: "Il contenuto è stato importato nell'editor",
+      });
+      setUrl('');
+    }
+    setShowDuplicateDialog(false);
+    setTempContent(null);
   };
 
   return (
@@ -266,6 +281,26 @@ const UrlInput: React.FC<UrlInputProps> = ({
           </div>
         )}
       </div>
+
+      <AlertDialog open={showDuplicateDialog} onOpenChange={setShowDuplicateDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Contenuto già presente</AlertDialogTitle>
+            <AlertDialogDescription>
+              Questo contenuto è già stato salvato nel database. 
+              Vuoi comunque utilizzarlo nell'editor?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setShowDuplicateDialog(false)}>
+              Annulla
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleUseDuplicate}>
+              Usa comunque
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </form>
   );
 };
