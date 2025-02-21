@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ChevronDown, ChevronUp, Image as ImageIcon } from 'lucide-react';
+import { ChevronDown, ChevronUp, Image as ImageIcon, ExternalLink } from 'lucide-react';
 import { ContentActions } from './ContentActions';
 import { ExpandedContent } from './ExpandedContent';
 import type { ExtractedContent } from './types';
@@ -37,7 +37,7 @@ export const ContentTable = ({
           <TableHead className="w-[30px]"></TableHead>
           <TableHead className="w-[50px]">Img</TableHead>
           <TableHead>Titolo</TableHead>
-          <TableHead className="hidden md:table-cell">URL</TableHead>
+          <TableHead className="hidden md:table-cell w-[50px]">Link</TableHead>
           <TableHead className="hidden lg:table-cell">Contenuto</TableHead>
           <TableHead className="hidden lg:table-cell">Data</TableHead>
           <TableHead className="text-right">Azioni</TableHead>
@@ -72,15 +72,16 @@ export const ContentTable = ({
               <TableCell className="font-medium">
                 {content.title || 'Senza titolo'}
               </TableCell>
-              <TableCell className="hidden md:table-cell max-w-xs truncate">
+              <TableCell className="hidden md:table-cell w-[50px]">
                 <a 
                   href={content.url} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline"
+                  className="text-blue-600 hover:text-blue-800 transition-colors inline-flex items-center"
                   onClick={(e) => e.stopPropagation()}
+                  title={content.url}
                 >
-                  {content.url}
+                  <ExternalLink className="h-4 w-4" />
                 </a>
               </TableCell>
               <TableCell className="hidden lg:table-cell max-w-xs truncate">
