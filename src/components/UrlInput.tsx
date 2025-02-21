@@ -58,6 +58,16 @@ const UrlInput: React.FC<UrlInputProps> = ({
     setIsImageUrl(isValidImageUrl(newUrl));
   };
 
+  const checkExistingContent = async (url: string) => {
+    const { data: existingContent } = await supabase
+      .from('extracted_content')
+      .select('*')
+      .eq('url', url)
+      .maybeSingle();
+
+    return existingContent;
+  };
+
   const saveToDatabase = async (data: {
     url: string;
     title?: string;
@@ -68,6 +78,37 @@ const UrlInput: React.FC<UrlInputProps> = ({
     extraction_date?: string;
   }) => {
     try {
+      // Verifica se esiste già un contenuto con lo stesso URL
+      const existingContent = await checkExistingContent(data.url);
+
+      if (existingContent) {
+        console.log('🔄 [UrlInput] Contenuto esistente trovato, verifica aggiornamento immagine');
+        
+        // Se il contenuto esiste ma non ha un'immagine e noi ne abbiamo una nuova
+        if (!existingContent.image_url && data.image_url) {
+          console.log('🖼️ [UrlInput] Aggiornamento immagine per contenuto esistente');
+          const { error } = await supabase
+            .from('extracted_content')
+            .update({ image_url: data.image_url })
+            .eq('url', data.url);
+
+          if (error) throw error;
+          
+          toast({
+            title: "Immagine aggiornata",
+            description: "L'immagine è stata aggiunta al contenuto esistente",
+          });
+          return true;
+        }
+
+        toast({
+          title: "Contenuto già presente",
+          description: "Questo URL è già stato salvato nel database",
+        });
+        return false;
+      }
+
+      // Se il contenuto non esiste, lo salviamo
       const { error } = await supabase
         .from('extracted_content')
         .insert([data]);
@@ -119,7 +160,7 @@ const UrlInput: React.FC<UrlInputProps> = ({
             description: result.description,
             content: result.content,
             credits: result.credits,
-            image_url: result.image, // Aggiungiamo il campo image_url
+            image_url: result.image,
             extraction_date: result.extractionDate
           });
 
@@ -145,12 +186,6 @@ const UrlInput: React.FC<UrlInputProps> = ({
 
             // Resetta l'URL dopo il successo
             setUrl('');
-          } else {
-            toast({
-              title: "Errore",
-              description: "Impossibile salvare il contenuto nel database",
-              variant: "destructive",
-            });
           }
         } else {
           toast({
@@ -222,4 +257,3 @@ const UrlInput: React.FC<UrlInputProps> = ({
 };
 
 export default UrlInput;
-

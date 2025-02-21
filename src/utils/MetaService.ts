@@ -72,13 +72,22 @@ export class MetaService {
         doc.querySelector('meta[property="twitter:image"]')?.getAttribute('content') ||
         doc.querySelector('meta[property="twitter:image:src"]')?.getAttribute('content') ||
         doc.querySelector('link[rel="image_src"]')?.getAttribute('href') ||
-        doc.querySelector('meta[name="thumbnail"]')?.getAttribute('content') ||
-        '';
+        doc.querySelector('meta[name="thumbnail"]')?.getAttribute('content');
 
-      // Se l'immagine è un URL relativo, lo convertiamo in assoluto
-      if (image && !image.startsWith('http')) {
-        const baseUrl = new URL(url);
-        image = new URL(image, baseUrl.origin).toString();
+      // Validazione e normalizzazione dell'URL dell'immagine
+      if (image) {
+        try {
+          // Se l'immagine è un URL relativo, lo convertiamo in assoluto
+          if (!image.startsWith('http')) {
+            const baseUrl = new URL(url);
+            image = new URL(image, baseUrl.origin).toString();
+          }
+          // Verifica che l'URL sia valido
+          new URL(image);
+        } catch (error) {
+          console.warn('⚠️ [MetaService] URL immagine non valido:', image);
+          image = undefined;
+        }
       }
 
       console.log('🖼️ [MetaService] Immagine estratta:', image);
