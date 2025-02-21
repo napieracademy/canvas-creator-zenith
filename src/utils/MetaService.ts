@@ -7,6 +7,8 @@ interface MetadataResult {
   credits?: string;
   content?: string;
   error?: string;
+  extractionDate?: string;
+  url?: string;
 }
 
 export class MetaService {
@@ -84,7 +86,9 @@ export class MetaService {
         description: description.trim(),
         image: image.trim(),
         credits: credits,
-        content: contentLines
+        content: contentLines,
+        extractionDate: new Date().toLocaleString(),
+        url: url
       };
 
       console.log('📦 [MetaService] Oggetto risultato creato:', result);
