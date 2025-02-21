@@ -2,10 +2,11 @@
 import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Copy } from 'lucide-react';
+import { ArrowLeft, Copy, Save } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/components/ui/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ExtractedContentState {
   url: string;
@@ -25,20 +26,79 @@ const ExtractedContent = () => {
 
   useEffect(() => {
     if (contentData?.content) {
-      // Seleziona le prime 10 righe del contenuto
       const firstTenLines = contentData.content
         .split('\n')
         .filter(line => line.trim().length > 0)
         .slice(0, 10)
         .join('\n');
 
-      // Imposta il contenuto nel campo della pagina principale
       const contentEvent = new CustomEvent('contentExtracted', {
         detail: { content: firstTenLines }
       });
       document.dispatchEvent(contentEvent);
     }
   }, [contentData]);
+
+  const handleSaveToDatabase = async () => {
+    try {
+      const { error } = await supabase
+        .from('extracted_content')
+        .insert({
+          url: contentData.url,
+          title: contentData.title,
+          description: contentData.description,
+          image_url: contentData.image,
+          credits: contentData.credits,
+          content: contentData.content,
+          extraction_date: new Date().toISOString()
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Contenuto salvato",
+        description: "Il contenuto è stato salvato nel database",
+      });
+    } catch (error) {
+      console.error('Errore durante il salvataggio:', error);
+      toast({
+        title: "Errore",
+        description: "Errore durante il salvataggio del contenuto",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleExportCSV = () => {
+    const csvContent = [
+      ['URL', 'Titolo', 'Descrizione', 'Immagine', 'Crediti', 'Contenuto', 'Data Estrazione'],
+      [
+        contentData.url,
+        contentData.title,
+        contentData.description,
+        contentData.image,
+        contentData.credits,
+        contentData.content,
+        contentData.extractionDate
+      ]
+    ]
+    .map(row => row.map(cell => `"${(cell || '').replace(/"/g, '""')}"`).join(','))
+    .join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const timestamp = new Date().toISOString().split('T')[0];
+    link.href = URL.createObjectURL(blob);
+    link.download = `extracted_content_${timestamp}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    toast({
+      title: "CSV esportato",
+      description: "Il file CSV è stato scaricato",
+    });
+  };
 
   if (!contentData) {
     return (
@@ -70,10 +130,21 @@ const ExtractedContent = () => {
 
   return (
     <div className="container mx-auto p-6">
-      <Button variant="ghost" onClick={() => navigate('/')} className="mb-4">
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        Torna indietro
-      </Button>
+      <div className="flex justify-between items-center mb-4">
+        <Button variant="ghost" onClick={() => navigate('/')}>
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Torna indietro
+        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleExportCSV}>
+            Esporta CSV
+          </Button>
+          <Button onClick={handleSaveToDatabase}>
+            <Save className="h-4 w-4 mr-2" />
+            Salva nel Database
+          </Button>
+        </div>
+      </div>
 
       <Card className="p-6 space-y-6">
         <div>
