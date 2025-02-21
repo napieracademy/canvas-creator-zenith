@@ -32,12 +32,12 @@ export const ContentTable = ({
   onMigrateToHome
 }: ContentTableProps) => {
   const [columnVisibility, setColumnVisibility] = React.useState<ColumnVisibility>({
-    id: true,
+    id: false,
     image: true,
     title: true,
-    link: true,
+    link: false,
     content: true,
-    extractionDate: true,
+    extractionDate: false,
     actions: true
   });
 
