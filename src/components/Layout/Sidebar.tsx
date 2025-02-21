@@ -30,6 +30,7 @@ interface SidebarProps {
   onSpacingChange: (spacing: number) => void;
   onTitleExtracted: (title: string) => void;
   onDescriptionExtracted: (description: string) => void;
+  onImageExtracted?: (image: string) => void;
   onTabChange: (value: string) => void;
   onLoadingChange: (loading: boolean) => void;
   onFormatChange: (format: 'post' | 'story') => void;
@@ -61,6 +62,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   onSpacingChange,
   onTitleExtracted,
   onDescriptionExtracted,
+  onImageExtracted,
   onTabChange,
   onLoadingChange,
   onFormatChange,
@@ -94,6 +96,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             onSpacingChange={onSpacingChange}
             onTitleExtracted={onTitleExtracted}
             onDescriptionExtracted={onDescriptionExtracted}
+            onImageExtracted={onImageExtracted}
             onTabChange={onTabChange}
             onLoadingChange={onLoadingChange}
             disabled={disabled}
