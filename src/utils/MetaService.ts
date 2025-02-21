@@ -1,3 +1,4 @@
+
 interface MetadataResult {
   success: boolean;
   title?: string;
@@ -14,14 +15,39 @@ export class MetaService {
     try {
       console.log('🚀 [MetaService] Inizio estrazione metadati per URL:', url);
 
-      const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`;
-      console.log('📡 [MetaService] Tentativo di fetch via proxy:', proxyUrl);
-      
-      const response = await fetch(proxyUrl);
-      console.log('✨ [MetaService] Risposta proxy ricevuta, status:', response.status);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      // Proviamo prima con un proxy
+      const proxyUrls = [
+        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+        `https://cors-anywhere.herokuapp.com/${url}`,
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
+      ];
+
+      let response = null;
+      let error = null;
+
+      // Prova ogni proxy finché uno non funziona
+      for (const proxyUrl of proxyUrls) {
+        try {
+          console.log('📡 [MetaService] Tentativo di fetch via proxy:', proxyUrl);
+          response = await fetch(proxyUrl, {
+            headers: {
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            }
+          });
+          
+          if (response.ok) {
+            console.log('✨ [MetaService] Proxy funzionante trovato:', proxyUrl);
+            break;
+          }
+        } catch (e) {
+          error = e;
+          console.log('⚠️ [MetaService] Proxy fallito:', proxyUrl, e);
+          continue;
+        }
+      }
+
+      if (!response || !response.ok) {
+        throw error || new Error('Tutti i proxy hanno fallito');
       }
 
       const text = await response.text();
@@ -50,27 +76,18 @@ export class MetaService {
         doc.querySelector('meta[name="publisher"]')?.getAttribute('content') || 
         new URL(url).hostname.replace('www.', '');
 
-      // Selettori da rimuovere, aggiornati per includere elementi specifici
+      // Selettori da rimuovere
       const unwantedSelectors = [
-        // Elementi di base
         'script', 'style', 'iframe', 'nav', 'header', 'footer', 'aside',
         'form', '.social', '.share', '.comments', '.related', '.sidebar',
         '.advertisement', '.newsletter', '.subscription',
-        
-        // Menu e navigazione
         '.tabs-nav', '[data-mrf-recirculation]', '.overtitle-art-logo',
         '.title-art-hp', '.nav-section', '.menu-section',
-        
-        // Link correlati e evidenza
         '[data-type="related"]', '[data-type="highlights"]',
         '[data-mrf-recirculation="In Evidenza"]',
         '.related-articles', '.highlighted-content',
-        
-        // Altri elementi di navigazione
         '.breadcrumbs', '.pagination', '.article-navigation',
         '.article-footer', '.article-header', '.article-meta',
-        
-        // Elementi specifici del sito
         '.has-text-black', '#article-navigation',
         '.is-pastone', '.is-small-medium'
       ];
@@ -111,25 +128,11 @@ export class MetaService {
         elements.forEach(el => el.remove());
       });
 
-      // Rimuovi specificamente elementi con data-mrf-recirculation="In Evidenza"
-      const evidenzaElements = clone.querySelectorAll('[data-mrf-recirculation="In Evidenza"]');
-      evidenzaElements.forEach(el => el.remove());
-
-      // Rimuovi elementi con classi specifiche
-      const classesToRemove = ['tabs-nav', 'overtitle-art-logo', 'title-art-hp'];
-      classesToRemove.forEach(className => {
-        const elements = clone.getElementsByClassName(className);
-        while (elements.length > 0) {
-          elements[0].remove();
-        }
-      });
-
       // Estrai solo i paragrafi con contenuto significativo e prendi le prime 10 righe
       const paragraphs = Array.from(clone.querySelectorAll('p'))
         .map(p => p.textContent?.trim())
-        .filter(text => text && text.length > 20)  // Filtra paragrafi troppo corti
+        .filter(text => text && text.length > 20)
         .filter(text => {
-          // Filtra elementi non desiderati
           const unwantedPatterns = [
             /^in evidenza$/i,
             /^ultime notizie$/i,
@@ -140,7 +143,7 @@ export class MetaService {
           ];
           return !unwantedPatterns.some(pattern => pattern.test(text || ''));
         })
-        .slice(0, 10); // Prendi solo le prime 10 righe
+        .slice(0, 10);
 
       const cleanContent = paragraphs.join('\n\n');
       console.log('📄 [MetaService] Contenuto pulito estratto (prime 10 righe)');
@@ -153,6 +156,7 @@ export class MetaService {
           .join(' · ');
       }
 
+      // Prepara il risultato con la data in formato ISO
       const result = {
         success: true,
         title: title.trim(),
