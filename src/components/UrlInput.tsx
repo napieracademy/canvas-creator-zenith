@@ -100,9 +100,6 @@ const UrlInput: React.FC<UrlInputProps> = ({
             onDescriptionExtracted(result.description);
             extracted = true;
           }
-          if (result.image && onImageExtracted) {
-            onImageExtracted(result.image);
-          }
           if (result.content && onContentExtracted) {
             onContentExtracted(result.content);
           }
@@ -134,7 +131,6 @@ const UrlInput: React.FC<UrlInputProps> = ({
                 url: result.url,
                 title: result.title,
                 description: result.description,
-                image: result.image,
                 credits: result.credits,
                 content: result.content,
                 extractionDate: result.extractionDate
