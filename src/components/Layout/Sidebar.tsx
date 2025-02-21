@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { cn } from "@/lib/utils";
 import TextEditor from '@/components/TextEditor';
@@ -74,6 +73,8 @@ const Sidebar: React.FC<SidebarProps> = ({
   onLogoChange,
 }) => {
   const [showContent, setShowContent] = useState(false);
+  
+  console.log('Sidebar rendered with extractedContent:', extractedContent);
 
   return (
     <div className={cn(
@@ -120,25 +121,16 @@ const Sidebar: React.FC<SidebarProps> = ({
             {extractedContent && (
               <div className="space-y-2">
                 <Separator />
-                <div 
-                  className="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
-                  onClick={() => setShowContent(!showContent)}
-                >
-                  <Label className="text-sm font-medium text-gray-700 cursor-pointer">
-                    Contenuto estratto
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-gray-700">
+                    Contenuto estratto (Debug)
                   </Label>
-                  <Button variant="ghost" size="sm">
-                    {showContent ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                  </Button>
-                </div>
-                
-                {showContent && (
                   <ScrollArea className="h-[200px] w-full rounded-md border p-4">
                     <div className="text-sm text-gray-600 whitespace-pre-wrap">
-                      {extractedContent}
+                      {extractedContent || 'Nessun contenuto estratto'}
                     </div>
                   </ScrollArea>
-                )}
+                </div>
               </div>
             )}
           </div>
