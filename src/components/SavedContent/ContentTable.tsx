@@ -1,35 +1,12 @@
+
 import React, { useState, useEffect } from 'react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
-import { Image as ImageIcon, ExternalLink, Trash2, Clock, FilterX, Filter } from 'lucide-react';
-import { ContentActions } from './ContentActions';
-import { ExpandedContent } from './ExpandedContent';
-import { ColumnToggle, type ColumnVisibility } from './ColumnToggle';
+import { Table, TableBody } from "@/components/ui/table";
 import type { ExtractedContent } from './types';
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { ContentTableHeader } from './ContentTableHeader';
+import { ContentTableToolbar } from './ContentTableToolbar';
+import { ContentTableRow } from './ContentTableRow';
+import { ExpandedContent } from './ExpandedContent';
+import type { ColumnVisibility } from './ColumnToggle';
 
 interface ContentTableProps {
   contents: ExtractedContent[];
@@ -88,8 +65,7 @@ export const ContentTable = ({
     };
 
     updateCountdowns();
-    const interval = setInterval(updateCountdowns, 60000); // Aggiorna ogni minuto
-
+    const interval = setInterval(updateCountdowns, 60000);
     return () => clearInterval(interval);
   }, [contents]);
 
@@ -144,160 +120,37 @@ export const ContentTable = ({
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <div className="flex gap-2">
-          {selectedRows.size > 0 && (
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="destructive" size="sm">
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Elimina selezionati ({selectedRows.size})
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Sei sicuro?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Stai per eliminare {selectedRows.size} elementi selezionati. Questa azione non può essere annullata.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Annulla</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleBulkDelete}>Elimina</AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          )}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowDuplicates(!showDuplicates)}
-            className={showDuplicates ? "bg-muted" : ""}
-          >
-            {showDuplicates ? (
-              <FilterX className="h-4 w-4 mr-2" />
-            ) : (
-              <Filter className="h-4 w-4 mr-2" />
-            )}
-            {showDuplicates ? "Mostra tutti" : "Mostra duplicati"}
-          </Button>
-        </div>
-        <div className="flex-grow flex justify-end">
-          <ColumnToggle columns={columnVisibility} onColumnToggle={handleColumnToggle} />
-        </div>
-      </div>
+      <ContentTableToolbar
+        selectedRows={selectedRows}
+        showDuplicates={showDuplicates}
+        columnVisibility={columnVisibility}
+        onDeleteSelected={handleBulkDelete}
+        onToggleDuplicates={() => setShowDuplicates(!showDuplicates)}
+        onColumnToggle={handleColumnToggle}
+      />
       <div className="rounded-md border">
         <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[30px]">
-                <Checkbox 
-                  checked={selectedRows.size === displayedContents.length && displayedContents.length > 0}
-                  onCheckedChange={handleSelectAll}
-                  aria-label="Select all"
-                />
-              </TableHead>
-              {columnVisibility.image && <TableHead className="w-[50px] text-left">Img</TableHead>}
-              {columnVisibility.id && <TableHead className="w-[100px] text-left">ID</TableHead>}
-              {columnVisibility.title && <TableHead className="text-left">Titolo</TableHead>}
-              {columnVisibility.link && <TableHead className="hidden md:table-cell w-[50px] text-center">Link</TableHead>}
-              {columnVisibility.content && <TableHead className="hidden lg:table-cell text-left">Contenuto</TableHead>}
-              <TableHead className="w-[120px] text-center">Tempo rimasto</TableHead>
-              {columnVisibility.actions && <TableHead className="text-right">Azioni</TableHead>}
-            </TableRow>
-          </TableHeader>
+          <ContentTableHeader
+            selectedRows={selectedRows}
+            displayedContents={displayedContents}
+            columnVisibility={columnVisibility}
+            onSelectAll={handleSelectAll}
+          />
           <TableBody>
             {displayedContents.map((content) => (
               <React.Fragment key={content.id}>
-                <TableRow className={isDuplicate(content.url) ? "bg-purple-50" : ""}>
-                  <TableCell className="w-[30px]">
-                    <Checkbox 
-                      checked={selectedRows.has(content.id)}
-                      onCheckedChange={(checked) => handleSelectRow(content.id, checked as boolean)}
-                      aria-label={`Select ${content.title}`}
-                    />
-                  </TableCell>
-                  {columnVisibility.image && (
-                    <TableCell className="w-[50px] text-left cursor-pointer" onClick={() => onToggleRow(content.id)}>
-                      {content.image_url ? (
-                        <HoverCard>
-                          <HoverCardTrigger asChild>
-                            <img
-                              src={content.image_url}
-                              alt={content.title}
-                              className="w-8 h-8 object-cover rounded cursor-pointer"
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                target.src = '/placeholder.svg';
-                              }}
-                            />
-                          </HoverCardTrigger>
-                          <HoverCardContent className="w-64 p-0">
-                            <img
-                              src={content.image_url}
-                              alt={content.title}
-                              className="w-full h-64 object-cover rounded"
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                target.src = '/placeholder.svg';
-                              }}
-                            />
-                          </HoverCardContent>
-                        </HoverCard>
-                      ) : (
-                        <ImageIcon className="w-8 h-8 text-gray-300" />
-                      )}
-                    </TableCell>
-                  )}
-                  {columnVisibility.id && (
-                    <TableCell className="font-mono text-sm text-left cursor-pointer" onClick={() => onToggleRow(content.id)}>
-                      {content.id.substring(0, 8)}...
-                    </TableCell>
-                  )}
-                  {columnVisibility.title && (
-                    <TableCell className="font-medium text-left cursor-pointer" onClick={() => onToggleRow(content.id)}>
-                      {content.title || 'Senza titolo'}
-                    </TableCell>
-                  )}
-                  {columnVisibility.link && (
-                    <TableCell className="hidden md:table-cell w-[50px] text-center">
-                      <a 
-                        href={content.url} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 transition-colors inline-flex items-center justify-center"
-                        onClick={(e) => e.stopPropagation()}
-                        title={content.url}
-                      >
-                        <ExternalLink className="h-4 w-4" />
-                      </a>
-                    </TableCell>
-                  )}
-                  {columnVisibility.content && (
-                    <TableCell className="hidden lg:table-cell max-w-xs truncate text-left cursor-pointer" onClick={() => onToggleRow(content.id)}>
-                      {content.content?.substring(0, 100)}
-                      {content.content?.length > 100 ? '...' : ''}
-                    </TableCell>
-                  )}
-                  <TableCell className="w-[120px] text-center">
-                    <div className="flex items-center justify-center gap-2 text-sm">
-                      <Clock className="h-4 w-4 text-muted-foreground" />
-                      <span className={timeRemaining[content.id]?.startsWith("In") ? "text-red-500" : ""}>
-                        {timeRemaining[content.id]}
-                      </span>
-                    </div>
-                  </TableCell>
-                  {columnVisibility.actions && (
-                    <TableCell className="text-right">
-                      <ContentActions
-                        content={content}
-                        onDelete={onDelete}
-                        onView={onView}
-                        onMigrateToHome={onMigrateToHome}
-                      />
-                    </TableCell>
-                  )}
-                </TableRow>
+                <ContentTableRow
+                  content={content}
+                  isDuplicate={isDuplicate(content.url)}
+                  isSelected={selectedRows.has(content.id)}
+                  columnVisibility={columnVisibility}
+                  timeRemaining={timeRemaining[content.id]}
+                  onToggleRow={onToggleRow}
+                  onSelectRow={handleSelectRow}
+                  onDelete={onDelete}
+                  onView={onView}
+                  onMigrateToHome={onMigrateToHome}
+                />
                 {expandedRows.has(content.id) && <ExpandedContent content={content} />}
               </React.Fragment>
             ))}
