@@ -135,44 +135,39 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
     <div className="space-y-4">
       <Tabs defaultValue="classic" className="w-full">
         <TabsList className="grid w-full grid-cols-5 gap-4 p-4">
-          <TabsTrigger value="classic" className="relative flex flex-col items-center gap-2 pt-2 pb-4 hover:bg-white/10">
-            <div className="w-12 h-12 rounded-full bg-gradient 
+          <TabsTrigger value="classic" className="relative flex items-center justify-center hover:bg-white/10">
+            <div className="w-8 h-8 rounded-full bg-gradient 
               bg-gradient-to-br from-purple-500 to-pink-500 
               flex items-center justify-center text-white shadow-lg">
-              <PaintBucket className="w-6 h-6" />
+              <PaintBucket className="w-4 h-4" />
             </div>
-            <span className="text-xs font-medium">Classici</span>
           </TabsTrigger>
-          <TabsTrigger value="cosmic" className="relative flex flex-col items-center gap-2 pt-2 pb-4 hover:bg-white/10">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br 
+          <TabsTrigger value="cosmic" className="relative flex items-center justify-center hover:bg-white/10">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br 
               from-indigo-600 to-purple-600 
               flex items-center justify-center text-white shadow-lg">
-              <Rocket className="w-6 h-6" />
+              <Rocket className="w-4 h-4" />
             </div>
-            <span className="text-xs font-medium">Cosmici</span>
           </TabsTrigger>
-          <TabsTrigger value="retro" className="relative flex flex-col items-center gap-2 pt-2 pb-4 hover:bg-white/10">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br 
+          <TabsTrigger value="retro" className="relative flex items-center justify-center hover:bg-white/10">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br 
               from-blue-600 to-cyan-500 
               flex items-center justify-center text-white shadow-lg">
-              <Gamepad2 className="w-6 h-6" />
+              <Gamepad2 className="w-4 h-4" />
             </div>
-            <span className="text-xs font-medium">C64</span>
           </TabsTrigger>
-          <TabsTrigger value="avengers" className="relative flex flex-col items-center gap-2 pt-2 pb-4 hover:bg-white/10">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br 
+          <TabsTrigger value="avengers" className="relative flex items-center justify-center hover:bg-white/10">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br 
               from-red-600 to-yellow-500 
               flex items-center justify-center text-white shadow-lg">
-              <Shield className="w-6 h-6" />
+              <Shield className="w-4 h-4" />
             </div>
-            <span className="text-xs font-medium">Avengers</span>
           </TabsTrigger>
-          <TabsTrigger value="featured" className="relative flex flex-col items-center gap-2 pt-2 pb-4 hover:bg-white/10" disabled={!featuredImage}>
-            <div className={`w-12 h-12 rounded-full ${!featuredImage ? 'bg-gray-200' : 'bg-gradient-to-br from-green-500 to-emerald-700'} 
+          <TabsTrigger value="featured" className="relative flex items-center justify-center hover:bg-white/10" disabled={!featuredImage}>
+            <div className={`w-8 h-8 rounded-full ${!featuredImage ? 'bg-gray-200' : 'bg-gradient-to-br from-green-500 to-emerald-700'} 
               flex items-center justify-center text-white shadow-lg`}>
-              <PaintBucket className="w-6 h-6" />
+              <PaintBucket className="w-4 h-4" />
             </div>
-            <span className="text-xs font-medium">Featured</span>
           </TabsTrigger>
         </TabsList>
         <TabsContent value="classic" className="mt-4">
