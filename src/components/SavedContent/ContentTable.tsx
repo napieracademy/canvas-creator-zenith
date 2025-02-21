@@ -36,6 +36,7 @@ export const ContentTable = ({
         <TableRow>
           <TableHead className="w-[30px]"></TableHead>
           <TableHead className="w-[50px]">Img</TableHead>
+          <TableHead className="w-[100px]">ID</TableHead>
           <TableHead>Titolo</TableHead>
           <TableHead className="hidden md:table-cell w-[50px]">Link</TableHead>
           <TableHead className="hidden lg:table-cell">Contenuto</TableHead>
@@ -68,6 +69,9 @@ export const ContentTable = ({
                 ) : (
                   <ImageIcon className="w-8 h-8 text-gray-300" />
                 )}
+              </TableCell>
+              <TableCell className="font-mono text-sm">
+                {content.id.substring(0, 8)}...
               </TableCell>
               <TableCell className="font-medium">
                 {content.title || 'Senza titolo'}
