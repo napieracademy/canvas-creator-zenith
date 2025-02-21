@@ -16,6 +16,11 @@ import { ExpandedContent } from './ExpandedContent';
 import { ColumnToggle, type ColumnVisibility } from './ColumnToggle';
 import type { ExtractedContent } from './types';
 import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -153,15 +158,30 @@ export const ContentTable = ({
                   {columnVisibility.image && (
                     <TableCell className="w-[50px] text-left cursor-pointer" onClick={() => onToggleRow(content.id)}>
                       {content.image_url ? (
-                        <img
-                          src={content.image_url}
-                          alt={content.title}
-                          className="w-8 h-8 object-cover rounded"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = '/placeholder.svg';
-                          }}
-                        />
+                        <HoverCard>
+                          <HoverCardTrigger asChild>
+                            <img
+                              src={content.image_url}
+                              alt={content.title}
+                              className="w-8 h-8 object-cover rounded cursor-pointer"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.src = '/placeholder.svg';
+                              }}
+                            />
+                          </HoverCardTrigger>
+                          <HoverCardContent className="w-64 p-0">
+                            <img
+                              src={content.image_url}
+                              alt={content.title}
+                              className="w-full h-64 object-cover rounded"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.src = '/placeholder.svg';
+                              }}
+                            />
+                          </HoverCardContent>
+                        </HoverCard>
                       ) : (
                         <ImageIcon className="w-8 h-8 text-gray-300" />
                       )}
