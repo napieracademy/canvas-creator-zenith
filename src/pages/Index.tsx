@@ -8,6 +8,7 @@ import MobileWarning from '@/components/Layout/MobileWarning';
 import LoadingOverlay from '@/components/Layout/LoadingOverlay';
 import Sidebar from '@/components/Layout/Sidebar';
 import MainContent from '@/components/Layout/MainContent';
+import NavigationMenu from '@/components/Layout/NavigationMenu';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 
@@ -137,6 +138,7 @@ const IndexPage = () => {
 
   return (
     <div className="relative">
+      <NavigationMenu />
       <div className="flex">
         {viewMode === 'full' && (
           <div className={`relative transition-all duration-300 ${sidebarOpen ? 'w-[400px]' : 'w-0'}`}>
