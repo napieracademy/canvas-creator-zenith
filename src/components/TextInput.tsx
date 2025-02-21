@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
@@ -41,6 +42,7 @@ const TextInput: React.FC<TextInputProps> = ({
   onContentExtracted
 }) => {
   const isDescription = label.toLowerCase() === 'descrizione';
+  const isContent = label.toLowerCase() === 'contenuto';
   const hasTitle = isDescription && otherText && otherText.trim().length > 0;
   const isEmpty = !value || value.trim().length === 0;
   const { toast } = useToast();
@@ -73,67 +75,60 @@ const TextInput: React.FC<TextInputProps> = ({
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-2">
         <Label className="text-sm font-medium text-gray-700">{label}</Label>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleUndo}
-            disabled={disabled || charHistory.length <= 1}
-            className="h-8 w-8 p-0"
-          >
-            <Undo2 className="h-4 w-4" />
-          </Button>
-          <TextAlignControl 
-            textAlign={textAlign} 
-            onTextAlignChange={onTextAlignChange} 
-            disabled={disabled} 
-          />
-          <FontSizeControl 
-            fontSize={fontSize} 
-            onFontSizeChange={onFontSizeChange} 
-            disabled={disabled} 
-          />
-          <TextImproveControl 
-            value={value} 
-            onChange={handleChange} 
-            label={label} 
-            disabled={disabled}
-            otherText={otherText}
-          />
-          {isDescription && hasTitle && isEmpty && (
-            <>
-              <ChevronRight className="h-4 w-4 text-gray-400 animate-bounce-x" />
-              <DescriptionGenerateControl
-                title={otherText}
-                onDescriptionGenerated={handleChange}
-                disabled={disabled}
-              />
-            </>
-          )}
-        </div>
+        {!isContent && (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleUndo}
+              disabled={disabled || charHistory.length <= 1}
+              className="h-8 w-8 p-0"
+            >
+              <Undo2 className="h-4 w-4" />
+            </Button>
+            <TextAlignControl 
+              textAlign={textAlign} 
+              onTextAlignChange={onTextAlignChange} 
+              disabled={disabled} 
+            />
+            <FontSizeControl 
+              fontSize={fontSize} 
+              onFontSizeChange={onFontSizeChange} 
+              disabled={disabled} 
+            />
+            <TextImproveControl 
+              value={value} 
+              onChange={handleChange} 
+              label={label} 
+              disabled={disabled}
+              otherText={otherText}
+            />
+            {isDescription && hasTitle && isEmpty && (
+              <>
+                <ChevronRight className="h-4 w-4 text-gray-400 animate-bounce-x" />
+                <DescriptionGenerateControl
+                  title={otherText}
+                  onDescriptionGenerated={handleChange}
+                  disabled={disabled}
+                />
+              </>
+            )}
+          </div>
+        )}
       </div>
       
       <Textarea
         placeholder={isDescription && hasTitle && isEmpty 
           ? "Clicca sulla bacchetta magica per generare automaticamente una descrizione dal titolo..." 
-          : `Scrivi il tuo ${label.toLowerCase()} qui...`}
-        value={value}
+          : isContent 
+            ? "Il contenuto estratto apparirà qui..."
+            : `Scrivi il tuo ${label.toLowerCase()} qui...`}
+        value={isContent ? (extractedContent || '') : value}
         onChange={(e) => handleChange(e.target.value)}
-        className="resize-none h-32 bg-white/50 backdrop-blur-sm focus:bg-white transition-colors duration-200"
+        className={`resize-none ${isContent ? 'h-64' : 'h-32'} bg-white/50 backdrop-blur-sm focus:bg-white transition-colors duration-200`}
         style={{ textAlign }}
-        disabled={disabled}
+        disabled={disabled || isContent}
       />
-
-      {extractedContent && (
-        <div className="mt-4">
-          <Label className="text-sm font-medium text-gray-700">Contenuto estratto</Label>
-          <Textarea
-            value={extractedContent}
-            readOnly
-            className="mt-2 resize-y min-h-[100px] max-h-[400px] bg-gray-50 text-sm"
-          />
-        </div>
-      )}
     </div>
   );
 };
