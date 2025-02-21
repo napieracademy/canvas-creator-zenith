@@ -58,33 +58,54 @@ export class MetaService {
         doc.querySelector('meta[name="publisher"]')?.getAttribute('content') || '';
       console.log('🏢 [MetaService] Editore estratto:', publisher);
 
-      // Cloniamo il body per manipolarlo senza toccare il documento originale
-      const clone = doc.body.cloneNode(true) as HTMLElement;
+      // Cerchiamo prima il contenuto principale in selettori comuni
+      const mainContentSelectors = [
+        'article',
+        '[role="main"]',
+        'main',
+        '.post-content',
+        '.article-content',
+        '.entry-content',
+        '#article-body',
+        '.story-body'
+      ];
 
-      // Rimuoviamo tutti gli elementi non necessari
+      let mainElement = null;
+      for (const selector of mainContentSelectors) {
+        mainElement = doc.querySelector(selector);
+        if (mainElement) break;
+      }
+
+      // Se non troviamo un contenitore specifico, usiamo il body
+      if (!mainElement) {
+        mainElement = doc.body;
+      }
+
+      // Cloniamo l'elemento principale per manipolarlo
+      const clone = mainElement.cloneNode(true) as HTMLElement;
+
+      // Rimuoviamo elementi non necessari
       const elementsToRemove = clone.querySelectorAll(
-        'script, style, iframe, nav, header, footer, aside, .ad, .ads, .advertisement, .social-share, .comments'
+        'script, style, iframe, nav, header, footer, aside, .ad, .ads, .advertisement, ' +
+        '.social-share, .comments, .related-posts, .sidebar, .widget, ' +
+        '[role="complementary"], [role="navigation"], .nav, .menu, .search, ' +
+        '.share, .social, .author-bio, .breadcrumb, .pagination'
       );
       elementsToRemove.forEach(el => el.remove());
 
-      // Estraiamo il testo principale
-      const mainContent = clone.textContent || '';
-      
-      // Puliamo il testo
-      const cleanContent = mainContent
-        .split('\n')
-        .map(line => line.trim())
-        .filter(line => {
-          // Rimuoviamo righe vuote o troppo corte
-          if (line.length < 10) return false;
-          // Rimuoviamo righe che sembrano essere menu o footer
-          if (line.includes('Cookie') || line.includes('Privacy') || line.includes('Menu')) return false;
-          // Rimuoviamo linee che sembrano essere date
-          if (/^\d{1,2}\/\d{1,2}\/\d{2,4}$/.test(line)) return false;
+      // Estraiamo i paragrafi con contenuto significativo
+      const paragraphs = Array.from(clone.querySelectorAll('p, h1, h2, h3, h4, h5, h6'))
+        .map(p => p.textContent?.trim())
+        .filter(text => {
+          if (!text) return false;
+          if (text.length < 20) return false;
+          if (text.includes('Cookie') || text.includes('Privacy')) return false;
+          if (text.includes('Copyright') || text.includes('All rights reserved')) return false;
+          if (/^\d{1,2}\/\d{1,2}\/\d{2,4}$/.test(text)) return false;
           return true;
-        })
-        .join('\n\n');
+        });
 
+      const cleanContent = paragraphs.join('\n\n');
       console.log('📄 [MetaService] Contenuto pulito, lunghezza:', cleanContent.length);
 
       let credits = '';
@@ -94,7 +115,6 @@ export class MetaService {
           .map(text => text.toLowerCase())
           .join(' · ');
       }
-      console.log('🏷️ [MetaService] Credits generati:', credits);
 
       const cleanTitle = title
         .toLowerCase()
@@ -110,29 +130,23 @@ export class MetaService {
 
       const timestamp = new Date().toISOString().split('T')[0];
       const filename = `${cleanTitle}_${cleanSiteName}_${timestamp}.txt`;
-      console.log('📋 [MetaService] Nome file generato:', filename);
-      
-      const metadataText = `
-URL Originale: ${url}
-Data Estrazione: ${new Date().toLocaleString()}
 
-METADATI ESTRATTI:
-----------------
-Titolo: ${title}
-Descrizione: ${description}
-Immagine: ${image}
-Crediti: ${credits || 'Non specificati'}
+      const result = {
+        success: true,
+        title: title.trim(),
+        description: description.trim(),
+        image: image.trim(),
+        credits: credits,
+        content: cleanContent,
+        extractionDate: new Date().toLocaleString(),
+        url: url
+      };
 
-CONTENUTO:
----------
-${cleanContent}
-`;
-
-      console.log('📝 [MetaService] Testo metadata formattato generato, lunghezza:', metadataText.length);
+      // Creiamo il file di testo con i metadati
+      const metadataText = `${cleanContent}\n\n---\n\nFonte: ${url}\nData: ${result.extractionDate}\nCrediti: ${credits || 'Non specificati'}`;
 
       const blob = new Blob([metadataText], { type: 'text/plain;charset=utf-8' });
       const downloadUrl = window.URL.createObjectURL(blob);
-      console.log('🔗 [MetaService] URL download generato:', downloadUrl);
 
       const link = document.createElement('a');
       link.href = downloadUrl;
@@ -141,18 +155,6 @@ ${cleanContent}
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(downloadUrl);
-      console.log('💾 [MetaService] Download file iniziato');
-
-      const result = {
-        success: true,
-        title: title.trim(),
-        description: description.trim(),
-        image: image.trim(),
-        credits: credits,
-        content: metadataText,
-        extractionDate: new Date().toLocaleString(),
-        url: url
-      };
 
       console.log('✅ [MetaService] Estrazione completata con successo');
       return result;
