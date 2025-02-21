@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
@@ -97,7 +96,11 @@ const UrlInput: React.FC<UrlInputProps> = ({
               }
             };
 
-            addToQueue({ task: saveOperation });
+            addToQueue({ 
+              task: saveOperation,
+              priority: 'high',
+              description: `Salvataggio contenuto da ${url}`
+            });
           } else {
             throw new Error(result.error || "Impossibile estrarre i contenuti dall'URL");
           }
@@ -113,7 +116,11 @@ const UrlInput: React.FC<UrlInputProps> = ({
       }
     };
 
-    addToQueue({ task: processUrl });
+    addToQueue({ 
+      task: processUrl,
+      priority: 'high',
+      description: `Elaborazione URL: ${url}`
+    });
   };
 
   const handleUseDuplicate = () => {
