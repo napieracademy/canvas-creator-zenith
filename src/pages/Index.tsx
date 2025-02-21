@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from '@/components/ui/use-toast';
@@ -8,8 +9,10 @@ import LoadingOverlay from '@/components/Layout/LoadingOverlay';
 import Sidebar from '@/components/Layout/Sidebar';
 import MainContent from '@/components/Layout/MainContent';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 
 const IndexPage = () => {
+  const location = useLocation();
   const getRandomTheme = () => {
     const randomIndex = Math.floor(Math.random() * colorPairs.length);
     return colorPairs[randomIndex];
@@ -19,8 +22,8 @@ const IndexPage = () => {
   const isMobile = useIsMobile();
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [text, setText] = useState('Social Image Creator');
-  const [description, setDescription] = useState('Crea bellissime immagini per i social media in pochi secondi. Personalizza colori, font e layout per ottenere il massimo impatto visivo.');
+  const [text, setText] = useState(location.state?.text || 'Social Image Creator');
+  const [description, setDescription] = useState(location.state?.description || 'Crea bellissime immagini per i social media in pochi secondi. Personalizza colori, font e layout per ottenere il massimo impatto visivo.');
   const [backgroundColor, setBackgroundColor] = useState(randomTheme.background);
   const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right'>('left');
   const [descriptionAlign, setDescriptionAlign] = useState<'left' | 'center' | 'right'>('left');
@@ -40,10 +43,17 @@ const IndexPage = () => {
   const [logo, setLogo] = useState('/placeholder.svg');
 
   useEffect(() => {
-    toast({
-      title: "Tema selezionato",
-      description: `Tema: ${randomTheme.name}`,
-    });
+    if (location.state?.text || location.state?.description) {
+      toast({
+        title: "Contenuto importato",
+        description: "Il contenuto è stato importato con successo",
+      });
+    } else {
+      toast({
+        title: "Tema selezionato",
+        description: `Tema: ${randomTheme.name}`,
+      });
+    }
   }, []);
 
   const handleColorSelect = (background: string, text: string) => {

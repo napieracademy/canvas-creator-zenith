@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Eye, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeft, Eye, Trash2, ChevronDown, ChevronUp, Home } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import {
@@ -80,6 +80,19 @@ const SavedContent = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const handleMigrateToHome = (content: ExtractedContent) => {
+    navigate('/', {
+      state: {
+        text: content.title,
+        description: content.description,
+      }
+    });
+    toast({
+      title: "Contenuto migrato",
+      description: "Il contenuto è stato trasferito alla home",
+    });
   };
 
   const handleView = (content: ExtractedContent) => {
@@ -175,6 +188,14 @@ const SavedContent = () => {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2" onClick={(e) => e.stopPropagation()}>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleMigrateToHome(content)}
+                          className="text-green-500 hover:text-green-700"
+                        >
+                          <Home className="h-4 w-4" />
+                        </Button>
                         <Button variant="outline" size="sm" onClick={() => handleView(content)}>
                           <Eye className="h-4 w-4" />
                         </Button>
