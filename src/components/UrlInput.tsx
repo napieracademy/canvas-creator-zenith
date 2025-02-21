@@ -8,7 +8,7 @@ import { useToast } from './ui/use-toast';
 import { MetaService } from '@/utils/MetaService';
 import { Loader2, Image as ImageIcon } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
-import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 
 interface UrlInputProps {
   onTitleExtracted: (title: string) => void;
@@ -31,7 +31,6 @@ const UrlInput: React.FC<UrlInputProps> = ({
   const [isImageUrl, setIsImageUrl] = useState(false);
   const [progress, setProgress] = useState(0);
   const { toast } = useToast();
-  const navigate = useNavigate();
 
   const simulateProgress = () => {
     setProgress(0);
@@ -57,6 +56,29 @@ const UrlInput: React.FC<UrlInputProps> = ({
     const newUrl = e.target.value;
     setUrl(newUrl);
     setIsImageUrl(isValidImageUrl(newUrl));
+  };
+
+  const saveToDatabase = async (data: {
+    url: string;
+    title?: string;
+    description?: string;
+    content?: string;
+    credits?: string;
+    extraction_date?: string;
+  }) => {
+    try {
+      const { error } = await supabase
+        .from('extracted_content')
+        .insert([data]);
+
+      if (error) throw error;
+
+      console.log('✅ [UrlInput] Contenuto salvato nel database');
+      return true;
+    } catch (error) {
+      console.error('❌ [UrlInput] Errore nel salvataggio:', error);
+      return false;
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -89,57 +111,41 @@ const UrlInput: React.FC<UrlInputProps> = ({
         const result = await MetaService.extractMetadata(url);
         
         if (result.success) {
-          let extracted = false;
+          // Salva nel database
+          const saved = await saveToDatabase({
+            url: url,
+            title: result.title,
+            description: result.description,
+            content: result.content,
+            credits: result.credits,
+            extraction_date: result.extractionDate
+          });
 
-          // Aggiorniamo prima tutti i dati
-          if (result.title) {
-            onTitleExtracted(result.title);
-            extracted = true;
-          }
-          if (result.description) {
-            onDescriptionExtracted(result.description);
-            extracted = true;
-          }
-          if (result.content && onContentExtracted) {
-            onContentExtracted(result.content);
-          }
-          if (result.credits) {
-            const creditsEvent = new CustomEvent('creditsExtracted', {
-              detail: { credits: result.credits }
-            });
-            document.dispatchEvent(creditsEvent);
-          }
-
-          setProgress(100);
-
-          if (extracted) {
-            // Aspettiamo che tutti i dati siano aggiornati
-            await new Promise(resolve => setTimeout(resolve, 100));
-
-            toast({
-              title: "Contenuto estratto",
-              description: "Il contenuto è stato estratto con successo",
-            });
-
-            // Solo dopo che tutti i dati sono stati aggiornati, navighiamo
-            if (onTabChange) {
-              onTabChange('manual');
+          if (saved) {
+            // Aggiorna i campi nella UI
+            if (result.title) onTitleExtracted(result.title);
+            if (result.description) onDescriptionExtracted(result.description);
+            if (result.content && onContentExtracted) onContentExtracted(result.content);
+            
+            if (result.credits) {
+              const creditsEvent = new CustomEvent('creditsExtracted', {
+                detail: { credits: result.credits }
+              });
+              document.dispatchEvent(creditsEvent);
             }
 
-            navigate('/extracted-content', { 
-              state: {
-                url: result.url,
-                title: result.title,
-                description: result.description,
-                credits: result.credits,
-                content: result.content,
-                extractionDate: result.extractionDate
-              }
+            setProgress(100);
+            toast({
+              title: "Contenuto estratto",
+              description: "Il contenuto è stato estratto e salvato con successo",
             });
+
+            // Resetta l'URL dopo il successo
+            setUrl('');
           } else {
             toast({
-              title: "Nessun contenuto",
-              description: "Nessun contenuto è stato trovato nell'URL specificato",
+              title: "Errore",
+              description: "Impossibile salvare il contenuto nel database",
               variant: "destructive",
             });
           }
@@ -161,7 +167,6 @@ const UrlInput: React.FC<UrlInputProps> = ({
     } finally {
       onLoadingChange?.(false);
       stopProgress();
-      setUrl('');
     }
   };
 
