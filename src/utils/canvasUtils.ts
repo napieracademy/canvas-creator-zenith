@@ -1,11 +1,9 @@
+
 import { CanvasContext } from '@/types/canvas';
 
 export const SAFE_ZONE_MARGIN = 120;
-const LOGO_SIZE = 80;
-const LOGO_MARGIN = 40;
 
 export function drawSafeZone(ctx: CanvasRenderingContext2D, width: number, height: number) {
-  console.log('Drawing safe zone:', { width, height });
   ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
   ctx.fillRect(0, 0, width, SAFE_ZONE_MARGIN);
   ctx.fillRect(0, height - SAFE_ZONE_MARGIN, width, SAFE_ZONE_MARGIN);
@@ -23,82 +21,71 @@ export function drawSafeZone(ctx: CanvasRenderingContext2D, width: number, heigh
   );
 }
 
-export function drawLogo(context: CanvasContext, logoUrl: string) {
+export function drawBackground(context: CanvasContext, backgroundUrl: string): Promise<void> {
   const { ctx, width, height } = context;
   
-  console.log('🖼️ Attempting to draw logo:', { logoUrl, width, height });
+  console.log('Drawing background:', { backgroundUrl, width, height });
   
-  // Se l'URL non è valido o è il placeholder, non fare nulla
-  if (!logoUrl || logoUrl === '/placeholder.svg') {
-    console.log('⚠️ Logo URL non valido o placeholder:', logoUrl);
+  // Se è un colore solido o un gradiente
+  if (!backgroundUrl.startsWith('http') && !backgroundUrl.startsWith('/')) {
+    if (backgroundUrl.includes('gradient')) {
+      const gradient = ctx.createLinearGradient(0, 0, width, height);
+      const colors = backgroundUrl.match(/#[a-fA-F0-9]{6}/g);
+      if (colors && colors.length >= 2) {
+        gradient.addColorStop(0, colors[0]);
+        gradient.addColorStop(1, colors[1]);
+      }
+      ctx.fillStyle = gradient;
+    } else {
+      ctx.fillStyle = backgroundUrl;
+    }
+    ctx.fillRect(0, 0, width, height);
     return Promise.resolve();
   }
 
+  // Se è un'immagine
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.crossOrigin = "anonymous";
     
     img.onload = () => {
-      console.log('✅ Logo loaded successfully:', { 
+      console.log('Background image loaded:', { 
         originalWidth: img.width, 
-        originalHeight: img.height
+        originalHeight: img.height 
       });
       
-      try {
-        // Salva il contesto corrente
-        ctx.save();
-        
-        // Calcola le dimensioni per mantenere l'aspect ratio
-        const aspectRatio = img.width / img.height;
-        let drawWidth = width;
-        let drawHeight = height * 0.5; // Usa metà dell'altezza del canvas
-        
-        if (aspectRatio > 1) {
-          // Immagine più larga che alta
-          drawHeight = drawWidth / aspectRatio;
-        } else {
-          // Immagine più alta che larga
-          drawWidth = drawHeight * aspectRatio;
-        }
-        
-        // Centra l'immagine
-        const x = (width - drawWidth) / 2;
-        const y = 0;
-        
-        console.log('🎨 Drawing logo with dimensions:', { 
-          x, y, width: drawWidth, height: drawHeight
-        });
+      const aspectRatio = img.width / img.height;
+      const canvasAspectRatio = width / height;
+      let drawWidth = width;
+      let drawHeight = height;
+      let x = 0;
+      let y = 0;
 
-        // Imposta compositing mode
-        ctx.globalCompositeOperation = 'source-over';
-        
-        // Disegna l'immagine
-        ctx.drawImage(img, x, y, drawWidth, drawHeight);
-        
-        // Ripristina il contesto
-        ctx.restore();
-        
-        console.log('✨ Logo drawing completed');
-        resolve(true);
-      } catch (error) {
-        console.error('❌ Error while drawing logo:', error);
-        reject(error);
+      if (aspectRatio > canvasAspectRatio) {
+        // Immagine più larga del canvas
+        drawHeight = width / aspectRatio;
+        y = (height - drawHeight) / 2;
+      } else {
+        // Immagine più alta del canvas
+        drawWidth = height * aspectRatio;
+        x = (width - drawWidth) / 2;
       }
+
+      ctx.drawImage(img, x, y, drawWidth, drawHeight);
+      resolve();
     };
     
     img.onerror = (error) => {
-      console.error('❌ Error loading logo:', error);
+      console.error('Error loading background image:', error);
       reject(error);
     };
     
-    console.log('🔄 Starting logo load:', logoUrl);
-    img.src = logoUrl;
+    img.src = backgroundUrl;
   });
 }
 
 export function calculateLines(context: CanvasContext, text: string, size: number, type: 'title' | 'description' = 'title') {
   const { ctx, width, safeZoneMargin, fontFamily = 'Inter' } = context;
-  console.log('Calculating lines:', { text, size, type, fontFamily });
   
   const maxWidth = width - (2 * safeZoneMargin);
   ctx.font = `${type === 'title' ? 'bold' : ''} ${size}px ${fontFamily}`;
@@ -129,7 +116,6 @@ export function calculateLines(context: CanvasContext, text: string, size: numbe
     if (currentLine) lines.push(currentLine);
   }
   
-  console.log('Calculated lines:', lines);
   return lines;
 }
 
@@ -142,7 +128,6 @@ export function drawText(
   type: 'title' | 'description' = 'title',
   spacing: number = 40
 ) {
-  console.log('Drawing text:', { text, textAlign, textColor, fontSize, type, spacing });
   const { ctx, width, height, fontFamily = 'Inter' } = context;
   
   if (!text.trim()) {
@@ -181,11 +166,8 @@ export function drawText(
 
     lines.forEach((line, index) => {
       const y = startY + (index * lineHeight) + (lineHeight / 2);
-      console.log('Drawing line:', { line, x, y });
       ctx.fillText(line, x, y);
     });
-  } catch (error) {
-    console.error('Error drawing text:', error);
   } finally {
     ctx.restore();
   }
