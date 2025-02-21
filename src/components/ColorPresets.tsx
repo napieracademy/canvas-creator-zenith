@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ColorPresetsProps, ColorPresetPair } from '@/types/colorPresets';
 import { colorPairs } from '@/data/colorPairs';
 import { Button } from './ui/button';
+import { PaintBucket, Rocket, Gamepad2, Shield } from 'lucide-react';
 
 const ColorPresets: React.FC<ColorPresetsProps> = ({ 
   onSelectColors, 
@@ -134,20 +135,44 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
     <div className="space-y-4">
       <Tabs defaultValue="classic" className="w-full">
         <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="classic" className="text-xs px-1">
-            Classici
+          <TabsTrigger value="classic" className="relative flex flex-col items-center gap-2 pt-2 pb-4">
+            <div className="w-12 h-12 rounded-full bg-gradient 
+              bg-gradient-to-br from-purple-500 to-pink-500 
+              flex items-center justify-center text-white">
+              <PaintBucket className="w-6 h-6" />
+            </div>
+            <span className="text-xs">Classici</span>
           </TabsTrigger>
-          <TabsTrigger value="cosmic" className="text-xs px-1">
-            Cosmici
+          <TabsTrigger value="cosmic" className="relative flex flex-col items-center gap-2 pt-2 pb-4">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br 
+              from-indigo-600 to-purple-600 
+              flex items-center justify-center text-white">
+              <Rocket className="w-6 h-6" />
+            </div>
+            <span className="text-xs">Cosmici</span>
           </TabsTrigger>
-          <TabsTrigger value="retro" className="text-xs px-1">
-            C64
+          <TabsTrigger value="retro" className="relative flex flex-col items-center gap-2 pt-2 pb-4">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br 
+              from-blue-600 to-cyan-500 
+              flex items-center justify-center text-white">
+              <Gamepad2 className="w-6 h-6" />
+            </div>
+            <span className="text-xs">C64</span>
           </TabsTrigger>
-          <TabsTrigger value="avengers" className="text-xs px-1">
-            Avengers
+          <TabsTrigger value="avengers" className="relative flex flex-col items-center gap-2 pt-2 pb-4">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br 
+              from-red-600 to-yellow-500 
+              flex items-center justify-center text-white">
+              <Shield className="w-6 h-6" />
+            </div>
+            <span className="text-xs">Avengers</span>
           </TabsTrigger>
-          <TabsTrigger value="featured" className="text-xs px-1" disabled={!featuredImage}>
-            Featured
+          <TabsTrigger value="featured" className="relative flex flex-col items-center gap-2 pt-2 pb-4" disabled={!featuredImage}>
+            <div className={`w-12 h-12 rounded-full ${!featuredImage ? 'bg-gray-200' : 'bg-gradient-to-br from-green-500 to-emerald-700'} 
+              flex items-center justify-center text-white`}>
+              <PaintBucket className="w-6 h-6" />
+            </div>
+            <span className="text-xs">Featured</span>
           </TabsTrigger>
         </TabsList>
         <TabsContent value="classic" className="mt-4">
