@@ -59,9 +59,15 @@ export class MetaService {
       const clone = doc.body.cloneNode(true) as HTMLElement;
       const elementsToRemove = clone.querySelectorAll('script, style');
       elementsToRemove.forEach(el => el.remove());
-      const content = clone.textContent || '';
+      const rawContent = clone.textContent || '';
+      
+      // Prendiamo solo le prime 10 righe del contenuto
+      const contentLines = rawContent.split('\n')
+        .filter(line => line.trim().length > 0) // Rimuove le righe vuote
+        .slice(0, 10) // Prende solo le prime 10 righe
+        .join('\n');
 
-      console.log('📄 [MetaService] Lunghezza contenuto grezzo:', content.length);
+      console.log('📄 [MetaService] Lunghezza contenuto limitato:', contentLines.length);
 
       let credits = '';
       if (author || publisher) {
@@ -78,7 +84,7 @@ export class MetaService {
         description: description.trim(),
         image: image.trim(),
         credits: credits,
-        content: content
+        content: contentLines
       };
 
       console.log('📦 [MetaService] Oggetto risultato creato:', result);
@@ -110,7 +116,7 @@ Descrizione: ${result.description}
 Immagine: ${result.image}
 Crediti: ${result.credits || 'Non specificati'}
 
-CONTENUTO:
+CONTENUTO (Prime 10 righe):
 ---------
 ${result.content || 'Nessun contenuto estratto'}
 `;
