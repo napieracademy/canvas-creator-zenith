@@ -195,9 +195,22 @@ export class MetaService {
         content: normalizedContent
       };
 
-      // Genera e scarica il file di testo con i metadati
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const filename = `metadata_${timestamp}.txt`;
+      // Genera un nome file pulito dal titolo (rimuovi caratteri non validi)
+      const cleanTitle = result.title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '_') // sostituisce caratteri non alfanumerici con underscore
+        .replace(/^_+|_+$/g, '') // rimuove underscore all'inizio e alla fine
+        .substring(0, 50); // limita la lunghezza del titolo
+
+      // Estrai il nome del sito dai crediti o dall'URL
+      const siteName = publisher || new URL(url).hostname.replace('www.', '');
+      const cleanSiteName = siteName
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '_')
+        .replace(/^_+|_+$/g, '');
+
+      const timestamp = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+      const filename = `${cleanTitle}_${cleanSiteName}_${timestamp}.txt`;
       
       const metadataText = `
 URL Originale: ${url}
