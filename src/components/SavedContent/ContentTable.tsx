@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { Table, TableBody } from "@/components/ui/table";
 import type { ExtractedContent } from './types';
@@ -118,18 +117,18 @@ export const ContentTable = ({
     setSelectedRows(new Set());
   };
 
-  // Colori più saturi per i duplicati
+  // Colori molto più tenui per i duplicati
   const duplicateColors = [
-    'bg-purple-200',
-    'bg-pink-200',
-    'bg-blue-200',
-    'bg-green-200',
-    'bg-yellow-200',
-    'bg-orange-200',
-    'bg-red-200',
-    'bg-indigo-200',
-    'bg-cyan-200',
-    'bg-emerald-200'
+    'bg-purple-50/50',
+    'bg-pink-50/50',
+    'bg-blue-50/50',
+    'bg-green-50/50',
+    'bg-yellow-50/50',
+    'bg-orange-50/50',
+    'bg-red-50/50',
+    'bg-indigo-50/50',
+    'bg-cyan-50/50',
+    'bg-emerald-50/50'
   ];
 
   // Crea una mappa di URL -> colore per i duplicati
