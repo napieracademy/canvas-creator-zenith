@@ -120,6 +120,16 @@ const IndexPage = () => {
     }
   }, []);
 
+  useEffect(() => {
+    if (extractedContent) {
+      setNewTextContent(extractedContent);
+      toast({
+        title: "Contenuto aggiornato",
+        description: "Il contenuto estratto è stato inserito nel nuovo campo",
+      });
+    }
+  }, [extractedContent]);
+
   const handleClean = () => {
     setText(DEFAULT_TEXT);
     setDescription(DEFAULT_DESCRIPTION);
@@ -278,7 +288,8 @@ const IndexPage = () => {
                   onTextAlignChange={setNewTextAlign}
                   fontSize={newFontSize}
                   onFontSizeChange={setNewFontSize}
-                  label="Nuovo Contenuto"
+                  label="Contenuto Estratto"
+                  extractedContent={extractedContent}
                 />
               </>
             )}
