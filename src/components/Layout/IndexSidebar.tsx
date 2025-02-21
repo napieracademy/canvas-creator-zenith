@@ -48,8 +48,6 @@ const IndexSidebar: React.FC<IndexSidebarProps> = ({
             onTabChange={state.setActiveTab}
             onLoadingChange={state.setIsLoading}
             onColorSelect={handlers.handleColorSelect}
-            articleContent={state.articleContent}
-            onArticleContentExtracted={state.setArticleContent}
             onLogoChange={handlers.handleLogoChange}
           />
           <TextInput
@@ -61,6 +59,7 @@ const IndexSidebar: React.FC<IndexSidebarProps> = ({
             onFontSizeChange={state.setArticleFontSize}
             label="Contenuto Articolo"
             articleContent={state.articleContent}
+            onArticleContentExtracted={state.setArticleContent}
           />
         </>
       )}
