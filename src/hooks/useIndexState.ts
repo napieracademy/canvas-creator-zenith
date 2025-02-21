@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
@@ -82,22 +83,6 @@ export const useIndexState = () => {
   const [extractedArticleText, setExtractedArticleText] = useState('');
   const [articleTextAlign, setArticleTextAlign] = useState<'left' | 'center' | 'right'>('left');
   const [articleFontSize, setArticleFontSize] = useState(32);
-
-  useEffect(() => {
-    const dataToCache = {
-      text,
-      description,
-      backgroundColor,
-      textColor,
-      fontSize,
-      descriptionFontSize,
-      spacing,
-      textAlign,
-      descriptionAlign,
-      format
-    };
-    localStorage.setItem('socialImageCache', JSON.stringify(dataToCache));
-  }, [text, description, backgroundColor, textColor, fontSize, descriptionFontSize, spacing, textAlign, descriptionAlign, format]);
 
   useEffect(() => {
     if (location.state?.text || location.state?.description) {
