@@ -1,4 +1,3 @@
-
 import { CanvasContext } from '@/types/canvas';
 
 export const SAFE_ZONE_MARGIN = 120;
@@ -27,54 +26,72 @@ export function drawSafeZone(ctx: CanvasRenderingContext2D, width: number, heigh
 export function drawLogo(context: CanvasContext, logoUrl: string) {
   const { ctx, width, height } = context;
   
+  console.log('🖼️ Attempting to draw logo:', { logoUrl, width, height });
+  
   // Se l'URL non è valido o è il placeholder, non fare nulla
   if (!logoUrl || logoUrl === '/placeholder.svg') {
-    console.log('Logo URL non valido o placeholder:', logoUrl);
-    return;
+    console.log('⚠️ Logo URL non valido o placeholder:', logoUrl);
+    return Promise.resolve();
   }
 
-  console.log('Drawing logo:', logoUrl);
-  
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.crossOrigin = "anonymous";
     
     img.onload = () => {
-      console.log('Logo loaded:', { width: img.width, height: img.height });
+      console.log('✅ Logo loaded successfully:', { 
+        originalWidth: img.width, 
+        originalHeight: img.height
+      });
       
-      // Calcola le dimensioni mantenendo l'aspect ratio
-      const aspectRatio = img.width / img.height;
-      let newWidth = img.width;
-      let newHeight = img.height;
-      
-      // Calcola le dimensioni per riempire la metà superiore del canvas
-      const scale = Math.max(width / img.width, (height * 0.5) / img.height);
-      newWidth = img.width * scale;
-      newHeight = img.height * scale;
-      
-      // Centra l'immagine orizzontalmente
-      const x = (width - newWidth) / 2;
-      const y = 0; // Posiziona in alto
-      
-      console.log('Drawing image with dimensions:', { x, y, newWidth, newHeight });
-      
-      // Disegna prima un colore di sfondo neutro
-      ctx.fillStyle = '#f0f0f0';
-      ctx.fillRect(0, 0, width, height);
-      
-      // Imposta il blend mode per l'immagine
-      ctx.globalCompositeOperation = 'multiply';
-      ctx.drawImage(img, x, y, newWidth, height * 0.5);
-      ctx.globalCompositeOperation = 'source-over';
-      
-      resolve(true);
+      try {
+        // Salva il contesto corrente
+        ctx.save();
+        
+        // Calcola le dimensioni per mantenere l'aspect ratio
+        const aspectRatio = img.width / img.height;
+        let drawWidth = width;
+        let drawHeight = height * 0.5; // Usa metà dell'altezza del canvas
+        
+        if (aspectRatio > 1) {
+          // Immagine più larga che alta
+          drawHeight = drawWidth / aspectRatio;
+        } else {
+          // Immagine più alta che larga
+          drawWidth = drawHeight * aspectRatio;
+        }
+        
+        // Centra l'immagine
+        const x = (width - drawWidth) / 2;
+        const y = 0;
+        
+        console.log('🎨 Drawing logo with dimensions:', { 
+          x, y, width: drawWidth, height: drawHeight
+        });
+
+        // Imposta compositing mode
+        ctx.globalCompositeOperation = 'source-over';
+        
+        // Disegna l'immagine
+        ctx.drawImage(img, x, y, drawWidth, drawHeight);
+        
+        // Ripristina il contesto
+        ctx.restore();
+        
+        console.log('✨ Logo drawing completed');
+        resolve(true);
+      } catch (error) {
+        console.error('❌ Error while drawing logo:', error);
+        reject(error);
+      }
     };
     
     img.onerror = (error) => {
-      console.error('Error loading logo:', error);
+      console.error('❌ Error loading logo:', error);
       reject(error);
     };
     
+    console.log('🔄 Starting logo load:', logoUrl);
     img.src = logoUrl;
   });
 }
