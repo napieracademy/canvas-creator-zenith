@@ -58,12 +58,12 @@ export const ContentTable = ({
           <TableHeader>
             <TableRow>
               <TableHead className="w-[30px]"></TableHead>
-              {columnVisibility.image && <TableHead className="w-[50px]">Img</TableHead>}
-              {columnVisibility.id && <TableHead className="w-[100px]">ID</TableHead>}
-              {columnVisibility.title && <TableHead>Titolo</TableHead>}
-              {columnVisibility.link && <TableHead className="hidden md:table-cell w-[50px]">Link</TableHead>}
-              {columnVisibility.content && <TableHead className="hidden lg:table-cell">Contenuto</TableHead>}
-              {columnVisibility.extractionDate && <TableHead className="hidden lg:table-cell">Data di estrazione</TableHead>}
+              {columnVisibility.image && <TableHead className="w-[50px] text-left">Img</TableHead>}
+              {columnVisibility.id && <TableHead className="w-[100px] text-left">ID</TableHead>}
+              {columnVisibility.title && <TableHead className="text-left">Titolo</TableHead>}
+              {columnVisibility.link && <TableHead className="hidden md:table-cell w-[50px] text-center">Link</TableHead>}
+              {columnVisibility.content && <TableHead className="hidden lg:table-cell text-left">Contenuto</TableHead>}
+              {columnVisibility.extractionDate && <TableHead className="hidden lg:table-cell text-left">Data di estrazione</TableHead>}
               {columnVisibility.actions && <TableHead className="text-right">Azioni</TableHead>}
             </TableRow>
           </TableHeader>
@@ -79,7 +79,7 @@ export const ContentTable = ({
                     )}
                   </TableCell>
                   {columnVisibility.image && (
-                    <TableCell className="w-[50px]">
+                    <TableCell className="w-[50px] text-left">
                       {content.image_url ? (
                         <img
                           src={content.image_url}
@@ -96,22 +96,22 @@ export const ContentTable = ({
                     </TableCell>
                   )}
                   {columnVisibility.id && (
-                    <TableCell className="font-mono text-sm">
+                    <TableCell className="font-mono text-sm text-left">
                       {content.id.substring(0, 8)}...
                     </TableCell>
                   )}
                   {columnVisibility.title && (
-                    <TableCell className="font-medium">
+                    <TableCell className="font-medium text-left">
                       {content.title || 'Senza titolo'}
                     </TableCell>
                   )}
                   {columnVisibility.link && (
-                    <TableCell className="hidden md:table-cell w-[50px]">
+                    <TableCell className="hidden md:table-cell w-[50px] text-center">
                       <a 
                         href={content.url} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 transition-colors inline-flex items-center"
+                        className="text-blue-600 hover:text-blue-800 transition-colors inline-flex items-center justify-center"
                         onClick={(e) => e.stopPropagation()}
                         title={content.url}
                       >
@@ -120,13 +120,13 @@ export const ContentTable = ({
                     </TableCell>
                   )}
                   {columnVisibility.content && (
-                    <TableCell className="hidden lg:table-cell max-w-xs truncate">
+                    <TableCell className="hidden lg:table-cell max-w-xs truncate text-left">
                       {content.content?.substring(0, 100)}
                       {content.content?.length > 100 ? '...' : ''}
                     </TableCell>
                   )}
                   {columnVisibility.extractionDate && (
-                    <TableCell className="hidden lg:table-cell">
+                    <TableCell className="hidden lg:table-cell text-left">
                       {new Date(content.extraction_date).toLocaleString('it-IT')}
                     </TableCell>
                   )}
