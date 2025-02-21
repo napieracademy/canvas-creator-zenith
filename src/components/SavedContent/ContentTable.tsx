@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { Table, TableBody } from "@/components/ui/table";
 import type { ExtractedContent } from './types';
@@ -42,7 +43,7 @@ export const ContentTable = ({
   onMigrateToHome,
   onFetchContents
 }: ContentTableProps) => {
-  const [columnVisibility, setColumnVisibility] = React.useState<ColumnVisibility>({
+  const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>({
     id: false,
     image: true,
     title: true,
@@ -52,9 +53,9 @@ export const ContentTable = ({
     actions: true
   });
 
-  const [selectedRows, setSelectedRows] = React.useState<Set<string>>(new Set());
-  const [timeRemaining, setTimeRemaining] = React.useState<{[key: string]: string}>({});
-  const [showDuplicates, setShowDuplicates] = React.useState(false);
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+  const [timeRemaining, setTimeRemaining] = useState<{[key: string]: string}>({});
+  const [showDuplicates, setShowDuplicates] = useState(false);
 
   useEffect(() => {
     const updateCountdowns = () => {
@@ -190,6 +191,7 @@ export const ContentTable = ({
         onToggleDuplicates={() => setShowDuplicates(!showDuplicates)}
         onColumnToggle={handleColumnToggle}
         onDeleteDuplicates={handleDeleteDuplicates}
+        onRefresh={onFetchContents}
         hasDuplicates={getDuplicateUrls().length > 0}
       />
       <div className="rounded-md border">

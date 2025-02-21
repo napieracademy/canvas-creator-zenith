@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { FilterX, Filter, Trash2, Copy } from 'lucide-react';
+import { FilterX, Filter, Trash2, Copy, RefreshCw } from 'lucide-react';
 import { ColumnToggle, type ColumnVisibility } from './ColumnToggle';
 import {
   AlertDialog,
@@ -23,6 +23,7 @@ interface ContentTableToolbarProps {
   onToggleDuplicates: () => void;
   onColumnToggle: (key: keyof ColumnVisibility) => void;
   onDeleteDuplicates: () => void;
+  onRefresh: () => void;
   hasDuplicates: boolean;
 }
 
@@ -34,6 +35,7 @@ export const ContentTableToolbar = ({
   onToggleDuplicates,
   onColumnToggle,
   onDeleteDuplicates,
+  onRefresh,
   hasDuplicates
 }: ContentTableToolbarProps) => (
   <div className="flex justify-between items-center">
@@ -72,6 +74,14 @@ export const ContentTableToolbar = ({
           <Filter className="h-4 w-4 mr-2" />
         )}
         {showDuplicates ? "Mostra tutti" : "Mostra duplicati"}
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={onRefresh}
+      >
+        <RefreshCw className="h-4 w-4 mr-2" />
+        Aggiorna lista
       </Button>
       {hasDuplicates && (
         <AlertDialog>
