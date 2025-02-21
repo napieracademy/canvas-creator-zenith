@@ -8,6 +8,7 @@ import { useToast } from './ui/use-toast';
 import { MetaService } from '@/utils/MetaService';
 import { Loader2, Image as ImageIcon } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
+import ApiKeyInput from './ApiKeyInput';
 
 interface UrlInputProps {
   onTitleExtracted: (title: string) => void;
@@ -29,6 +30,7 @@ const UrlInput: React.FC<UrlInputProps> = ({
   const [url, setUrl] = useState('');
   const [isImageUrl, setIsImageUrl] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [hasApiKey, setHasApiKey] = useState(!!MetaService.getApiKey());
   const { toast } = useToast();
 
   const simulateProgress = () => {
@@ -56,6 +58,17 @@ const UrlInput: React.FC<UrlInputProps> = ({
     setUrl(newUrl);
     setIsImageUrl(isValidImageUrl(newUrl));
   };
+
+  if (!hasApiKey) {
+    return (
+      <div className="space-y-4">
+        <p className="text-sm text-gray-600">
+          Per estrarre contenuti da URL, inserisci la tua API key di Firecrawl
+        </p>
+        <ApiKeyInput onKeySet={() => setHasApiKey(true)} />
+      </div>
+    );
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
