@@ -2,14 +2,14 @@
 import React from 'react';
 import { Button } from '../ui/button';
 import { Loader2, Image as ImageIcon } from 'lucide-react';
-import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '../ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 
 interface SubmitButtonProps {
   isImageUrl: boolean;
   isLoading: boolean;
 }
 
-export const SubmitButton: React.FC<SubmitButtonProps> = ({ isImageUrl, isLoading }) => (
+export const SubmitButton = ({ isImageUrl, isLoading }: SubmitButtonProps) => (
   <TooltipProvider>
     <Tooltip>
       <TooltipTrigger asChild>

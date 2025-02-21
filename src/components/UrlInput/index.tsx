@@ -20,8 +20,6 @@ const UrlInput: React.FC<UrlInputProps> = ({
   const [url, setUrl] = useState('');
   const [isImageUrl, setIsImageUrl] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [showDuplicateDialog, setShowDuplicateDialog] = useState(false);
-  const [tempContent, setTempContent] = useState<any>(null);
   const { toast } = useToast();
 
   const simulateProgress = createSimulateProgress(setProgress);
@@ -30,23 +28,6 @@ const UrlInput: React.FC<UrlInputProps> = ({
     const newUrl = e.target.value;
     setUrl(newUrl);
     setIsImageUrl(isValidImageUrl(newUrl));
-  };
-
-  const updateEditor = (result: any) => {
-    if (result.title) onTitleExtracted(result.title);
-    if (result.description) onDescriptionExtracted(result.description);
-    if (result.content && onContentExtracted) onContentExtracted(result.content);
-    if (result.image && onImageExtracted) {
-      console.log('🖼️ [UrlInput] Estratta immagine:', result.image);
-      onImageExtracted(result.image);
-    }
-    
-    if (result.credits) {
-      const creditsEvent = new CustomEvent('creditsExtracted', {
-        detail: { credits: result.credits }
-      });
-      document.dispatchEvent(creditsEvent);
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -79,29 +60,36 @@ const UrlInput: React.FC<UrlInputProps> = ({
         const result = await MetaService.extractMetadata(url);
         
         if (result.success) {
-          const { saved, duplicate, existingContent } = await saveToDatabase({
+          const saved = await saveToDatabase({
             url: url,
             title: result.title,
             description: result.description,
             content: result.content,
             credits: result.credits,
             image_url: result.image,
-            extraction_date: result.extractionDate,
-            publication_date: result.publicationDate,
-            modification_date: result.modificationDate
+            extraction_date: result.extractionDate
           });
 
           if (saved) {
-            updateEditor(result);
+            if (result.title) onTitleExtracted(result.title);
+            if (result.description) onDescriptionExtracted(result.description);
+            if (result.content && onContentExtracted) onContentExtracted(result.content);
+            if (result.image && onImageExtracted) onImageExtracted(result.image);
+            
+            if (result.credits) {
+              const creditsEvent = new CustomEvent('creditsExtracted', {
+                detail: { credits: result.credits }
+              });
+              document.dispatchEvent(creditsEvent);
+            }
+
             setProgress(100);
             toast({
               title: "Contenuto estratto",
               description: "Il contenuto è stato estratto e salvato con successo",
             });
+
             setUrl('');
-          } else if (duplicate && existingContent) {
-            setTempContent(existingContent);
-            setShowDuplicateDialog(true);
           } else {
             toast({
               title: "Errore",
@@ -125,10 +113,8 @@ const UrlInput: React.FC<UrlInputProps> = ({
         variant: "destructive",
       });
     } finally {
-      if (!showDuplicateDialog) {
-        onLoadingChange?.(false);
-        stopProgress();
-      }
+      onLoadingChange?.(false);
+      stopProgress();
     }
   };
 
