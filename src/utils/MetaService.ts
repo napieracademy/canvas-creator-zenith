@@ -143,6 +143,9 @@ CONTENUTO:
 ${result.content || 'Nessun contenuto estratto'}
 `;
 
+      // Aggiorniamo il risultato con il testo formattato
+      result.content = metadataText;
+
       const blob = new Blob([metadataText], { type: 'text/plain;charset=utf-8' });
       const downloadUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
