@@ -87,14 +87,15 @@ const TextEditor: React.FC<TextEditorProps> = ({
         <TextInput 
           value={extractedContent || ''} 
           onChange={onContentExtracted || (() => {})} 
-          textAlign="left"
-          onTextAlignChange={() => {}}
-          fontSize={14}
-          onFontSizeChange={() => {}}
-          label="Contenuto"
-          disabled={false}
-          otherText=""
+          textAlign={descriptionAlign}
+          onTextAlignChange={onDescriptionAlignChange}
+          fontSize={descriptionFontSize}
+          onFontSizeChange={onDescriptionFontSizeChange}
+          label="Prime 10 righe"
+          disabled={disabled}
+          otherText={text}
           extractedContent={extractedContent}
+          onContentExtracted={onContentExtracted}
         />
       </div>
     </div>
