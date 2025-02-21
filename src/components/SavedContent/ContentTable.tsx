@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, Image as ImageIcon } from 'lucide-react';
 import { ContentActions } from './ContentActions';
 import { ExpandedContent } from './ExpandedContent';
 import type { ExtractedContent } from './types';
@@ -35,6 +35,7 @@ export const ContentTable = ({
       <TableHeader>
         <TableRow>
           <TableHead className="w-[30px]"></TableHead>
+          <TableHead className="w-[50px]">Img</TableHead>
           <TableHead>Titolo</TableHead>
           <TableHead className="hidden md:table-cell">URL</TableHead>
           <TableHead className="hidden lg:table-cell">Contenuto</TableHead>
@@ -51,6 +52,21 @@ export const ContentTable = ({
                   <ChevronUp className="h-4 w-4" />
                 ) : (
                   <ChevronDown className="h-4 w-4" />
+                )}
+              </TableCell>
+              <TableCell className="w-[50px]">
+                {content.image_url ? (
+                  <img
+                    src={content.image_url}
+                    alt={content.title}
+                    className="w-8 h-8 object-cover rounded"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = '/placeholder.svg';
+                    }}
+                  />
+                ) : (
+                  <ImageIcon className="w-8 h-8 text-gray-300" />
                 )}
               </TableCell>
               <TableCell className="font-medium">
