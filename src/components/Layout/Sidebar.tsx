@@ -6,6 +6,11 @@ import Header from '@/components/Layout/Header';
 import ColorPresets from '@/components/ColorPresets';
 import { Separator } from "@/components/ui/separator";
 import { withFeatureVariants } from '@/components/withFeatureVariants';
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Label } from "@/components/ui/label";
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { useState } from 'react';
 
 interface SidebarProps {
   text: string;
@@ -68,6 +73,8 @@ const Sidebar: React.FC<SidebarProps> = ({
   onContentExtracted,
   onLogoChange,
 }) => {
+  const [showContent, setShowContent] = useState(false);
+
   return (
     <div className={cn(
       "flex h-screen flex-col gap-4 border-r bg-background p-6",
@@ -109,6 +116,31 @@ const Sidebar: React.FC<SidebarProps> = ({
               currentBackground={backgroundColor}
               currentText={textColor}
             />
+
+            {extractedContent && (
+              <div className="space-y-2">
+                <Separator />
+                <div 
+                  className="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
+                  onClick={() => setShowContent(!showContent)}
+                >
+                  <Label className="text-sm font-medium text-gray-700 cursor-pointer">
+                    Contenuto estratto
+                  </Label>
+                  <Button variant="ghost" size="sm">
+                    {showContent ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                  </Button>
+                </div>
+                
+                {showContent && (
+                  <ScrollArea className="h-[200px] w-full rounded-md border p-4">
+                    <div className="text-sm text-gray-600 whitespace-pre-wrap">
+                      {extractedContent}
+                    </div>
+                  </ScrollArea>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
