@@ -1,4 +1,3 @@
-
 interface MetadataResult {
   success: boolean;
   title?: string;
@@ -159,8 +158,8 @@ export class MetaService {
         title: title.trim(),
         description: description.trim(),
         credits: credits,
-        content: cleanContent, // Ora contiene solo le prime 10 righe
-        extractionDate: new Date().toLocaleString(),
+        content: cleanContent,
+        extractionDate: new Date().toISOString(),
         url: url
       };
 
