@@ -28,13 +28,34 @@ const IndexPage = () => {
 
   // Recupera i dati dal localStorage o usa i valori predefiniti
   const loadFromCache = () => {
+    // Se ci sono dati dalla navigazione, li usiamo come prioritari
+    if (location.state?.text || location.state?.description) {
+      const cached = localStorage.getItem('socialImageCache');
+      const cachedData = cached ? JSON.parse(cached) : {};
+      
+      return {
+        text: location.state.text || DEFAULT_TEXT,
+        description: location.state.description || DEFAULT_DESCRIPTION,
+        backgroundColor: cachedData.backgroundColor || randomTheme.background,
+        textColor: cachedData.textColor || randomTheme.text,
+        fontSize: cachedData.fontSize || 111,
+        descriptionFontSize: cachedData.descriptionFontSize || 56,
+        spacing: cachedData.spacing || 100,
+        textAlign: cachedData.textAlign || 'left',
+        descriptionAlign: cachedData.descriptionAlign || 'left',
+        format: cachedData.format || 'post'
+      };
+    }
+
+    // Altrimenti, usiamo il cache o i valori predefiniti
     const cached = localStorage.getItem('socialImageCache');
     if (cached) {
       return JSON.parse(cached);
     }
+
     return {
-      text: location.state?.text || DEFAULT_TEXT,
-      description: location.state?.description || DEFAULT_DESCRIPTION,
+      text: DEFAULT_TEXT,
+      description: DEFAULT_DESCRIPTION,
       backgroundColor: randomTheme.background,
       textColor: randomTheme.text,
       fontSize: 111,
