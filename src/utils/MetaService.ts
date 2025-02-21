@@ -3,7 +3,7 @@ interface MetadataResult {
   title?: string;
   description?: string;
   credits?: string;
-  content?: string;
+  extractedContent?: string;
   image?: string;
   error?: string;
   extractionDate?: string;
@@ -216,7 +216,7 @@ export class MetaService {
         title: title.trim(),
         description: extractedDescription?.trim(),
         credits: credits,
-        content: cleanContent,
+        extractedContent: cleanContent,
         image: image,
         extractionDate: new Date().toISOString(),
         url: url,

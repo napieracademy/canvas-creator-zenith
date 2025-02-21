@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
@@ -24,8 +23,8 @@ interface TextInputProps {
   onTabChange?: (value: string) => void;
   onLoadingChange?: (loading: boolean) => void;
   otherText?: string;
-  articleContent?: string;
-  onArticleContentExtracted?: (content: string) => void;
+  extractedContent?: string;
+  onExtractedContentUpdated?: (extractedContent: string) => void;
 }
 
 const TextInput: React.FC<TextInputProps> = ({ 
@@ -38,8 +37,8 @@ const TextInput: React.FC<TextInputProps> = ({
   label,
   disabled,
   otherText,
-  articleContent,
-  onArticleContentExtracted
+  extractedContent,
+  onExtractedContentUpdated
 }) => {
   const isDescription = label.toLowerCase() === 'descrizione';
   const isArticle = label.toLowerCase() === 'contenuto articolo';
@@ -122,7 +121,7 @@ const TextInput: React.FC<TextInputProps> = ({
           : isArticle 
             ? "Il contenuto dell'articolo estratto apparirà qui..."
             : `Scrivi il tuo ${label.toLowerCase()} qui...`}
-        value={isArticle ? (articleContent || '') : value}
+        value={isArticle ? (extractedContent || '') : value}
         onChange={(e) => handleChange(e.target.value)}
         className={`resize-none ${isArticle ? 'h-64' : 'h-32'} bg-white/50 backdrop-blur-sm focus:bg-white transition-colors duration-200`}
         style={{ textAlign }}
