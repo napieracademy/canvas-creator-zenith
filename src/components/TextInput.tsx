@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
 import TextAlignControl from './TextControls/TextAlignControl';
@@ -36,12 +36,30 @@ const TextInput: React.FC<TextInputProps> = ({
   const [charHistory, setCharHistory] = useState<string[]>([value]);
   const { toast } = useToast();
 
-  // Determine input type and state
-  const isDescription = label.toLowerCase() === 'descrizione';
-  const isArticle = label.toLowerCase() === 'contenuto articolo';
-  const isTitle = label.toLowerCase() === 'titolo';
-  const hasTitle = isDescription && otherText && otherText.trim().length > 0;
-  const isEmpty = !value || value.trim().length === 0;
+  // Memoize input type checks
+  const inputType = useMemo(() => {
+    const labelLower = label.toLowerCase();
+    return {
+      isDescription: labelLower === 'descrizione',
+      isArticle: labelLower === 'contenuto articolo',
+      isTitle: labelLower === 'titolo'
+    };
+  }, [label]);
+
+  // Memoize state checks
+  const { hasTitle, isEmpty } = useMemo(() => ({
+    hasTitle: inputType.isDescription && otherText && otherText.trim().length > 0,
+    isEmpty: !value || value.trim().length === 0
+  }), [inputType.isDescription, otherText, value]);
+
+  const handleError = useCallback((error: Error, context: string) => {
+    console.error(`Error in TextInput (${context}):`, error);
+    toast({
+      title: "Errore",
+      description: `Si è verificato un errore durante ${context}`,
+      variant: "destructive"
+    });
+  }, [toast]);
 
   /**
    * Handles text changes while maintaining history
@@ -53,14 +71,9 @@ const TextInput: React.FC<TextInputProps> = ({
         onChange(newValue);
       }
     } catch (error) {
-      console.error('Error handling text change:', error);
-      toast({
-        title: "Errore",
-        description: "Si è verificato un errore durante la modifica del testo",
-        variant: "destructive"
-      });
+      handleError(error as Error, "la modifica del testo");
     }
-  }, [charHistory, onChange, toast]);
+  }, [charHistory, onChange, handleError]);
 
   /**
    * Handles undo operation
@@ -79,15 +92,21 @@ const TextInput: React.FC<TextInputProps> = ({
           description: "L'ultima modifica è stata annullata"
         });
       } catch (error) {
-        console.error('Error handling undo:', error);
-        toast({
-          title: "Errore",
-          description: "Impossibile annullare l'ultima modifica",
-          variant: "destructive"
-        });
+        handleError(error as Error, "l'annullamento dell'ultima modifica");
       }
     }
-  }, [charHistory, onChange, toast]);
+  }, [charHistory, onChange, toast, handleError]);
+
+  // Memoize placeholder text
+  const placeholder = useMemo(() => {
+    if (inputType.isDescription && hasTitle && isEmpty) {
+      return "Clicca sulla bacchetta magica per generare automaticamente una descrizione dal titolo...";
+    }
+    if (inputType.isArticle) {
+      return "Il contenuto dell'articolo estratto apparirà qui...";
+    }
+    return `Scrivi il tuo ${label.toLowerCase()} qui...`;
+  }, [inputType.isDescription, inputType.isArticle, hasTitle, isEmpty, label]);
 
   return (
     <div className="space-y-4">
@@ -120,7 +139,7 @@ const TextInput: React.FC<TextInputProps> = ({
             disabled={disabled}
             otherText={otherText}
           />
-          {isDescription && hasTitle && isEmpty && (
+          {inputType.isDescription && hasTitle && isEmpty && (
             <>
               <ChevronRight className="h-4 w-4 text-gray-400 animate-bounce-x" />
               <DescriptionGenerateControl
@@ -134,14 +153,10 @@ const TextInput: React.FC<TextInputProps> = ({
       </div>
       
       <Textarea
-        placeholder={isDescription && hasTitle && isEmpty 
-          ? "Clicca sulla bacchetta magica per generare automaticamente una descrizione dal titolo..." 
-          : isArticle 
-            ? "Il contenuto dell'articolo estratto apparirà qui..."
-            : `Scrivi il tuo ${label.toLowerCase()} qui...`}
-        value={isArticle ? (extractedContent || '') : value}
+        placeholder={placeholder}
+        value={inputType.isArticle ? (extractedContent || '') : value}
         onChange={(e) => handleChange(e.target.value)}
-        className={`resize-none ${isArticle ? 'h-64' : 'h-32'} bg-white/50 backdrop-blur-sm focus:bg-white transition-colors duration-200`}
+        className={`resize-none ${inputType.isArticle ? 'h-64' : 'h-32'} bg-white/50 backdrop-blur-sm focus:bg-white transition-colors duration-200`}
         style={{ textAlign }}
         disabled={disabled}
       />

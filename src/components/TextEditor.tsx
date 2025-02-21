@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useToast } from './ui/use-toast';
 import TextInput from '@/components/TextInput';
 import type { TextEditorProps } from '@/types/text';
 
@@ -31,12 +32,39 @@ const TextEditor: React.FC<TextEditorProps> = ({
   extractedContent,
   onExtractedContentUpdated
 }) => {
+  const { toast } = useToast();
+
+  const handleError = (error: Error, context: string) => {
+    console.error(`Error in TextEditor (${context}):`, error);
+    toast({
+      title: "Errore",
+      description: `Si è verificato un errore durante ${context}`,
+      variant: "destructive"
+    });
+  };
+
+  const handleTextChange = (newText: string) => {
+    try {
+      onTextChange(newText);
+    } catch (error) {
+      handleError(error as Error, "la modifica del testo");
+    }
+  };
+
+  const handleDescriptionChange = (newDescription: string) => {
+    try {
+      onDescriptionChange(newDescription);
+    } catch (error) {
+      handleError(error as Error, "la modifica della descrizione");
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="space-y-6">
         <TextInput 
           value={text}
-          onChange={onTextChange} 
+          onChange={handleTextChange} 
           textAlign={textAlign}
           onTextAlignChange={onTextAlignChange}
           fontSize={fontSize}
@@ -55,7 +83,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
 
         <TextInput 
           value={description} 
-          onChange={onDescriptionChange} 
+          onChange={handleDescriptionChange} 
           textAlign={descriptionAlign}
           onTextAlignChange={onDescriptionAlignChange}
           fontSize={descriptionFontSize}
