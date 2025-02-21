@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Table, TableBody } from "@/components/ui/table";
 import type { ExtractedContent } from './types';
 import { ContentTableHeader } from './ContentTableHeader';
@@ -118,6 +117,34 @@ export const ContentTable = ({
     setSelectedRows(new Set());
   };
 
+  // Colori predefiniti per i duplicati
+  const duplicateColors = [
+    'bg-purple-50',
+    'bg-pink-50',
+    'bg-blue-50',
+    'bg-green-50',
+    'bg-yellow-50',
+    'bg-orange-50',
+    'bg-red-50',
+    'bg-indigo-50',
+    'bg-cyan-50',
+    'bg-emerald-50'
+  ];
+
+  // Crea una mappa di URL -> colore per i duplicati
+  const urlColorMap = useMemo(() => {
+    const colorMap = new Map<string, string>();
+    let colorIndex = 0;
+
+    const duplicateUrls = getDuplicateUrls();
+    duplicateUrls.forEach(url => {
+      colorMap.set(url, duplicateColors[colorIndex % duplicateColors.length]);
+      colorIndex++;
+    });
+
+    return colorMap;
+  }, [contents]);
+
   return (
     <div className="space-y-4">
       <ContentTableToolbar
@@ -145,6 +172,7 @@ export const ContentTable = ({
                   isSelected={selectedRows.has(content.id)}
                   columnVisibility={columnVisibility}
                   timeRemaining={timeRemaining[content.id]}
+                  urlColorMap={urlColorMap}
                   onToggleRow={onToggleRow}
                   onSelectRow={handleSelectRow}
                   onDelete={onDelete}
