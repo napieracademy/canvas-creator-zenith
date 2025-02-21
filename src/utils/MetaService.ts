@@ -58,18 +58,34 @@ export class MetaService {
         doc.querySelector('meta[name="publisher"]')?.getAttribute('content') || '';
       console.log('🏢 [MetaService] Editore estratto:', publisher);
 
+      // Cloniamo il body per manipolarlo senza toccare il documento originale
       const clone = doc.body.cloneNode(true) as HTMLElement;
-      const elementsToRemove = clone.querySelectorAll('script, style');
-      elementsToRemove.forEach(el => el.remove());
-      const rawContent = clone.textContent || '';
-      
-      // Prendiamo solo le prime 10 righe del contenuto
-      const contentLines = rawContent.split('\n')
-        .filter(line => line.trim().length > 0) // Rimuove le righe vuote
-        .slice(0, 10) // Prende solo le prime 10 righe
-        .join('\n');
 
-      console.log('📄 [MetaService] Lunghezza contenuto limitato:', contentLines.length);
+      // Rimuoviamo tutti gli elementi non necessari
+      const elementsToRemove = clone.querySelectorAll(
+        'script, style, iframe, nav, header, footer, aside, .ad, .ads, .advertisement, .social-share, .comments'
+      );
+      elementsToRemove.forEach(el => el.remove());
+
+      // Estraiamo il testo principale
+      const mainContent = clone.textContent || '';
+      
+      // Puliamo il testo
+      const cleanContent = mainContent
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => {
+          // Rimuoviamo righe vuote o troppo corte
+          if (line.length < 10) return false;
+          // Rimuoviamo righe che sembrano essere menu o footer
+          if (line.includes('Cookie') || line.includes('Privacy') || line.includes('Menu')) return false;
+          // Rimuoviamo linee che sembrano essere date
+          if (/^\d{1,2}\/\d{1,2}\/\d{2,4}$/.test(line)) return false;
+          return true;
+        })
+        .join('\n\n');
+
+      console.log('📄 [MetaService] Contenuto pulito, lunghezza:', cleanContent.length);
 
       let credits = '';
       if (author || publisher) {
@@ -80,20 +96,7 @@ export class MetaService {
       }
       console.log('🏷️ [MetaService] Credits generati:', credits);
 
-      const result = {
-        success: true,
-        title: title.trim(),
-        description: description.trim(),
-        image: image.trim(),
-        credits: credits,
-        content: contentLines,
-        extractionDate: new Date().toLocaleString(),
-        url: url
-      };
-
-      console.log('📦 [MetaService] Oggetto risultato creato:', result);
-
-      const cleanTitle = result.title
+      const cleanTitle = title
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '_')
         .replace(/^_+|_+$/g, '')
@@ -115,21 +118,17 @@ Data Estrazione: ${new Date().toLocaleString()}
 
 METADATI ESTRATTI:
 ----------------
-Titolo: ${result.title}
-Descrizione: ${result.description}
-Immagine: ${result.image}
-Crediti: ${result.credits || 'Non specificati'}
+Titolo: ${title}
+Descrizione: ${description}
+Immagine: ${image}
+Crediti: ${credits || 'Non specificati'}
 
-CONTENUTO (Prime 10 righe):
+CONTENUTO:
 ---------
-${result.content || 'Nessun contenuto estratto'}
+${cleanContent}
 `;
 
       console.log('📝 [MetaService] Testo metadata formattato generato, lunghezza:', metadataText.length);
-
-      // Aggiorniamo il risultato con il testo formattato
-      result.content = metadataText;
-      console.log('🔄 [MetaService] Contenuto risultato aggiornato con testo formattato');
 
       const blob = new Blob([metadataText], { type: 'text/plain;charset=utf-8' });
       const downloadUrl = window.URL.createObjectURL(blob);
@@ -143,6 +142,17 @@ ${result.content || 'Nessun contenuto estratto'}
       document.body.removeChild(link);
       window.URL.revokeObjectURL(downloadUrl);
       console.log('💾 [MetaService] Download file iniziato');
+
+      const result = {
+        success: true,
+        title: title.trim(),
+        description: description.trim(),
+        image: image.trim(),
+        credits: credits,
+        content: metadataText,
+        extractionDate: new Date().toLocaleString(),
+        url: url
+      };
 
       console.log('✅ [MetaService] Estrazione completata con successo');
       return result;
