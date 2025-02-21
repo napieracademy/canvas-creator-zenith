@@ -85,8 +85,8 @@ const TextEditor: React.FC<TextEditorProps> = ({
         />
 
         <TextInput 
-          value={extractedContent || ''} 
-          onChange={onContentExtracted || (() => {})} 
+          value={text} 
+          onChange={onTextChange} 
           textAlign={descriptionAlign}
           onTextAlignChange={onDescriptionAlignChange}
           fontSize={descriptionFontSize}
