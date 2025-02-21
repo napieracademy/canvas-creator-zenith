@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   Table,
@@ -63,8 +62,7 @@ export const ContentTable = ({
     }));
   };
 
-  const handleSelectRow = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleSelectRow = (id: string) => {
     const newSelectedRows = new Set(selectedRows);
     if (newSelectedRows.has(id)) {
       newSelectedRows.delete(id);
@@ -74,11 +72,11 @@ export const ContentTable = ({
     setSelectedRows(newSelectedRows);
   };
 
-  const handleSelectAll = () => {
-    if (selectedRows.size === contents.length) {
-      setSelectedRows(new Set());
-    } else {
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
       setSelectedRows(new Set(contents.map(content => content.id)));
+    } else {
+      setSelectedRows(new Set());
     }
   };
 
@@ -143,12 +141,11 @@ export const ContentTable = ({
             {contents.map((content) => (
               <React.Fragment key={content.id}>
                 <TableRow className="cursor-pointer" onClick={() => onToggleRow(content.id)}>
-                  <TableCell className="w-[30px]">
+                  <TableCell className="w-[30px]" onClick={(e) => e.stopPropagation()}>
                     <Checkbox 
                       checked={selectedRows.has(content.id)}
-                      onCheckedChange={(e) => handleSelectRow(content.id, e as unknown as React.MouseEvent)}
+                      onCheckedChange={() => handleSelectRow(content.id)}
                       aria-label={`Select ${content.title}`}
-                      onClick={(e) => e.stopPropagation()}
                     />
                   </TableCell>
                   <TableCell className="w-[30px]">
