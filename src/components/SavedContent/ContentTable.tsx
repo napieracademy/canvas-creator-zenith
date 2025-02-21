@@ -1,3 +1,4 @@
+
 import React from 'react';
 import {
   Table,
@@ -62,14 +63,16 @@ export const ContentTable = ({
     }));
   };
 
-  const handleSelectRow = (id: string) => {
-    const newSelectedRows = new Set(selectedRows);
-    if (newSelectedRows.has(id)) {
-      newSelectedRows.delete(id);
-    } else {
-      newSelectedRows.add(id);
-    }
-    setSelectedRows(newSelectedRows);
+  const handleSelectRow = (id: string, checked: boolean) => {
+    setSelectedRows(prev => {
+      const newSet = new Set(prev);
+      if (checked) {
+        newSet.add(id);
+      } else {
+        newSet.delete(id);
+      }
+      return newSet;
+    });
   };
 
   const handleSelectAll = (checked: boolean) => {
@@ -140,15 +143,15 @@ export const ContentTable = ({
           <TableBody>
             {contents.map((content) => (
               <React.Fragment key={content.id}>
-                <TableRow className="cursor-pointer" onClick={() => onToggleRow(content.id)}>
-                  <TableCell className="w-[30px]" onClick={(e) => e.stopPropagation()}>
+                <TableRow>
+                  <TableCell className="w-[30px]">
                     <Checkbox 
                       checked={selectedRows.has(content.id)}
-                      onCheckedChange={() => handleSelectRow(content.id)}
+                      onCheckedChange={(checked) => handleSelectRow(content.id, checked as boolean)}
                       aria-label={`Select ${content.title}`}
                     />
                   </TableCell>
-                  <TableCell className="w-[30px]">
+                  <TableCell className="w-[30px] cursor-pointer" onClick={() => onToggleRow(content.id)}>
                     {expandedRows.has(content.id) ? (
                       <ChevronUp className="h-4 w-4" />
                     ) : (
@@ -156,7 +159,7 @@ export const ContentTable = ({
                     )}
                   </TableCell>
                   {columnVisibility.image && (
-                    <TableCell className="w-[50px] text-left">
+                    <TableCell className="w-[50px] text-left cursor-pointer" onClick={() => onToggleRow(content.id)}>
                       {content.image_url ? (
                         <img
                           src={content.image_url}
@@ -173,12 +176,12 @@ export const ContentTable = ({
                     </TableCell>
                   )}
                   {columnVisibility.id && (
-                    <TableCell className="font-mono text-sm text-left">
+                    <TableCell className="font-mono text-sm text-left cursor-pointer" onClick={() => onToggleRow(content.id)}>
                       {content.id.substring(0, 8)}...
                     </TableCell>
                   )}
                   {columnVisibility.title && (
-                    <TableCell className="font-medium text-left">
+                    <TableCell className="font-medium text-left cursor-pointer" onClick={() => onToggleRow(content.id)}>
                       {content.title || 'Senza titolo'}
                     </TableCell>
                   )}
@@ -197,13 +200,13 @@ export const ContentTable = ({
                     </TableCell>
                   )}
                   {columnVisibility.content && (
-                    <TableCell className="hidden lg:table-cell max-w-xs truncate text-left">
+                    <TableCell className="hidden lg:table-cell max-w-xs truncate text-left cursor-pointer" onClick={() => onToggleRow(content.id)}>
                       {content.content?.substring(0, 100)}
                       {content.content?.length > 100 ? '...' : ''}
                     </TableCell>
                   )}
                   {columnVisibility.extractionDate && (
-                    <TableCell className="hidden lg:table-cell text-left">
+                    <TableCell className="hidden lg:table-cell text-left cursor-pointer" onClick={() => onToggleRow(content.id)}>
                       {new Date(content.extraction_date).toLocaleString('it-IT')}
                     </TableCell>
                   )}
