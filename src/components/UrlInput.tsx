@@ -64,6 +64,7 @@ const UrlInput: React.FC<UrlInputProps> = ({
     description?: string;
     content?: string;
     credits?: string;
+    image_url?: string;
     extraction_date?: string;
   }) => {
     try {
@@ -111,13 +112,14 @@ const UrlInput: React.FC<UrlInputProps> = ({
         const result = await MetaService.extractMetadata(url);
         
         if (result.success) {
-          // Salva nel database
+          // Salva nel database - Ora includiamo anche l'immagine
           const saved = await saveToDatabase({
             url: url,
             title: result.title,
             description: result.description,
             content: result.content,
             credits: result.credits,
+            image_url: result.image, // Aggiungiamo il campo image_url
             extraction_date: result.extractionDate
           });
 
@@ -126,6 +128,7 @@ const UrlInput: React.FC<UrlInputProps> = ({
             if (result.title) onTitleExtracted(result.title);
             if (result.description) onDescriptionExtracted(result.description);
             if (result.content && onContentExtracted) onContentExtracted(result.content);
+            if (result.image && onImageExtracted) onImageExtracted(result.image);
             
             if (result.credits) {
               const creditsEvent = new CustomEvent('creditsExtracted', {
@@ -219,3 +222,4 @@ const UrlInput: React.FC<UrlInputProps> = ({
 };
 
 export default UrlInput;
+
