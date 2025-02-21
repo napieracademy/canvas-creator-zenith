@@ -43,12 +43,7 @@ export class MetaService {
       const response = await this.firecrawlApp.crawlUrl(url, {
         limit: 1,
         scrapeOptions: {
-          formats: ['markdown', 'html'],
-          selectors: {
-            title: 'h1, meta[property="og:title"]',
-            description: 'meta[name="description"], meta[property="og:description"]',
-            image: 'meta[property="og:image"]',
-          }
+          formats: ['markdown', 'html']
         }
       });
 
@@ -70,13 +65,18 @@ export class MetaService {
         };
       }
 
-      return {
-        success: true,
+      // Estraiamo le informazioni dal documento Firecrawl
+      const metadata = {
         title: data.title || '',
         description: data.description || '',
-        image: data.image || '',
+        image: '', // Le immagini possono essere estratte dal contenuto HTML se necessario
         content: data.content || '',
         credits: `Estratto da: ${url}`
+      };
+
+      return {
+        success: true,
+        ...metadata
       };
     } catch (error) {
       console.error('Error in metadata extraction:', error);
