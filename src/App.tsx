@@ -1,3 +1,5 @@
+import React from 'react';
+import FeatureManager from './utils/featureManager';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,6 +9,19 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
+
+// Registriamo la variante no-logo
+FeatureManager.addVariant({
+  id: 'no-logo',
+  code: `
+    // Rimuove la funzionalità del logo sia dal Sidebar che dal Canvas
+    - Sidebar: rimozione input file per upload logo
+    - Canvas: disabilitazione funzione drawLogo
+  `,
+  description: 'Disabilita la funzionalità del logo',
+  location: 'Sidebar',
+  isEnabled: true
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>

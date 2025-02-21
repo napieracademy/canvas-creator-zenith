@@ -1,4 +1,3 @@
-
 import { CanvasContext } from '@/types/canvas';
 
 export const SAFE_ZONE_MARGIN = 120;
@@ -25,43 +24,7 @@ export function drawSafeZone(ctx: CanvasRenderingContext2D, width: number, heigh
 }
 
 export function drawLogo(context: CanvasContext, logoUrl: string) {
-  console.log('Drawing logo:', { logoUrl });
-  const { ctx, width, safeZoneMargin } = context;
-  
-  if (!logoUrl) {
-    console.warn('No logo URL provided');
-    return;
-  }
-
-  const img = new Image();
-  img.crossOrigin = "anonymous"; // Aggiungiamo questo per gestire CORS
-  
-  img.onload = () => {
-    console.log('Logo loaded successfully:', { width: img.width, height: img.height });
-    const scale = LOGO_SIZE / Math.max(img.width, img.height);
-    const scaledWidth = img.width * scale;
-    const scaledHeight = img.height * scale;
-    
-    ctx.save();
-    try {
-      ctx.drawImage(
-        img,
-        safeZoneMargin + LOGO_MARGIN,
-        safeZoneMargin + LOGO_MARGIN,
-        scaledWidth,
-        scaledHeight
-      );
-    } catch (error) {
-      console.error('Error drawing logo:', error);
-    }
-    ctx.restore();
-  };
-
-  img.onerror = (error) => {
-    console.error('Error loading logo:', error);
-  };
-
-  img.src = logoUrl;
+  return;
 }
 
 export function calculateLines(context: CanvasContext, text: string, size: number, type: 'title' | 'description' = 'title') {
