@@ -5,7 +5,7 @@ import type { TextEditorProps } from '@/types/text';
 
 /**
  * TextEditor component that manages both title and description inputs
- * @param props Component properties
+ * @param props Component properties including text content and styling options
  */
 const TextEditor: React.FC<TextEditorProps> = ({
   text,
