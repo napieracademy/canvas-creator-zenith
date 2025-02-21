@@ -10,38 +10,16 @@ interface MetaResult {
 }
 
 export class MetaService {
-  private static API_KEY_STORAGE_KEY = 'scraper_api_key';
-
-  static saveApiKey(apiKey: string): void {
-    localStorage.setItem(this.API_KEY_STORAGE_KEY, apiKey);
-    console.log('API key saved successfully');
-  }
-
-  static getApiKey(): string | null {
-    return localStorage.getItem(this.API_KEY_STORAGE_KEY);
-  }
-
   static async extractMetadata(url: string): Promise<MetaResult> {
     try {
-      const apiKey = this.getApiKey();
-      if (!apiKey) {
-        return { 
-          success: false, 
-          error: 'API key non trovata. Inserisci la tua API key di ScraperAPI.' 
-        };
-      }
-
-      console.log('Starting ScraperAPI extraction for URL:', url);
-      const scraperUrl = `https://api.scraperapi.com?api_key=${apiKey}&url=${encodeURIComponent(url)}`;
+      console.log('Starting metadata extraction for URL:', url);
       
-      const response = await fetch(scraperUrl);
+      const response = await fetch(url);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
       const html = await response.text();
-      console.log('Raw HTML received:', html.substring(0, 500) + '...'); // Log first 500 chars of HTML
-      
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, 'text/html');
 
