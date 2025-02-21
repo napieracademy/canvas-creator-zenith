@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
@@ -120,7 +119,7 @@ const UrlInput: React.FC<UrlInputProps> = ({
             modification_date: result.modificationDate
           });
           setShowDuplicateDialog(true);
-          return false;
+          return { saved: false, duplicate: true };
         }
       }
 
@@ -131,10 +130,10 @@ const UrlInput: React.FC<UrlInputProps> = ({
       if (error) throw error;
 
       console.log('✅ [UrlInput] Contenuto salvato nel database');
-      return true;
+      return { saved: true, duplicate: false };
     } catch (error) {
       console.error('❌ [UrlInput] Errore nel salvataggio:', error);
-      return false;
+      return { saved: false, duplicate: false };
     }
   };
 
@@ -174,7 +173,7 @@ const UrlInput: React.FC<UrlInputProps> = ({
             description = sentences.slice(0, 2).join('. ') + '.';
           }
           
-          const saved = await saveToDatabase({
+          const { saved, duplicate } = await saveToDatabase({
             url: url,
             title: result.title,
             description: description,
@@ -194,6 +193,12 @@ const UrlInput: React.FC<UrlInputProps> = ({
               description: "Il contenuto è stato estratto e salvato con successo",
             });
             setUrl('');
+          } else if (!duplicate) {
+            toast({
+              title: "Errore",
+              description: "Impossibile salvare il contenuto nel database",
+              variant: "destructive",
+            });
           }
         } else {
           toast({
@@ -211,8 +216,10 @@ const UrlInput: React.FC<UrlInputProps> = ({
         variant: "destructive",
       });
     } finally {
-      onLoadingChange?.(false);
-      stopProgress();
+      if (!showDuplicateDialog) {
+        onLoadingChange?.(false);
+        stopProgress();
+      }
     }
   };
 
@@ -235,6 +242,8 @@ const UrlInput: React.FC<UrlInputProps> = ({
     }
     setShowDuplicateDialog(false);
     setTempContent(null);
+    onLoadingChange?.(false);
+    setProgress(100);
   };
 
   return (
