@@ -86,13 +86,13 @@ const TextEditor: React.FC<TextEditorProps> = ({
 
         <TextInput 
           value={text} 
-          onChange={onTextChange} 
+          onChange={() => {}} 
           textAlign={descriptionAlign}
           onTextAlignChange={onDescriptionAlignChange}
           fontSize={descriptionFontSize}
           onFontSizeChange={onDescriptionFontSizeChange}
           label="Prime 10 righe"
-          disabled={disabled}
+          disabled={true}
           otherText={text}
           extractedContent={extractedContent}
           onContentExtracted={onContentExtracted}
