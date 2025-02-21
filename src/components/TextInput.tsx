@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
 import TextAlignControl from './TextControls/TextAlignControl';
@@ -43,11 +43,18 @@ const TextInput: React.FC<TextInputProps> = ({
 }) => {
   const isDescription = label.toLowerCase() === 'descrizione';
   const isContent = label.toLowerCase() === 'contenuto';
+  const isTitle = label.toLowerCase() === 'titolo';
   const hasTitle = isDescription && otherText && otherText.trim().length > 0;
   const isEmpty = !value || value.trim().length === 0;
   const { toast } = useToast();
   
   const [charHistory, setCharHistory] = useState<string[]>([value]);
+
+  useEffect(() => {
+    if (isTitle && extractedContent) {
+      handleChange(extractedContent);
+    }
+  }, [extractedContent]);
 
   const handleChange = (newValue: string) => {
     if (newValue !== charHistory[charHistory.length - 1]) {
