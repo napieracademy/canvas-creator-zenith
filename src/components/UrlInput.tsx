@@ -72,11 +72,13 @@ const UrlInput: React.FC<UrlInputProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Starting URL submission with URL:', url);
     onLoadingChange?.(true);
     const stopProgress = simulateProgress();
 
     try {
       if (isImageUrl) {
+        console.log('Processing image URL');
         const img = new Image();
         img.onload = () => {
           if (onImageExtracted) {
@@ -89,6 +91,7 @@ const UrlInput: React.FC<UrlInputProps> = ({
           }
         };
         img.onerror = () => {
+          console.error('Image loading failed');
           toast({
             title: "Errore",
             description: "L'URL dell'immagine non è valido o l'immagine non è accessibile",
@@ -97,20 +100,25 @@ const UrlInput: React.FC<UrlInputProps> = ({
         };
         img.src = url;
       } else {
+        console.log('Extracting metadata from URL');
         const result = await MetaService.extractMetadata(url);
+        console.log('Metadata extraction result:', result);
         
         if (result.success) {
           let extracted = false;
 
           if (result.title) {
+            console.log('Title extracted:', result.title);
             onTitleExtracted(result.title);
             extracted = true;
           }
           if (result.description) {
+            console.log('Description extracted:', result.description);
             onDescriptionExtracted(result.description);
             extracted = true;
           }
           if (result.image && onImageExtracted) {
+            console.log('Image extracted:', result.image);
             onImageExtracted(result.image);
             toast({
               title: "Immagine estratta",
@@ -119,9 +127,11 @@ const UrlInput: React.FC<UrlInputProps> = ({
             extracted = true;
           }
           if (result.content && onContentExtracted) {
+            console.log('Content extracted:', result.content);
             onContentExtracted(result.content);
           }
           if (result.credits) {
+            console.log('Credits extracted:', result.credits);
             const creditsEvent = new CustomEvent('creditsExtracted', {
               detail: { credits: result.credits }
             });
@@ -147,6 +157,7 @@ const UrlInput: React.FC<UrlInputProps> = ({
             });
           }
         } else {
+          console.error('Metadata extraction failed:', result.error);
           toast({
             title: "Errore",
             description: result.error || "Impossibile estrarre i contenuti dall'URL",
