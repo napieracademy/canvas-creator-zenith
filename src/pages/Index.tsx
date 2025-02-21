@@ -11,6 +11,7 @@ import NavigationMenu from '@/components/Layout/NavigationMenu';
 import { ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import TextInput from '@/components/TextInput';
 
 const DEFAULT_TEXT = 'Social Image Creator';
 const DEFAULT_DESCRIPTION = 'Crea bellissime immagini per i social media in pochi secondi. Personalizza colori, font e layout per ottenere il massimo impatto visivo.';
@@ -85,6 +86,9 @@ const IndexPage = () => {
   const [viewMode, setViewMode] = useState<'full' | 'fast'>('full');
   const [extractedContent, setExtractedContent] = useState('');
   const [logo, setLogo] = useState('/placeholder.svg');
+  const [newTextContent, setNewTextContent] = useState('');
+  const [newTextAlign, setNewTextAlign] = useState<'left' | 'center' | 'right'>('left');
+  const [newFontSize, setNewFontSize] = useState(32);
 
   useEffect(() => {
     const dataToCache = {
@@ -235,37 +239,48 @@ const IndexPage = () => {
         {viewMode === 'full' && (
           <div className={`relative transition-all duration-300 ${sidebarOpen ? 'w-[400px]' : 'w-0'}`}>
             {sidebarOpen && (
-              <Sidebar
-                text={text}
-                description={description}
-                textAlign={textAlign}
-                descriptionAlign={descriptionAlign}
-                backgroundColor={backgroundColor}
-                textColor={textColor}
-                fontSize={fontSize}
-                descriptionFontSize={descriptionFontSize}
-                spacing={spacing}
-                format={format}
-                currentFont={currentFont}
-                onFormatChange={setFormat}
-                onTextChange={setText}
-                onDescriptionChange={setDescription}
-                onTextAlignChange={setTextAlign}
-                onDescriptionAlignChange={setDescriptionAlign}
-                onFontSizeChange={setFontSize}
-                onDescriptionFontSizeChange={setDescriptionFontSize}
-                onSpacingChange={setSpacing}
-                disabled={isLoading}
-                onTitleExtracted={setText}
-                onDescriptionExtracted={handleDescriptionExtracted}
-                onImageExtracted={handleImageExtracted}
-                onTabChange={setActiveTab}
-                onLoadingChange={setIsLoading}
-                onColorSelect={handleColorSelect}
-                extractedContent={extractedContent}
-                onContentExtracted={setExtractedContent}
-                onLogoChange={handleLogoChange}
-              />
+              <>
+                <Sidebar
+                  text={text}
+                  description={description}
+                  textAlign={textAlign}
+                  descriptionAlign={descriptionAlign}
+                  backgroundColor={backgroundColor}
+                  textColor={textColor}
+                  fontSize={fontSize}
+                  descriptionFontSize={descriptionFontSize}
+                  spacing={spacing}
+                  format={format}
+                  currentFont={currentFont}
+                  onFormatChange={setFormat}
+                  onTextChange={setText}
+                  onDescriptionChange={setDescription}
+                  onTextAlignChange={setTextAlign}
+                  onDescriptionAlignChange={setDescriptionAlign}
+                  onFontSizeChange={setFontSize}
+                  onDescriptionFontSizeChange={setDescriptionFontSize}
+                  onSpacingChange={setSpacing}
+                  disabled={isLoading}
+                  onTitleExtracted={setText}
+                  onDescriptionExtracted={handleDescriptionExtracted}
+                  onImageExtracted={handleImageExtracted}
+                  onTabChange={setActiveTab}
+                  onLoadingChange={setIsLoading}
+                  onColorSelect={handleColorSelect}
+                  extractedContent={extractedContent}
+                  onContentExtracted={setExtractedContent}
+                  onLogoChange={handleLogoChange}
+                />
+                <TextInput
+                  value={newTextContent}
+                  onChange={setNewTextContent}
+                  textAlign={newTextAlign}
+                  onTextAlignChange={setNewTextAlign}
+                  fontSize={newFontSize}
+                  onFontSizeChange={setNewFontSize}
+                  label="Nuovo Contenuto"
+                />
+              </>
             )}
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
