@@ -91,6 +91,7 @@ const UrlInput: React.FC<UrlInputProps> = ({
         if (result.success) {
           let extracted = false;
 
+          // Aggiorniamo prima tutti i dati
           if (result.title) {
             onTitleExtracted(result.title);
             extracted = true;
@@ -101,11 +102,6 @@ const UrlInput: React.FC<UrlInputProps> = ({
           }
           if (result.image && onImageExtracted) {
             onImageExtracted(result.image);
-            toast({
-              title: "Immagine estratta",
-              description: "L'immagine è stata estratta dall'articolo",
-            });
-            extracted = true;
           }
           if (result.content && onContentExtracted) {
             onContentExtracted(result.content);
@@ -120,12 +116,19 @@ const UrlInput: React.FC<UrlInputProps> = ({
           setProgress(100);
 
           if (extracted) {
+            // Aspettiamo che tutti i dati siano aggiornati
+            await new Promise(resolve => setTimeout(resolve, 100));
+
             toast({
               title: "Contenuto estratto",
               description: "Il contenuto è stato estratto con successo",
             });
-            
-            // Naviga alla pagina del contenuto estratto
+
+            // Solo dopo che tutti i dati sono stati aggiornati, navighiamo
+            if (onTabChange) {
+              onTabChange('manual');
+            }
+
             navigate('/extracted-content', { 
               state: {
                 url: result.url,
@@ -137,10 +140,6 @@ const UrlInput: React.FC<UrlInputProps> = ({
                 extractionDate: result.extractionDate
               }
             });
-            
-            if (onTabChange) {
-              onTabChange('manual');
-            }
           } else {
             toast({
               title: "Nessun contenuto",
@@ -166,6 +165,7 @@ const UrlInput: React.FC<UrlInputProps> = ({
     } finally {
       onLoadingChange?.(false);
       stopProgress();
+      setUrl('');
     }
   };
 
