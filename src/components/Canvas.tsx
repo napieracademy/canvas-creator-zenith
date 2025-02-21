@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect, useCallback } from 'react';
 import { CanvasProps } from '@/types/canvas';
 import { useCanvasScale } from '@/hooks/useCanvasScale';
@@ -106,11 +107,29 @@ const Canvas: React.FC<CanvasProps> = ({
         img.src = backgroundColor.slice(4, -1);
       });
 
-      const scale = Math.max(canvas.width / img.width, canvas.height / img.height);
+      // Disegna l'immagine nella metà superiore del canvas
+      const scale = Math.max(canvas.width / img.width, (canvas.height * 0.5) / img.height);
       const x = (canvas.width - img.width * scale) / 2;
-      const y = (canvas.height - img.height * scale) / 2;
+      const y = 0;
       
-      ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+      // Prima disegna il colore di sfondo
+      if (backgroundColor.includes('gradient')) {
+        const gradient = ctx.createLinearGradient(0, 0, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
+        const colors = backgroundColor.match(/#[a-fA-F0-9]{6}/g);
+        if (colors && colors.length >= 2) {
+          gradient.addColorStop(0, colors[0]);
+          gradient.addColorStop(1, colors[1]);
+        }
+        ctx.fillStyle = gradient;
+      } else {
+        ctx.fillStyle = backgroundColor;
+      }
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Poi disegna l'immagine con blend mode
+      ctx.globalCompositeOperation = 'multiply';
+      ctx.drawImage(img, x, y, img.width * scale, canvas.height * 0.5);
+      ctx.globalCompositeOperation = 'source-over';
 
       if (overlay) {
         console.log('Applying overlay');
@@ -201,3 +220,4 @@ const Canvas: React.FC<CanvasProps> = ({
 };
 
 export default withFeatureVariants(Canvas, 'Canvas');
+
