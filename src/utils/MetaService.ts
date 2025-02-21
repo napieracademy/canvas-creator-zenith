@@ -40,6 +40,8 @@ export class MetaService {
       }
       
       const html = await response.text();
+      console.log('Raw HTML received:', html.substring(0, 500) + '...'); // Log first 500 chars of HTML
+      
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, 'text/html');
 
@@ -51,11 +53,15 @@ export class MetaService {
                     doc.querySelector('meta[property="og:description"]')?.getAttribute('content') || 
                     '',
         image: doc.querySelector('meta[property="og:image"]')?.getAttribute('content') || '',
-        content: doc.body.textContent || '',
+        content: doc.querySelector('article')?.textContent || 
+                doc.querySelector('.article-content')?.textContent ||
+                doc.querySelector('.post-content')?.textContent ||
+                doc.querySelector('main')?.textContent ||
+                doc.body.textContent || '',
         credits: `Estratto da: ${url}`
       };
 
-      console.log('ScraperAPI extraction successful:', metadata);
+      console.log('Extracted metadata:', metadata);
 
       return {
         success: true,
