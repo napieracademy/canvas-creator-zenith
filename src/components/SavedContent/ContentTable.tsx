@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronUp, Image as ImageIcon, ExternalLink, Trash2 } from 'lucide-react';
+import { Image as ImageIcon, ExternalLink, Trash2 } from 'lucide-react';
 import { ContentActions } from './ContentActions';
 import { ExpandedContent } from './ExpandedContent';
 import { ColumnToggle, type ColumnVisibility } from './ColumnToggle';
@@ -130,7 +130,6 @@ export const ContentTable = ({
                   aria-label="Select all"
                 />
               </TableHead>
-              <TableHead className="w-[30px]"></TableHead>
               {columnVisibility.image && <TableHead className="w-[50px] text-left">Img</TableHead>}
               {columnVisibility.id && <TableHead className="w-[100px] text-left">ID</TableHead>}
               {columnVisibility.title && <TableHead className="text-left">Titolo</TableHead>}
@@ -150,13 +149,6 @@ export const ContentTable = ({
                       onCheckedChange={(checked) => handleSelectRow(content.id, checked as boolean)}
                       aria-label={`Select ${content.title}`}
                     />
-                  </TableCell>
-                  <TableCell className="w-[30px] cursor-pointer" onClick={() => onToggleRow(content.id)}>
-                    {expandedRows.has(content.id) ? (
-                      <ChevronUp className="h-4 w-4" />
-                    ) : (
-                      <ChevronDown className="h-4 w-4" />
-                    )}
                   </TableCell>
                   {columnVisibility.image && (
                     <TableCell className="w-[50px] text-left cursor-pointer" onClick={() => onToggleRow(content.id)}>
