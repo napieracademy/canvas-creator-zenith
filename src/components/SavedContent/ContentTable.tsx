@@ -1,6 +1,7 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { Table, TableBody } from "@/components/ui/table";
+import { useToast } from "@/components/ui/use-toast";
+import { supabase } from '@/integrations/supabase/client';
 import type { ExtractedContent } from './types';
 import { ContentTableHeader } from './ContentTableHeader';
 import { ContentTableToolbar } from './ContentTableToolbar';
@@ -43,6 +44,7 @@ export const ContentTable = ({
   onMigrateToHome,
   onFetchContents
 }: ContentTableProps) => {
+  const { toast } = useToast();
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>({
     id: false,
     image: true,
@@ -56,6 +58,7 @@ export const ContentTable = ({
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const [timeRemaining, setTimeRemaining] = useState<{[key: string]: string}>({});
   const [showDuplicates, setShowDuplicates] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
     const updateCountdowns = () => {
@@ -70,6 +73,34 @@ export const ContentTable = ({
     const interval = setInterval(updateCountdowns, 60000);
     return () => clearInterval(interval);
   }, [contents]);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      const { data, error } = await supabase
+        .from('extracted_content')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      toast({
+        title: "Lista aggiornata",
+        description: "I contenuti sono stati aggiornati con successo",
+      });
+
+      onFetchContents();
+    } catch (error) {
+      console.error('Errore durante l\'aggiornamento della lista:', error);
+      toast({
+        title: "Errore",
+        description: "Impossibile aggiornare la lista dei contenuti",
+        variant: "destructive",
+      });
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   const handleColumnToggle = (columnKey: keyof ColumnVisibility) => {
     setColumnVisibility(prev => ({
@@ -191,7 +222,7 @@ export const ContentTable = ({
         onToggleDuplicates={() => setShowDuplicates(!showDuplicates)}
         onColumnToggle={handleColumnToggle}
         onDeleteDuplicates={handleDeleteDuplicates}
-        onRefresh={onFetchContents}
+        onRefresh={handleRefresh}
         hasDuplicates={getDuplicateUrls().length > 0}
       />
       <div className="rounded-md border">
