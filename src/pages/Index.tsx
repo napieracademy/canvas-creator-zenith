@@ -121,6 +121,16 @@ const IndexPage = () => {
     setLogo(newLogo);
   };
 
+  // Funzione per gestire l'estrazione della descrizione
+  const handleDescriptionExtracted = (newDescription: string) => {
+    console.log('📝 [Index] Nuova descrizione ricevuta:', newDescription);
+    setDescription(newDescription);
+    toast({
+      title: "Descrizione aggiornata",
+      description: "La descrizione è stata estratta con successo"
+    });
+  };
+
   if (isMobile) {
     return <MobileWarning />;
   }
@@ -153,7 +163,7 @@ const IndexPage = () => {
                 onSpacingChange={setSpacing}
                 disabled={isLoading}
                 onTitleExtracted={setText}
-                onDescriptionExtracted={setDescription}
+                onDescriptionExtracted={handleDescriptionExtracted}
                 onTabChange={setActiveTab}
                 onLoadingChange={setIsLoading}
                 onColorSelect={handleColorSelect}
@@ -195,7 +205,7 @@ const IndexPage = () => {
           onTextChange={setText}
           onDescriptionChange={setDescription}
           onTitleExtracted={setText}
-          onDescriptionExtracted={setDescription}
+          onDescriptionExtracted={handleDescriptionExtracted}
           onTabChange={setActiveTab}
           onLoadingChange={setIsLoading}
           onFormatChange={setFormat}
