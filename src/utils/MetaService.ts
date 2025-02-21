@@ -12,23 +12,28 @@ interface MetadataResult {
 export class MetaService {
   static async extractMetadata(url: string): Promise<MetadataResult> {
     try {
-      // Utilizziamo AllOrigins in modalità fetch per performance ottimali
-      const proxyUrl = `https://api.allorigins.win/fetch?url=${encodeURIComponent(url)}`;
-      const response = await fetch(proxyUrl);
+      // Utilizziamo AllOrigins in modalità get che è più stabile
+      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}&charset=UTF-8`;
+      
+      const response = await fetch(proxyUrl, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+        },
+      });
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
-      const html = data.contents;
       
-      if (!html) {
+      if (!data || !data.contents) {
         throw new Error('Nessun contenuto ricevuto dal server');
       }
 
       const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
+      const doc = parser.parseFromString(data.contents, 'text/html');
 
       // Estrai il titolo
       const title = doc.querySelector('meta[property="og:title"]')?.getAttribute('content') || 
