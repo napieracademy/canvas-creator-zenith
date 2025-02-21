@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { Table, TableBody } from "@/components/ui/table";
 import type { ExtractedContent } from './types';
@@ -107,20 +106,25 @@ export const ContentTable = ({
       return acc;
     }, {} as { [key: string]: ExtractedContent[] });
 
-    // Per ogni gruppo di URL duplicati
-    Object.values(groupedByUrl).forEach(group => {
-      if (group.length > 1) {
+    // Raccogli tutti gli ID da eliminare
+    const idsToDelete = Object.values(groupedByUrl)
+      .filter(group => group.length > 1) // Solo gruppi con duplicati
+      .flatMap(group => {
         // Ordina per data di creazione (il più recente prima)
         const sortedGroup = group.sort((a, b) => 
           new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         );
+        // Prendi tutti gli ID tranne il primo (il più recente)
+        return sortedGroup.slice(1).map(content => content.id);
+      });
 
-        // Elimina tutti tranne il primo (il più recente)
-        sortedGroup.slice(1).forEach(content => {
-          onDelete(content.id);
+    // Elimina tutti gli ID in un'unica operazione
+    if (idsToDelete.length > 0) {
+      Promise.all(idsToDelete.map(id => onDelete(id)))
+        .catch(error => {
+          console.error('Errore durante l\'eliminazione bulk dei duplicati:', error);
         });
-      }
-    });
+    }
   };
 
   const displayedContents = showDuplicates
