@@ -50,10 +50,7 @@ export class MetaService {
 
       console.log('Starting Firecrawl extraction for URL:', url);
       const response = await this.firecrawlApp.crawlUrl(url, {
-        limit: 1,
-        scrapeOptions: {
-          formats: ['markdown', 'html']
-        }
+        limit: 1
       });
 
       if (!response.success) {
