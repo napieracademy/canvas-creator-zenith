@@ -6,6 +6,7 @@ import { useToast } from '../ui/use-toast';
 import { MetaService } from '@/utils/MetaService';
 import { ProgressBar } from './ProgressBar';
 import { SubmitButton } from './SubmitButton';
+import { DuplicateDialog } from './DuplicateDialog';
 import { isValidImageUrl, saveToDatabase, createSimulateProgress } from './utils';
 import type { UrlInputProps } from './types';
 
@@ -20,6 +21,8 @@ const UrlInput: React.FC<UrlInputProps> = ({
   const [url, setUrl] = useState('');
   const [isImageUrl, setIsImageUrl] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [showDuplicateDialog, setShowDuplicateDialog] = useState(false);
+  const [tempContent, setTempContent] = useState<any>(null);
   const { toast } = useToast();
 
   const simulateProgress = createSimulateProgress(setProgress);
@@ -28,6 +31,23 @@ const UrlInput: React.FC<UrlInputProps> = ({
     const newUrl = e.target.value;
     setUrl(newUrl);
     setIsImageUrl(isValidImageUrl(newUrl));
+  };
+
+  const updateEditor = (result: any) => {
+    if (result.title) onTitleExtracted(result.title);
+    if (result.description) onDescriptionExtracted(result.description);
+    if (result.content && onContentExtracted) onContentExtracted(result.content);
+    if (result.image && onImageExtracted) {
+      console.log('🖼️ [UrlInput] Estratta immagine:', result.image);
+      onImageExtracted(result.image);
+    }
+    
+    if (result.credits) {
+      const creditsEvent = new CustomEvent('creditsExtracted', {
+        detail: { credits: result.credits }
+      });
+      document.dispatchEvent(creditsEvent);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -60,7 +80,7 @@ const UrlInput: React.FC<UrlInputProps> = ({
         const result = await MetaService.extractMetadata(url);
         
         if (result.success) {
-          const saved = await saveToDatabase({
+          const { saved, duplicate, existingContent } = await saveToDatabase({
             url: url,
             title: result.title,
             description: result.description,
@@ -71,25 +91,16 @@ const UrlInput: React.FC<UrlInputProps> = ({
           });
 
           if (saved) {
-            if (result.title) onTitleExtracted(result.title);
-            if (result.description) onDescriptionExtracted(result.description);
-            if (result.content && onContentExtracted) onContentExtracted(result.content);
-            if (result.image && onImageExtracted) onImageExtracted(result.image);
-            
-            if (result.credits) {
-              const creditsEvent = new CustomEvent('creditsExtracted', {
-                detail: { credits: result.credits }
-              });
-              document.dispatchEvent(creditsEvent);
-            }
-
+            updateEditor(result);
             setProgress(100);
             toast({
               title: "Contenuto estratto",
               description: "Il contenuto è stato estratto e salvato con successo",
             });
-
             setUrl('');
+          } else if (duplicate && existingContent) {
+            setTempContent(existingContent);
+            setShowDuplicateDialog(true);
           } else {
             toast({
               title: "Errore",
@@ -113,9 +124,34 @@ const UrlInput: React.FC<UrlInputProps> = ({
         variant: "destructive",
       });
     } finally {
-      onLoadingChange?.(false);
-      stopProgress();
+      if (!showDuplicateDialog) {
+        onLoadingChange?.(false);
+        stopProgress();
+      }
     }
+  };
+
+  const handleUseDuplicate = () => {
+    if (tempContent) {
+      const result = {
+        title: tempContent.title,
+        description: tempContent.description,
+        content: tempContent.content,
+        image: tempContent.image_url,
+        credits: tempContent.credits
+      };
+      updateEditor(result);
+      setProgress(100);
+      toast({
+        title: "Contenuto utilizzato",
+        description: "Il contenuto è stato importato nell'editor",
+      });
+      setUrl('');
+    }
+    setShowDuplicateDialog(false);
+    setTempContent(null);
+    onLoadingChange?.(false);
+    setProgress(100);
   };
 
   return (
@@ -140,6 +176,12 @@ const UrlInput: React.FC<UrlInputProps> = ({
         </div>
         {progress > 0 && <ProgressBar progress={progress} />}
       </div>
+
+      <DuplicateDialog
+        open={showDuplicateDialog}
+        onOpenChange={setShowDuplicateDialog}
+        onUseDuplicate={handleUseDuplicate}
+      />
     </form>
   );
 };

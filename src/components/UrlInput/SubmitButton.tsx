@@ -9,7 +9,7 @@ interface SubmitButtonProps {
   isLoading: boolean;
 }
 
-export const SubmitButton = ({ isImageUrl, isLoading }: SubmitButtonProps) => (
+export const SubmitButton: React.FC<SubmitButtonProps> = ({ isImageUrl, isLoading }) => (
   <TooltipProvider>
     <Tooltip>
       <TooltipTrigger asChild>
