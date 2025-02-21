@@ -1,4 +1,3 @@
-
 interface MetadataResult {
   success: boolean;
   title?: string;
@@ -173,7 +172,7 @@ export class MetaService {
       console.log('Content word count:', content.split(/\s+/).filter(word => word.length > 0).length);
       console.log('Content length:', content.length);
       
-      return {
+      const result = {
         success: true,
         title: title.trim(),
         description: description.trim(),
@@ -181,6 +180,38 @@ export class MetaService {
         credits: credits,
         content: content
       };
+
+      // Genera e scarica il file di testo con i metadati
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const filename = `metadata_${timestamp}.txt`;
+      
+      const metadataText = `
+URL Originale: ${url}
+Data Estrazione: ${new Date().toLocaleString()}
+
+METADATI ESTRATTI:
+----------------
+Titolo: ${result.title}
+Descrizione: ${result.description}
+Immagine: ${result.image}
+Crediti: ${result.credits || 'Non specificati'}
+
+CONTENUTO:
+---------
+${result.content || 'Nessun contenuto estratto'}
+`;
+
+      const blob = new Blob([metadataText], { type: 'text/plain;charset=utf-8' });
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
+
+      return result;
 
     } catch (error) {
       console.error('Error in metadata extraction:', error);
