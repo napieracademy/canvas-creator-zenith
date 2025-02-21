@@ -1,21 +1,8 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { AlignVerticalSpaceBetween } from 'lucide-react';
+import { AlignVerticalDistribute } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Label } from './ui/label';
 
 interface SpacingControlProps {
   value: number;
@@ -24,7 +11,13 @@ interface SpacingControlProps {
 }
 
 const SpacingControl: React.FC<SpacingControlProps> = ({ value, onChange, disabled }) => {
-  const [isOpen, setIsOpen] = React.useState(false);
+  const spacingValues = [40, 100, 160];
+  
+  const handleClick = () => {
+    const currentIndex = spacingValues.indexOf(value);
+    const nextIndex = (currentIndex + 1) % spacingValues.length;
+    onChange(spacingValues[nextIndex]);
+  };
 
   const getSpacingLabel = (value: number) => {
     if (value <= 40) return 'Stretto';
@@ -32,47 +25,35 @@ const SpacingControl: React.FC<SpacingControlProps> = ({ value, onChange, disabl
     return 'Largo';
   };
 
+  const getSpacingIconStyle = (value: number) => {
+    let gap;
+    if (value <= 40) gap = "gap-0.5";
+    else if (value <= 100) gap = "gap-2";
+    else gap = "gap-4";
+
+    return gap;
+  };
+
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Popover open={isOpen} onOpenChange={setIsOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="bg-white/80 hover:bg-white/90 backdrop-blur-sm transition-all duration-200"
-                disabled={disabled}
-                aria-label="Regola lo spazio tra titolo e descrizione"
-              >
-                <AlignVerticalSpaceBetween className="h-4 w-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-72">
-              <div className="space-y-4">
-                <div>
-                  <Label className="mb-2 block">Spazio tra titolo e descrizione</Label>
-                  <Select
-                    value={String(value)}
-                    onValueChange={(val) => onChange(Number(val))}
-                    disabled={disabled}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Scegli la spaziatura" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="40">Stretto</SelectItem>
-                      <SelectItem value="100">Medio</SelectItem>
-                      <SelectItem value="160">Largo</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="bg-white/80 hover:bg-white/90 backdrop-blur-sm transition-all duration-200"
+            disabled={disabled}
+            onClick={handleClick}
+            aria-label="Regola lo spazio tra titolo e descrizione"
+          >
+            <div className={`flex flex-col items-center justify-center ${getSpacingIconStyle(value)}`}>
+              <div className="w-4 h-0.5 bg-foreground rounded-full"></div>
+              <div className="w-4 h-0.5 bg-foreground rounded-full"></div>
+            </div>
+          </Button>
         </TooltipTrigger>
         <TooltipContent>
-          <p>Regola lo spazio tra titolo e descrizione</p>
+          <p>Spazio tra titolo e descrizione: {getSpacingLabel(value)}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
