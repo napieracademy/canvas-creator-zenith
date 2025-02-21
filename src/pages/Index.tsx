@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from '@/components/ui/use-toast';
@@ -26,9 +25,7 @@ const IndexPage = () => {
   const randomTheme = getRandomTheme();
   const isMobile = useIsMobile();
 
-  // Recupera i dati dal localStorage o usa i valori predefiniti
   const loadFromCache = () => {
-    // Se ci sono dati dalla navigazione, li usiamo come prioritari
     if (location.state?.text || location.state?.description) {
       const cached = localStorage.getItem('socialImageCache');
       const cachedData = cached ? JSON.parse(cached) : {};
@@ -47,7 +44,6 @@ const IndexPage = () => {
       };
     }
 
-    // Altrimenti, usiamo il cache o i valori predefiniti
     const cached = localStorage.getItem('socialImageCache');
     if (cached) {
       return JSON.parse(cached);
@@ -90,7 +86,6 @@ const IndexPage = () => {
   const [extractedContent, setExtractedContent] = useState('');
   const [logo, setLogo] = useState('/placeholder.svg');
 
-  // Salva i dati nel localStorage quando cambiano
   useEffect(() => {
     const dataToCache = {
       text,
@@ -200,7 +195,15 @@ const IndexPage = () => {
     setLogo(newLogo);
   };
 
-  // Funzione per gestire l'estrazione della descrizione
+  const handleImageExtracted = (imageUrl: string) => {
+    console.log('🖼️ [Index] Immagine estratta:', imageUrl);
+    setBackgroundColor(imageUrl);
+    toast({
+      title: "Immagine estratta",
+      description: "L'immagine di anteprima è stata impostata correttamente",
+    });
+  };
+
   const handleDescriptionExtracted = (newDescription: string) => {
     console.log('📝 [Index] Nuova descrizione ricevuta:', newDescription);
     setDescription(newDescription);
@@ -255,6 +258,7 @@ const IndexPage = () => {
                 disabled={isLoading}
                 onTitleExtracted={setText}
                 onDescriptionExtracted={handleDescriptionExtracted}
+                onImageExtracted={handleImageExtracted}
                 onTabChange={setActiveTab}
                 onLoadingChange={setIsLoading}
                 onColorSelect={handleColorSelect}
@@ -297,6 +301,7 @@ const IndexPage = () => {
           onDescriptionChange={setDescription}
           onTitleExtracted={setText}
           onDescriptionExtracted={handleDescriptionExtracted}
+          onImageExtracted={handleImageExtracted}
           onTabChange={setActiveTab}
           onLoadingChange={setIsLoading}
           onFormatChange={setFormat}

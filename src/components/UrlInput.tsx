@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
@@ -83,7 +84,10 @@ const UrlInput: React.FC<UrlInputProps> = ({
     if (result.title) onTitleExtracted(result.title);
     if (result.description) onDescriptionExtracted(result.description);
     if (result.content && onContentExtracted) onContentExtracted(result.content);
-    if (result.image && onImageExtracted) onImageExtracted(result.image);
+    if (result.image && onImageExtracted) {
+      console.log('🖼️ [UrlInput] Estratta immagine:', result.image);
+      onImageExtracted(result.image);
+    }
     
     if (result.credits) {
       const creditsEvent = new CustomEvent('creditsExtracted', {
