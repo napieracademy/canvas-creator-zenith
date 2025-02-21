@@ -24,8 +24,8 @@ interface TextInputProps {
   onTabChange?: (value: string) => void;
   onLoadingChange?: (loading: boolean) => void;
   otherText?: string;
-  extractedContent?: string;
-  onContentExtracted?: (content: string) => void;
+  articleContent?: string;
+  onArticleContentExtracted?: (content: string) => void;
 }
 
 const TextInput: React.FC<TextInputProps> = ({ 
@@ -38,11 +38,11 @@ const TextInput: React.FC<TextInputProps> = ({
   label,
   disabled,
   otherText,
-  extractedContent,
-  onContentExtracted
+  articleContent,
+  onArticleContentExtracted
 }) => {
   const isDescription = label.toLowerCase() === 'descrizione';
-  const isContent = label.toLowerCase() === 'contenuto';
+  const isArticle = label.toLowerCase() === 'contenuto articolo';
   const isTitle = label.toLowerCase() === 'titolo';
   const hasTitle = isDescription && otherText && otherText.trim().length > 0;
   const isEmpty = !value || value.trim().length === 0;
@@ -119,12 +119,12 @@ const TextInput: React.FC<TextInputProps> = ({
       <Textarea
         placeholder={isDescription && hasTitle && isEmpty 
           ? "Clicca sulla bacchetta magica per generare automaticamente una descrizione dal titolo..." 
-          : isContent 
-            ? "Il contenuto estratto apparirà qui..."
+          : isArticle 
+            ? "Il contenuto dell'articolo estratto apparirà qui..."
             : `Scrivi il tuo ${label.toLowerCase()} qui...`}
-        value={isContent ? (extractedContent || '') : value}
+        value={isArticle ? (articleContent || '') : value}
         onChange={(e) => handleChange(e.target.value)}
-        className={`resize-none ${isContent ? 'h-64' : 'h-32'} bg-white/50 backdrop-blur-sm focus:bg-white transition-colors duration-200`}
+        className={`resize-none ${isArticle ? 'h-64' : 'h-32'} bg-white/50 backdrop-blur-sm focus:bg-white transition-colors duration-200`}
         style={{ textAlign }}
         disabled={disabled}
       />

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
@@ -79,6 +78,10 @@ export const useIndexState = () => {
   const [newTextContent, setNewTextContent] = useState('');
   const [newTextAlign, setNewTextAlign] = useState<'left' | 'center' | 'right'>('left');
   const [newFontSize, setNewFontSize] = useState(32);
+  const [articleContent, setArticleContent] = useState('');
+  const [extractedArticleText, setExtractedArticleText] = useState('');
+  const [articleTextAlign, setArticleTextAlign] = useState<'left' | 'center' | 'right'>('left');
+  const [articleFontSize, setArticleFontSize] = useState(32);
 
   useEffect(() => {
     const dataToCache = {
@@ -119,6 +122,16 @@ export const useIndexState = () => {
       });
     }
   }, [extractedContent]);
+
+  useEffect(() => {
+    if (articleContent) {
+      setExtractedArticleText(articleContent);
+      toast({
+        title: "Articolo estratto",
+        description: "Il contenuto dell'articolo è stato importato correttamente",
+      });
+    }
+  }, [articleContent]);
 
   return {
     sidebarOpen,
@@ -166,6 +179,14 @@ export const useIndexState = () => {
     newTextAlign,
     setNewTextAlign,
     newFontSize,
-    setNewFontSize
+    setNewFontSize,
+    articleContent,
+    setArticleContent,
+    extractedArticleText,
+    setExtractedArticleText,
+    articleTextAlign,
+    setArticleTextAlign,
+    articleFontSize,
+    setArticleFontSize
   };
 };
