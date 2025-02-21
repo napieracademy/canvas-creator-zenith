@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import TextInput from '@/components/TextInput';
 
 interface TextEditorProps {
@@ -49,6 +49,23 @@ const TextEditor: React.FC<TextEditorProps> = ({
   extractedContent,
   onContentExtracted
 }) => {
+  // Quando il contenuto estratto cambia, aggiorniamo il titolo
+  useEffect(() => {
+    if (extractedContent) {
+      const newText = text.includes(extractedContent) ? text : `${text}\n\n${extractedContent}`;
+      onTextChange(newText);
+    }
+  }, [extractedContent]);
+
+  // Gestiamo il cambio del contenuto estratto
+  const handleContentChange = (newContent: string) => {
+    if (onContentExtracted) {
+      onContentExtracted(newContent);
+      const newText = `${text}\n\n${newContent}`;
+      onTextChange(newText);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="space-y-6">
@@ -86,7 +103,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
 
         <TextInput 
           value={extractedContent || ''} 
-          onChange={onContentExtracted || (() => {})} 
+          onChange={handleContentChange} 
           textAlign={descriptionAlign}
           onTextAlignChange={onDescriptionAlignChange}
           fontSize={descriptionFontSize}
