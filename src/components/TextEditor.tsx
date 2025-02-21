@@ -1,32 +1,12 @@
 
 import React from 'react';
 import TextInput from '@/components/TextInput';
+import type { TextEditorProps } from '@/types/text';
 
-interface TextEditorProps {
-  text: string;
-  description: string;
-  textAlign: 'left' | 'center' | 'right';
-  descriptionAlign: 'left' | 'center' | 'right';
-  fontSize: number;
-  descriptionFontSize: number;
-  spacing: number;
-  onTextChange: (text: string) => void;
-  onDescriptionChange: (description: string) => void;
-  onTextAlignChange: (align: 'left' | 'center' | 'right') => void;
-  onDescriptionAlignChange: (align: 'left' | 'center' | 'right') => void;
-  onFontSizeChange: (size: number) => void;
-  onDescriptionFontSizeChange: (size: number) => void;
-  onSpacingChange: (spacing: number) => void;
-  onTitleExtracted: (title: string) => void;
-  onDescriptionExtracted: (description: string) => void;
-  onImageExtracted?: (image: string) => void;
-  onTabChange: (value: string) => void;
-  onLoadingChange: (loading: boolean) => void;
-  disabled?: boolean;
-  extractedContent?: string;
-  onExtractedContentUpdated?: (content: string) => void;
-}
-
+/**
+ * TextEditor component that manages both title and description inputs
+ * @param props Component properties
+ */
 const TextEditor: React.FC<TextEditorProps> = ({
   text,
   description,

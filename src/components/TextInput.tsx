@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
 import TextAlignControl from './TextControls/TextAlignControl';
@@ -9,26 +9,12 @@ import DescriptionGenerateControl from './TextControls/DescriptionGenerateContro
 import { ChevronRight, Undo2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { useToast } from './ui/use-toast';
+import type { TextInputProps } from '@/types/text';
 
-interface TextInputProps {
-  value: string;
-  onChange: (value: string) => void;
-  textAlign: 'left' | 'center' | 'right';
-  onTextAlignChange: (value: 'left' | 'center' | 'right') => void;
-  fontSize: number;
-  onFontSizeChange: (value: number) => void;
-  label: string;
-  disabled?: boolean;
-  onTitleExtracted?: (title: string) => void;
-  onDescriptionExtracted?: (description: string) => void;
-  onImageExtracted?: (image: string) => void;
-  onTabChange?: (value: string) => void;
-  onLoadingChange?: (loading: boolean) => void;
-  otherText?: string;
-  extractedContent?: string;
-  onExtractedContentUpdated?: (extractedContent: string) => void;
-}
-
+/**
+ * TextInput component for handling text input with various controls
+ * @param props Component properties
+ */
 const TextInput: React.FC<TextInputProps> = ({ 
   value, 
   onChange, 
@@ -47,36 +33,61 @@ const TextInput: React.FC<TextInputProps> = ({
   extractedContent,
   onExtractedContentUpdated
 }) => {
+  const [charHistory, setCharHistory] = useState<string[]>([value]);
+  const { toast } = useToast();
+
+  // Determine input type and state
   const isDescription = label.toLowerCase() === 'descrizione';
   const isArticle = label.toLowerCase() === 'contenuto articolo';
   const isTitle = label.toLowerCase() === 'titolo';
   const hasTitle = isDescription && otherText && otherText.trim().length > 0;
   const isEmpty = !value || value.trim().length === 0;
-  const { toast } = useToast();
-  
-  const [charHistory, setCharHistory] = useState<string[]>([value]);
 
-  const handleChange = (newValue: string) => {
-    if (newValue !== charHistory[charHistory.length - 1]) {
-      setCharHistory(prev => [...prev, newValue]);
-    }
-    onChange(newValue);
-  };
-
-  const handleUndo = () => {
-    if (charHistory.length > 1) {
-      const newHistory = charHistory.slice(0, -1);
-      const previousValue = newHistory[newHistory.length - 1];
-      
-      setCharHistory(newHistory);
-      onChange(previousValue);
-      
+  /**
+   * Handles text changes while maintaining history
+   */
+  const handleChange = useCallback((newValue: string) => {
+    try {
+      if (newValue !== charHistory[charHistory.length - 1]) {
+        setCharHistory(prev => [...prev, newValue]);
+        onChange(newValue);
+      }
+    } catch (error) {
+      console.error('Error handling text change:', error);
       toast({
-        title: "Carattere annullato",
-        description: "L'ultima modifica è stata annullata"
+        title: "Errore",
+        description: "Si è verificato un errore durante la modifica del testo",
+        variant: "destructive"
       });
     }
-  };
+  }, [charHistory, onChange, toast]);
+
+  /**
+   * Handles undo operation
+   */
+  const handleUndo = useCallback(() => {
+    if (charHistory.length > 1) {
+      try {
+        const newHistory = charHistory.slice(0, -1);
+        const previousValue = newHistory[newHistory.length - 1];
+        
+        setCharHistory(newHistory);
+        onChange(previousValue);
+        
+        toast({
+          title: "Carattere annullato",
+          description: "L'ultima modifica è stata annullata"
+        });
+      } catch (error) {
+        console.error('Error handling undo:', error);
+        toast({
+          title: "Errore",
+          description: "Impossibile annullare l'ultima modifica",
+          variant: "destructive"
+        });
+      }
+    }
+  }, [charHistory, onChange, toast]);
 
   return (
     <div className="space-y-4">
