@@ -115,7 +115,11 @@ export const ContentTable = ({
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedRows(new Set(displayedContents.map(content => content.id)));
+      // Creiamo un Set con gli ID di tutti i contenuti, inclusi quelli nei gruppi
+      const allIds = new Set(
+        displayedContents.flatMap(group => group.items.map(content => content.id))
+      );
+      setSelectedRows(allIds);
     } else {
       setSelectedRows(new Set());
     }
