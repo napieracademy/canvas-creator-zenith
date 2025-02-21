@@ -32,7 +32,7 @@ export class MetaService {
       }
 
       console.log('Starting ScraperAPI extraction for URL:', url);
-      const scraperUrl = `http://api.scraperapi.com?api_key=${apiKey}&url=${encodeURIComponent(url)}`;
+      const scraperUrl = `https://api.scraperapi.com?api_key=${apiKey}&url=${encodeURIComponent(url)}`;
       
       const response = await fetch(scraperUrl);
       if (!response.ok) {
