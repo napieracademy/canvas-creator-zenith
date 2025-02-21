@@ -6,10 +6,9 @@ import TextAlignControl from './TextControls/TextAlignControl';
 import FontSizeControl from './TextControls/FontSizeControl';
 import TextImproveControl from './TextControls/TextImproveControl';
 import DescriptionGenerateControl from './TextControls/DescriptionGenerateControl';
-import { ChevronRight, Undo2, ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronRight, Undo2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { useToast } from './ui/use-toast';
-import { ScrollArea } from './ui/scroll-area';
 
 interface TextInputProps {
   value: string;
@@ -46,7 +45,6 @@ const TextInput: React.FC<TextInputProps> = ({
   const hasTitle = isDescription && otherText && otherText.trim().length > 0;
   const isEmpty = !value || value.trim().length === 0;
   const { toast } = useToast();
-  const [showContent, setShowContent] = useState(false);
   
   // Manteniamo una cronologia delle modifiche carattere per carattere
   const [charHistory, setCharHistory] = useState<string[]>([value]);
@@ -71,16 +69,6 @@ const TextInput: React.FC<TextInputProps> = ({
       toast({
         title: "Carattere annullato",
         description: "L'ultima modifica è stata annullata"
-      });
-    }
-  };
-
-  const toggleContent = () => {
-    setShowContent(!showContent);
-    if (!showContent) {
-      toast({
-        title: "Contenuto estratto",
-        description: "Puoi usare questo contenuto come riferimento per creare il tuo testo"
       });
     }
   };
@@ -141,26 +129,13 @@ const TextInput: React.FC<TextInputProps> = ({
       />
 
       {extractedContent && (
-        <div className="mt-4 space-y-2">
-          <div 
-            className="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
-            onClick={toggleContent}
-          >
-            <Label className="text-sm font-medium text-gray-700 cursor-pointer">
-              Contenuto estratto
-            </Label>
-            <Button variant="ghost" size="sm">
-              {showContent ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-            </Button>
-          </div>
-          
-          {showContent && (
-            <ScrollArea className="h-[200px] w-full rounded-md border p-4">
-              <div className="text-sm text-gray-600 whitespace-pre-wrap">
-                {extractedContent}
-              </div>
-            </ScrollArea>
-          )}
+        <div className="mt-4">
+          <Label className="text-sm font-medium text-gray-700">Contenuto estratto</Label>
+          <Textarea
+            value={extractedContent}
+            readOnly
+            className="mt-2 resize-y min-h-[100px] max-h-[400px] bg-gray-50 text-sm"
+          />
         </div>
       )}
     </div>
@@ -168,3 +143,4 @@ const TextInput: React.FC<TextInputProps> = ({
 };
 
 export default TextInput;
+

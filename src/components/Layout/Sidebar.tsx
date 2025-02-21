@@ -1,15 +1,23 @@
 import React from 'react';
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import TextInput from "@/components/TextInput";
+import UrlInput from "@/components/UrlInput";
+import TextAlignControl from "@/components/TextControls/TextAlignControl";
+import TextTranslateControl from "@/components/TextControls/TextTranslateControl";
+import ColorPresets from "@/components/ColorPresets";
+import FontSizeControl from "@/components/TextControls/FontSizeControl";
+import TextImproveControl from "@/components/TextControls/TextImproveControl";
+import DescriptionGenerateControl from "@/components/TextControls/DescriptionGenerateControl";
+import FormatSelector from "@/components/FormatSelector";
+import { Separator } from "@/components/ui/separator";
+import { Image } from 'lucide-react';
+import { toast } from '@/components/ui/use-toast';
 import TextEditor from '@/components/TextEditor';
 import Header from '@/components/Layout/Header';
-import ColorPresets from '@/components/ColorPresets';
-import { Separator } from "@/components/ui/separator";
 import { withFeatureVariants } from '@/components/withFeatureVariants';
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Label } from "@/components/ui/label";
-import { ChevronDown, ChevronUp } from 'lucide-react';
-import { Button } from "@/components/ui/button";
-import { useState } from 'react';
 
 interface SidebarProps {
   text: string;
@@ -72,9 +80,41 @@ const Sidebar: React.FC<SidebarProps> = ({
   onContentExtracted,
   onLogoChange,
 }) => {
-  const [showContent, setShowContent] = useState(false);
-  
-  console.log('Sidebar rendered with extractedContent:', extractedContent);
+  const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.size > 1024 * 1024) {
+        toast({
+          title: "File troppo grande",
+          description: "Il file non deve superare 1MB",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Formato non supportato",
+          description: "Carica un'immagine in formato PNG, JPG o SVG",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        if (onLogoChange) {
+          onLogoChange(result);
+          toast({
+            title: "Logo aggiornato",
+            description: "Il logo è stato caricato correttamente"
+          });
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   return (
     <div className={cn(
@@ -117,22 +157,6 @@ const Sidebar: React.FC<SidebarProps> = ({
               currentBackground={backgroundColor}
               currentText={textColor}
             />
-
-            {extractedContent && (
-              <div className="space-y-2">
-                <Separator />
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">
-                    Contenuto estratto (Debug)
-                  </Label>
-                  <ScrollArea className="h-[200px] w-full rounded-md border p-4">
-                    <div className="text-sm text-gray-600 whitespace-pre-wrap">
-                      {extractedContent || 'Nessun contenuto estratto'}
-                    </div>
-                  </ScrollArea>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
