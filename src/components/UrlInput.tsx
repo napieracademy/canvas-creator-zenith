@@ -153,11 +153,18 @@ const UrlInput: React.FC<UrlInputProps> = ({
         const result = await MetaService.extractMetadata(url);
         
         if (result.success) {
-          // Salva nel database - Ora includiamo anche l'immagine
+          // Se non c'è una descrizione, usiamo le prime due frasi del contenuto
+          let description = result.description;
+          if (!description && result.content) {
+            const sentences = result.content.split(/[.!?]+/).filter(Boolean);
+            description = sentences.slice(0, 2).join('. ') + '.';
+          }
+          
+          // Salva nel database
           const saved = await saveToDatabase({
             url: url,
             title: result.title,
-            description: result.description,
+            description: description,
             content: result.content,
             credits: result.credits,
             image_url: result.image,
@@ -167,7 +174,7 @@ const UrlInput: React.FC<UrlInputProps> = ({
           if (saved) {
             // Aggiorna i campi nella UI
             if (result.title) onTitleExtracted(result.title);
-            if (result.description) onDescriptionExtracted(result.description);
+            if (description) onDescriptionExtracted(description);
             if (result.content && onContentExtracted) onContentExtracted(result.content);
             if (result.image && onImageExtracted) onImageExtracted(result.image);
             
