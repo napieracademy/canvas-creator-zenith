@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { Table, TableBody } from "@/components/ui/table";
 import type { ExtractedContent } from './types';
@@ -100,7 +99,6 @@ export const ContentTable = ({
   };
 
   const handleDeleteDuplicates = () => {
-    // Raggruppa i contenuti per URL
     const groupedByUrl = contents.reduce((acc, content) => {
       if (!acc[content.url]) {
         acc[content.url] = [];
@@ -109,29 +107,37 @@ export const ContentTable = ({
       return acc;
     }, {} as { [key: string]: ExtractedContent[] });
 
-    // Raccogli tutti gli ID da eliminare
     const idsToDelete = Object.values(groupedByUrl)
-      .filter(group => group.length > 1) // Solo gruppi con duplicati
+      .filter(group => group.length > 1)
       .flatMap(group => {
-        // Ordina per data di creazione (il più recente prima)
         const sortedGroup = group.sort((a, b) => 
           new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         );
-        // Prendi tutti gli ID tranne il primo (il più recente)
         return sortedGroup.slice(1).map(content => content.id);
       });
 
-    // Elimina tutti gli ID in un'unica operazione
     if (idsToDelete.length > 0) {
       Promise.all(idsToDelete.map(id => onDelete(id)))
         .then(() => {
-          // Dopo aver eliminato tutti i duplicati, aggiorna la lista
+          console.log('Aggiornamento contenuti dopo eliminazione bulk');
           onFetchContents();
         })
         .catch(error => {
           console.error('Errore durante l\'eliminazione bulk dei duplicati:', error);
         });
     }
+  };
+
+  const handleBulkDelete = () => {
+    Promise.all(Array.from(selectedRows).map(id => onDelete(id)))
+      .then(() => {
+        console.log('Aggiornamento contenuti dopo eliminazione bulk selezionata');
+        onFetchContents();
+        setSelectedRows(new Set());
+      })
+      .catch(error => {
+        console.error('Errore durante l\'eliminazione bulk:', error);
+      });
   };
 
   const displayedContents = showDuplicates
@@ -148,14 +154,6 @@ export const ContentTable = ({
     }
   };
 
-  const handleBulkDelete = () => {
-    selectedRows.forEach(id => {
-      onDelete(id);
-    });
-    setSelectedRows(new Set());
-  };
-
-  // Colori molto più tenui per i duplicati
   const duplicateColors = [
     'bg-purple-50/50',
     'bg-pink-50/50',
@@ -169,7 +167,6 @@ export const ContentTable = ({
     'bg-emerald-50/50'
   ];
 
-  // Crea una mappa di URL -> colore per i duplicati
   const urlColorMap = useMemo(() => {
     const colorMap = new Map<string, string>();
     let colorIndex = 0;
