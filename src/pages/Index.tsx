@@ -9,8 +9,12 @@ import LoadingOverlay from '@/components/Layout/LoadingOverlay';
 import Sidebar from '@/components/Layout/Sidebar';
 import MainContent from '@/components/Layout/MainContent';
 import NavigationMenu from '@/components/Layout/NavigationMenu';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+
+const DEFAULT_TEXT = 'Social Image Creator';
+const DEFAULT_DESCRIPTION = 'Crea bellissime immagini per i social media in pochi secondi. Personalizza colori, font e layout per ottenere il massimo impatto visivo.';
 
 const IndexPage = () => {
   const location = useLocation();
@@ -22,19 +26,41 @@ const IndexPage = () => {
   const randomTheme = getRandomTheme();
   const isMobile = useIsMobile();
 
+  // Recupera i dati dal localStorage o usa i valori predefiniti
+  const loadFromCache = () => {
+    const cached = localStorage.getItem('socialImageCache');
+    if (cached) {
+      return JSON.parse(cached);
+    }
+    return {
+      text: location.state?.text || DEFAULT_TEXT,
+      description: location.state?.description || DEFAULT_DESCRIPTION,
+      backgroundColor: randomTheme.background,
+      textColor: randomTheme.text,
+      fontSize: 111,
+      descriptionFontSize: 56,
+      spacing: 100,
+      textAlign: 'left',
+      descriptionAlign: 'left',
+      format: 'post'
+    };
+  };
+
+  const initialState = loadFromCache();
+
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [text, setText] = useState(location.state?.text || 'Social Image Creator');
-  const [description, setDescription] = useState(location.state?.description || 'Crea bellissime immagini per i social media in pochi secondi. Personalizza colori, font e layout per ottenere il massimo impatto visivo.');
-  const [backgroundColor, setBackgroundColor] = useState(randomTheme.background);
-  const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right'>('left');
-  const [descriptionAlign, setDescriptionAlign] = useState<'left' | 'center' | 'right'>('left');
-  const [fontSize, setFontSize] = useState(111);
-  const [descriptionFontSize, setDescriptionFontSize] = useState(56);
-  const [spacing, setSpacing] = useState(100);
-  const [effectiveFontSize, setEffectiveFontSize] = useState(111);
-  const [textColor, setTextColor] = useState(randomTheme.text);
+  const [text, setText] = useState(initialState.text);
+  const [description, setDescription] = useState(initialState.description);
+  const [backgroundColor, setBackgroundColor] = useState(initialState.backgroundColor);
+  const [textAlign, setTextAlign] = useState(initialState.textAlign);
+  const [descriptionAlign, setDescriptionAlign] = useState(initialState.descriptionAlign);
+  const [fontSize, setFontSize] = useState(initialState.fontSize);
+  const [descriptionFontSize, setDescriptionFontSize] = useState(initialState.descriptionFontSize);
+  const [spacing, setSpacing] = useState(initialState.spacing);
+  const [effectiveFontSize, setEffectiveFontSize] = useState(initialState.fontSize);
+  const [textColor, setTextColor] = useState(initialState.textColor);
   const [showSafeZone, setShowSafeZone] = useState(false);
-  const [format, setFormat] = useState<'post' | 'story'>('post');
+  const [format, setFormat] = useState(initialState.format);
   const [activeTab, setActiveTab] = useState('manual');
   const [isLoading, setIsLoading] = useState(false);
   const [currentFont, setCurrentFont] = useState('');
@@ -42,6 +68,23 @@ const IndexPage = () => {
   const [viewMode, setViewMode] = useState<'full' | 'fast'>('full');
   const [extractedContent, setExtractedContent] = useState('');
   const [logo, setLogo] = useState('/placeholder.svg');
+
+  // Salva i dati nel localStorage quando cambiano
+  useEffect(() => {
+    const dataToCache = {
+      text,
+      description,
+      backgroundColor,
+      textColor,
+      fontSize,
+      descriptionFontSize,
+      spacing,
+      textAlign,
+      descriptionAlign,
+      format
+    };
+    localStorage.setItem('socialImageCache', JSON.stringify(dataToCache));
+  }, [text, description, backgroundColor, textColor, fontSize, descriptionFontSize, spacing, textAlign, descriptionAlign, format]);
 
   useEffect(() => {
     if (location.state?.text || location.state?.description) {
@@ -56,6 +99,20 @@ const IndexPage = () => {
       });
     }
   }, []);
+
+  const handleClean = () => {
+    setText(DEFAULT_TEXT);
+    setDescription(DEFAULT_DESCRIPTION);
+    setFontSize(111);
+    setDescriptionFontSize(56);
+    setSpacing(100);
+    setTextAlign('left');
+    setDescriptionAlign('left');
+    toast({
+      title: "Contenuto ripristinato",
+      description: "I testi sono stati riportati ai valori predefiniti",
+    });
+  };
 
   const handleColorSelect = (background: string, text: string) => {
     setBackgroundColor(background);
@@ -139,6 +196,17 @@ const IndexPage = () => {
   return (
     <div className="relative">
       <NavigationMenu />
+      <div className="flex items-center gap-2 absolute top-4 right-4 z-50">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleClean}
+          className="flex items-center gap-2"
+        >
+          <RefreshCw className="h-4 w-4" />
+          Ripristina
+        </Button>
+      </div>
       <div className="flex">
         {viewMode === 'full' && (
           <div className={`relative transition-all duration-300 ${sidebarOpen ? 'w-[400px]' : 'w-0'}`}>
