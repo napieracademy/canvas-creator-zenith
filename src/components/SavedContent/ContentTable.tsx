@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { Table, TableBody } from "@/components/ui/table";
 import type { ExtractedContent } from './types';
@@ -14,6 +15,7 @@ interface ContentTableProps {
   onDelete: (id: string) => void;
   onView: (content: ExtractedContent) => void;
   onMigrateToHome: (content: ExtractedContent) => void;
+  onFetchContents: () => Promise<void>;
 }
 
 const calculateTimeRemaining = (createdAt: string): string => {
@@ -38,7 +40,8 @@ export const ContentTable = ({
   onToggleRow,
   onDelete,
   onView,
-  onMigrateToHome
+  onMigrateToHome,
+  onFetchContents
 }: ContentTableProps) => {
   const [columnVisibility, setColumnVisibility] = React.useState<ColumnVisibility>({
     id: false,
@@ -121,6 +124,10 @@ export const ContentTable = ({
     // Elimina tutti gli ID in un'unica operazione
     if (idsToDelete.length > 0) {
       Promise.all(idsToDelete.map(id => onDelete(id)))
+        .then(() => {
+          // Dopo aver eliminato tutti i duplicati, aggiorna la lista
+          onFetchContents();
+        })
         .catch(error => {
           console.error('Errore durante l\'eliminazione bulk dei duplicati:', error);
         });

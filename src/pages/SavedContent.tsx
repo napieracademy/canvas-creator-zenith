@@ -119,6 +119,7 @@ const SavedContent = () => {
           onDelete={handleDelete}
           onView={handleView}
           onMigrateToHome={handleMigrateToHome}
+          onFetchContents={fetchContents}
         />
       )}
     </div>
