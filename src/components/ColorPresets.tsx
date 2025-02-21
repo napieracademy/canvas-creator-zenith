@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ColorPresetsProps, ColorPresetPair } from '@/types/colorPresets';
@@ -72,7 +71,7 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
           <div key={pair.name} className="flex flex-col items-center gap-2">
             <Button
               variant="outline"
-              className={`relative w-12 h-12 rounded-full p-0 overflow-hidden border-0 hover:opacity-90 transition-all duration-300 ${
+              className={`relative w-8 h-8 rounded-full p-0 overflow-hidden border-0 hover:opacity-90 transition-all duration-300 ${
                 currentBackground.includes(pair.background) && currentText === pair.text
                   ? 'ring-2 ring-primary ring-offset-2' 
                   : ''
@@ -124,7 +123,6 @@ const ColorPresets: React.FC<ColorPresetsProps> = ({
                 </div>
               </div>
             </Button>
-            <span className="text-xs text-gray-500 text-center">{pair.name}</span>
           </div>
         );
       })}
