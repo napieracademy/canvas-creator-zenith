@@ -33,6 +33,7 @@ const IndexSidebar: React.FC<IndexSidebarProps> = ({
             spacing={state.spacing}
             format={state.format}
             currentFont={state.currentFont}
+            onFormatChange={state.setFormat}
             onTextChange={state.setText}
             onDescriptionChange={state.setDescription}
             onTextAlignChange={state.setTextAlign}
@@ -40,15 +41,15 @@ const IndexSidebar: React.FC<IndexSidebarProps> = ({
             onFontSizeChange={state.setFontSize}
             onDescriptionFontSizeChange={state.setDescriptionFontSize}
             onSpacingChange={state.setSpacing}
+            disabled={state.isLoading}
             onTitleExtracted={state.setText}
             onDescriptionExtracted={handlers.handleDescriptionExtracted}
+            onImageExtracted={handlers.handleImageExtracted}
             onTabChange={state.setActiveTab}
             onLoadingChange={state.setIsLoading}
-            onFormatChange={state.setFormat}
             onColorSelect={handlers.handleColorSelect}
             onExtractedContentUpdated={state.setExtractedContent}
             onLogoChange={handlers.handleLogoChange}
-            disabled={state.isLoading}
             extractedContent={state.extractedContent}
           />
           <TextInput
