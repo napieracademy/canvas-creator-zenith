@@ -13,6 +13,8 @@ import UrlInput from '../UrlInput';
 interface UrlFetchControlProps {
   onTitleExtracted: (title: string) => void;
   onDescriptionExtracted: (description: string) => void;
+  onImageExtracted?: (image: string) => void;
+  onContentExtracted?: (content: string) => void;
   onTabChange: (value: string) => void;
   onLoadingChange: (loading: boolean) => void;
   disabled?: boolean;
@@ -21,6 +23,8 @@ interface UrlFetchControlProps {
 const UrlFetchControl: React.FC<UrlFetchControlProps> = ({
   onTitleExtracted,
   onDescriptionExtracted,
+  onImageExtracted,
+  onContentExtracted,
   onTabChange,
   onLoadingChange,
   disabled
@@ -46,6 +50,8 @@ const UrlFetchControl: React.FC<UrlFetchControlProps> = ({
               <UrlInput 
                 onTitleExtracted={onTitleExtracted}
                 onDescriptionExtracted={onDescriptionExtracted}
+                onImageExtracted={onImageExtracted}
+                onContentExtracted={onContentExtracted}
                 onTabChange={onTabChange}
                 onLoadingChange={onLoadingChange}
               />

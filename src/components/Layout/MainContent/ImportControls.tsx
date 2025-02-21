@@ -10,6 +10,8 @@ interface ImportControlsProps {
   isLoading: boolean;
   onTitleExtracted: (title: string) => void;
   onDescriptionExtracted: (description: string) => void;
+  onImageExtracted?: (image: string) => void;
+  onContentExtracted?: (content: string) => void;
   onTabChange: (value: string) => void;
   onLoadingChange: (loading: boolean) => void;
   onTextChange: (text: string) => void;
@@ -24,6 +26,8 @@ const ImportControls: React.FC<ImportControlsProps> = ({
   isLoading,
   onTitleExtracted,
   onDescriptionExtracted,
+  onImageExtracted,
+  onContentExtracted,
   onTabChange,
   onLoadingChange,
   onTextChange,
@@ -36,6 +40,8 @@ const ImportControls: React.FC<ImportControlsProps> = ({
       <UrlFetchControl
         onTitleExtracted={onTitleExtracted}
         onDescriptionExtracted={onDescriptionExtracted}
+        onImageExtracted={onImageExtracted}
+        onContentExtracted={onContentExtracted}
         onTabChange={onTabChange}
         onLoadingChange={onLoadingChange}
         disabled={isLoading}
