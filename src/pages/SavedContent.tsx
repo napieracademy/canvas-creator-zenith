@@ -50,7 +50,9 @@ const SavedContent = () => {
 
       if (error) throw error;
 
-      setContents(contents.filter(content => content.id !== id));
+      // Aggiorna la lista dopo l'eliminazione
+      await fetchContents();
+      
       toast({
         title: "Contenuto eliminato",
         description: "Il contenuto è stato eliminato con successo",
