@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { Table, TableBody } from "@/components/ui/table";
 import type { ExtractedContent } from './types';
@@ -20,7 +21,7 @@ const calculateTimeRemaining = (createdAt: string): string => {
   if (!createdAt) return "Data non disponibile";
   
   const created = new Date(createdAt);
-  const deadline = new Date(created.getTime() + 48 * 60 * 60 * 1000); // 48 ore dalla data di salvataggio
+  const deadline = new Date(created.getTime() + 48 * 60 * 60 * 1000);
   const now = new Date();
   const remaining = deadline.getTime() - now.getTime();
 
@@ -96,6 +97,32 @@ export const ContentTable = ({
     return Object.keys(urlCounts).filter(url => urlCounts[url] > 1);
   };
 
+  const handleDeleteDuplicates = () => {
+    // Raggruppa i contenuti per URL
+    const groupedByUrl = contents.reduce((acc, content) => {
+      if (!acc[content.url]) {
+        acc[content.url] = [];
+      }
+      acc[content.url].push(content);
+      return acc;
+    }, {} as { [key: string]: ExtractedContent[] });
+
+    // Per ogni gruppo di URL duplicati
+    Object.values(groupedByUrl).forEach(group => {
+      if (group.length > 1) {
+        // Ordina per data di creazione (il più recente prima)
+        const sortedGroup = group.sort((a, b) => 
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+
+        // Elimina tutti tranne il primo (il più recente)
+        sortedGroup.slice(1).forEach(content => {
+          onDelete(content.id);
+        });
+      }
+    });
+  };
+
   const displayedContents = showDuplicates
     ? contents.filter(content => getDuplicateUrls().includes(content.url))
     : contents;
@@ -154,6 +181,8 @@ export const ContentTable = ({
         onDeleteSelected={handleBulkDelete}
         onToggleDuplicates={() => setShowDuplicates(!showDuplicates)}
         onColumnToggle={handleColumnToggle}
+        onDeleteDuplicates={handleDeleteDuplicates}
+        hasDuplicates={getDuplicateUrls().length > 0}
       />
       <div className="rounded-md border">
         <Table>

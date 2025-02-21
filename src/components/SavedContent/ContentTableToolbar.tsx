@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { FilterX, Filter, Trash2 } from 'lucide-react';
+import { FilterX, Filter, Trash2, Copy } from 'lucide-react';
 import { ColumnToggle, type ColumnVisibility } from './ColumnToggle';
 import {
   AlertDialog,
@@ -22,6 +22,8 @@ interface ContentTableToolbarProps {
   onDeleteSelected: () => void;
   onToggleDuplicates: () => void;
   onColumnToggle: (key: keyof ColumnVisibility) => void;
+  onDeleteDuplicates: () => void;
+  hasDuplicates: boolean;
 }
 
 export const ContentTableToolbar = ({
@@ -30,7 +32,9 @@ export const ContentTableToolbar = ({
   columnVisibility,
   onDeleteSelected,
   onToggleDuplicates,
-  onColumnToggle
+  onColumnToggle,
+  onDeleteDuplicates,
+  hasDuplicates
 }: ContentTableToolbarProps) => (
   <div className="flex justify-between items-center">
     <div className="flex gap-2">
@@ -69,6 +73,28 @@ export const ContentTableToolbar = ({
         )}
         {showDuplicates ? "Mostra tutti" : "Mostra duplicati"}
       </Button>
+      {hasDuplicates && (
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="outline" size="sm">
+              <Copy className="h-4 w-4 mr-2" />
+              Elimina duplicati
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Conferma eliminazione duplicati</AlertDialogTitle>
+              <AlertDialogDescription>
+                Verranno eliminati tutti i contenuti duplicati, mantenendo solo la versione più recente per ogni URL. Questa azione non può essere annullata.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Annulla</AlertDialogCancel>
+              <AlertDialogAction onClick={onDeleteDuplicates}>Elimina duplicati</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
     </div>
     <div className="flex-grow flex justify-end">
       <ColumnToggle columns={columnVisibility} onColumnToggle={onColumnToggle} />
