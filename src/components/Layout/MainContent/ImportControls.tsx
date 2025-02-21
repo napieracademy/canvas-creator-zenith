@@ -3,6 +3,7 @@ import React from 'react';
 import UrlFetchControl from '@/components/TextControls/UrlFetchControl';
 import SuperButton from '@/components/SuperButton';
 import DownloadButton from '@/components/DownloadButton';
+import QueueStatus from '@/components/QueueManager/QueueStatus';
 
 interface ImportControlsProps {
   text: string;
@@ -55,6 +56,7 @@ const ImportControls: React.FC<ImportControlsProps> = ({
         disabled={isLoading}
       />
       <DownloadButton onDownload={onDownload} />
+      <QueueStatus />
     </div>
   );
 };
