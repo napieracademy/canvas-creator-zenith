@@ -1,12 +1,14 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
 import TextAlignControl from './TextControls/TextAlignControl';
 import FontSizeControl from './TextControls/FontSizeControl';
 import TextImproveControl from './TextControls/TextImproveControl';
 import DescriptionGenerateControl from './TextControls/DescriptionGenerateControl';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Undo2 } from 'lucide-react';
+import { Button } from './ui/button';
+import { useToast } from './ui/use-toast';
 
 interface TextInputProps {
   value: string;
@@ -42,12 +44,40 @@ const TextInput: React.FC<TextInputProps> = ({
   const isDescription = label.toLowerCase() === 'descrizione';
   const hasTitle = isDescription && otherText && otherText.trim().length > 0;
   const isEmpty = !value || value.trim().length === 0;
+  const { toast } = useToast();
+  
+  // Manteniamo l'ultimo valore salvato
+  const [lastValue, setLastValue] = useState(value);
+
+  const handleChange = (newValue: string) => {
+    setLastValue(value); // Salviamo il valore corrente prima di cambiarlo
+    onChange(newValue);
+  };
+
+  const handleUndo = () => {
+    if (lastValue !== value) {
+      onChange(lastValue);
+      toast({
+        title: "Modifiche annullate",
+        description: "Il testo è stato ripristinato al valore precedente"
+      });
+    }
+  };
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-2">
         <Label className="text-sm font-medium text-gray-700">{label}</Label>
         <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleUndo}
+            disabled={disabled || lastValue === value}
+            className="h-8 w-8 p-0"
+          >
+            <Undo2 className="h-4 w-4" />
+          </Button>
           <TextAlignControl 
             textAlign={textAlign} 
             onTextAlignChange={onTextAlignChange} 
@@ -60,7 +90,7 @@ const TextInput: React.FC<TextInputProps> = ({
           />
           <TextImproveControl 
             value={value} 
-            onChange={onChange} 
+            onChange={handleChange} 
             label={label} 
             disabled={disabled}
             otherText={otherText}
@@ -70,7 +100,7 @@ const TextInput: React.FC<TextInputProps> = ({
               <ChevronRight className="h-4 w-4 text-gray-400 animate-bounce-x" />
               <DescriptionGenerateControl
                 title={otherText}
-                onDescriptionGenerated={onChange}
+                onDescriptionGenerated={handleChange}
                 disabled={disabled}
               />
             </>
@@ -83,7 +113,7 @@ const TextInput: React.FC<TextInputProps> = ({
           ? "Clicca sulla bacchetta magica per generare automaticamente una descrizione dal titolo..." 
           : `Scrivi il tuo ${label.toLowerCase()} qui...`}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => handleChange(e.target.value)}
         className="resize-none h-32 bg-white/50 backdrop-blur-sm focus:bg-white transition-colors duration-200"
         style={{ textAlign }}
         disabled={disabled}
@@ -104,3 +134,4 @@ const TextInput: React.FC<TextInputProps> = ({
 };
 
 export default TextInput;
+
