@@ -17,7 +17,7 @@ import { Image } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import TextEditor from '@/components/TextEditor';
 import Header from '@/components/Layout/Header';
-import withFeatureVariants from '@/components/withFeatureVariants';
+import { withFeatureVariants } from '@/components/withFeatureVariants';
 
 interface SidebarProps {
   text: string;
