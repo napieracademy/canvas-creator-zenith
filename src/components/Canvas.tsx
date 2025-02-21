@@ -7,7 +7,7 @@ import {
   SAFE_ZONE_MARGIN,
   drawSafeZone,
   drawText,
-  drawBackground,
+  drawLogo,
 } from '@/utils/canvasUtils';
 import CanvasRender from './Canvas/CanvasRender';
 
@@ -23,8 +23,13 @@ const Canvas: React.FC<CanvasProps> = ({
   spacing = 40,
   showSafeZone = false,
   format = 'post',
+  overlay,
   font,
+  onFontSizeChange,
+  onDescriptionFontSizeChange,
+  onSpacingChange,
   onEffectiveFontSizeChange,
+  logo,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -36,26 +41,40 @@ const Canvas: React.FC<CanvasProps> = ({
 
   const renderCanvas = useCallback(async () => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) {
+      console.warn('Canvas element not found');
+      return;
+    }
 
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      console.warn('Canvas context not found');
+      return;
+    }
 
-    // Imposta le dimensioni reali del canvas
     canvas.width = ORIGINAL_WIDTH;
     canvas.height = ORIGINAL_HEIGHT;
     
-    // Pulisci il canvas
+    updateScale();
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Configura il font
-    const fontFamily = font === 'font-c64-system' ? 'Press Start 2P' :
-                      font === 'font-c64-mono' ? 'Share Tech Mono' :
-                      font === 'font-c64-bold' ? 'VT323' :
-                      font === 'font-c64-wide' ? 'Silkscreen' : 'Inter';
+    const getFontFamily = () => {
+      switch (font) {
+        case 'font-c64-system':
+          return 'Press Start 2P';
+        case 'font-c64-mono':
+          return 'Share Tech Mono';
+        case 'font-c64-bold':
+          return 'VT323';
+        case 'font-c64-wide':
+          return 'Silkscreen';
+        default:
+          return 'Inter';
+      }
+    };
 
-    // Attendi che i font siano caricati
-    await document.fonts.ready;
+    const fontFamily = getFontFamily();
 
     const context = {
       ctx,
@@ -65,24 +84,43 @@ const Canvas: React.FC<CanvasProps> = ({
       fontFamily
     };
 
-    // Disegna lo sfondo
-    await drawBackground(context, backgroundColor);
+    await document.fonts.ready;
 
-    // Disegna la safe zone se abilitata
+    // Draw background
+    if (backgroundColor.startsWith('http') || backgroundColor.startsWith('/')) {
+      await drawLogo(context, backgroundColor);
+    } else {
+      if (backgroundColor.includes('gradient')) {
+        const gradient = ctx.createLinearGradient(0, 0, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
+        const colors = backgroundColor.match(/#[a-fA-F0-9]{6}/g);
+        if (colors && colors.length >= 2) {
+          gradient.addColorStop(0, colors[0]);
+          gradient.addColorStop(1, colors[1]);
+        }
+        ctx.fillStyle = gradient;
+      } else {
+        ctx.fillStyle = backgroundColor;
+      }
+      ctx.fillRect(0, 0, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
+    }
+
+    // Draw logo if present
+    if (logo && logo !== '/placeholder.svg') {
+      await drawLogo(context, logo);
+    }
+
+    // Draw safe zone if enabled
     if (showSafeZone) {
       drawSafeZone(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
     }
 
-    // Disegna il testo principale
+    // Draw main text
     drawText(context, text, textAlign, textColor, fontSize, 'title', spacing);
     
-    // Disegna la descrizione se presente
+    // Draw description if provided
     if (description) {
       drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', spacing);
     }
-
-    // Aggiorna lo scale
-    updateScale();
   }, [
     text,
     description,
@@ -95,18 +133,20 @@ const Canvas: React.FC<CanvasProps> = ({
     spacing,
     showSafeZone,
     format,
+    overlay,
     font,
+    logo,
     ORIGINAL_HEIGHT,
     ORIGINAL_WIDTH,
     updateScale
   ]);
 
-  // Effetto per il rendering del canvas
   useEffect(() => {
-    renderCanvas().catch(console.error);
+    renderCanvas().catch(error => {
+      console.error('Error rendering canvas:', error);
+    });
   }, [renderCanvas]);
 
-  // Effetto per aggiornare il font size effettivo
   useEffect(() => {
     if (onEffectiveFontSizeChange) {
       onEffectiveFontSizeChange(fontSize);
@@ -117,22 +157,25 @@ const Canvas: React.FC<CanvasProps> = ({
     <div className="flex flex-col w-full h-full bg-background">
       <div 
         ref={containerRef} 
-        className="relative w-full h-full flex items-center justify-center overflow-hidden p-4"
+        className="relative w-full h-full flex items-center justify-center overflow-hidden"
+        style={{ 
+          zIndex: 1,
+          isolation: 'isolate'
+        }}
       >
         <CanvasRender 
           canvasRef={canvasRef}
-          className="max-w-full max-h-full"
+          className="max-w-full max-h-full object-contain"
           style={{
             transform: `scale(${scale / 100})`,
-            transformOrigin: 'center',
-            width: `${ORIGINAL_WIDTH}px`,
-            height: `${ORIGINAL_HEIGHT}px`,
+            transformOrigin: 'center center',
+            zIndex: 2
           }}
         />
       </div>
       <div className="mt-2 flex justify-end gap-2 text-sm text-gray-500">
-        <div>{Math.round(scale)}%</div>
-        <div>{ORIGINAL_WIDTH} × {ORIGINAL_HEIGHT} px</div>
+        <div>{scale}%</div>
+        <div>1080 × {ORIGINAL_HEIGHT} px</div>
       </div>
     </div>
   );
