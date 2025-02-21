@@ -23,7 +23,7 @@ interface TextEditorProps {
   onLoadingChange: (loading: boolean) => void;
   disabled?: boolean;
   extractedContent?: string;
-  onContentExtracted?: (content: string) => void;
+  onExtractedContentUpdated?: (content: string) => void;
 }
 
 const TextEditor: React.FC<TextEditorProps> = ({
@@ -47,7 +47,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
   onLoadingChange,
   disabled,
   extractedContent,
-  onContentExtracted
+  onExtractedContentUpdated
 }) => {
   return (
     <div className="space-y-4">
@@ -67,7 +67,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
           onLoadingChange={onLoadingChange}
           otherText={description}
           extractedContent={extractedContent}
-          onContentExtracted={onContentExtracted}
+          onExtractedContentUpdated={onExtractedContentUpdated}
         />
 
         <TextInput 
@@ -81,7 +81,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
           disabled={disabled}
           otherText={text}
           extractedContent={extractedContent}
-          onContentExtracted={onContentExtracted}
+          onExtractedContentUpdated={onExtractedContentUpdated}
         />
       </div>
     </div>

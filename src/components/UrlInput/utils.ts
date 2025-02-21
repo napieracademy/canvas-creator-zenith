@@ -34,7 +34,7 @@ export const saveToDatabase = async (data: SaveToDbData) => {
         url: data.url,
         title: data.title,
         description: data.description,
-        content: data.content,
+        extracted_content: data.extractedContent,
         credits: data.credits,
         image_url: data.image_url || null,
         extraction_date: data.extraction_date

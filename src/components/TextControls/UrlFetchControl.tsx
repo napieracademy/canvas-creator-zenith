@@ -14,7 +14,7 @@ interface UrlFetchControlProps {
   onTitleExtracted: (title: string) => void;
   onDescriptionExtracted: (description: string) => void;
   onImageExtracted?: (image: string) => void;
-  onContentExtracted?: (content: string) => void;
+  onExtractedContentUpdated?: (extractedContent: string) => void;
   onTabChange: (value: string) => void;
   onLoadingChange: (loading: boolean) => void;
   disabled?: boolean;
@@ -24,7 +24,7 @@ const UrlFetchControl: React.FC<UrlFetchControlProps> = ({
   onTitleExtracted,
   onDescriptionExtracted,
   onImageExtracted,
-  onContentExtracted,
+  onExtractedContentUpdated,
   onTabChange,
   onLoadingChange,
   disabled
@@ -51,7 +51,7 @@ const UrlFetchControl: React.FC<UrlFetchControlProps> = ({
                 onTitleExtracted={onTitleExtracted}
                 onDescriptionExtracted={onDescriptionExtracted}
                 onImageExtracted={onImageExtracted}
-                onContentExtracted={onContentExtracted}
+                onExtractedContentUpdated={onExtractedContentUpdated}
                 onTabChange={onTabChange}
                 onLoadingChange={onLoadingChange}
               />

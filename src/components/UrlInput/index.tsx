@@ -14,7 +14,7 @@ const UrlInput: React.FC<UrlInputProps> = ({
   onTitleExtracted, 
   onDescriptionExtracted,
   onImageExtracted,
-  onArticleContentExtracted,
+  onExtractedContentUpdated,
   onTabChange,
   onLoadingChange 
 }) => {
@@ -36,7 +36,9 @@ const UrlInput: React.FC<UrlInputProps> = ({
   const updateEditor = (result: any) => {
     if (result.title) onTitleExtracted(result.title);
     if (result.description) onDescriptionExtracted(result.description);
-    if (result.articleContent && onArticleContentExtracted) onArticleContentExtracted(result.articleContent);
+    if (result.extractedContent && onExtractedContentUpdated) {
+      onExtractedContentUpdated(result.extractedContent);
+    }
     if (result.image && onImageExtracted) {
       console.log('🖼️ [UrlInput] Estratta immagine:', result.image);
       onImageExtracted(result.image);
@@ -84,7 +86,7 @@ const UrlInput: React.FC<UrlInputProps> = ({
             url: url,
             title: result.title,
             description: result.description,
-            articleContent: result.articleContent,
+            extractedContent: result.extractedContent,
             credits: result.credits,
             image_url: result.image,
             extraction_date: result.extractionDate
@@ -136,7 +138,7 @@ const UrlInput: React.FC<UrlInputProps> = ({
       const result = {
         title: tempContent.title,
         description: tempContent.description,
-        articleContent: tempContent.articleContent,
+        extractedContent: tempContent.extractedContent,
         image: tempContent.image_url,
         credits: tempContent.credits
       };
