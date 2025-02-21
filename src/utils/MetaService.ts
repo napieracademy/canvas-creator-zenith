@@ -11,6 +11,15 @@ interface MetaResult {
   error?: string;
 }
 
+interface FirecrawlData {
+  title?: string;
+  description?: string;
+  content?: string;
+  html?: string;
+  markdown?: string;
+  text?: string;
+}
+
 export class MetaService {
   private static firecrawlApp: FirecrawlApp | null = null;
   private static API_KEY_STORAGE_KEY = 'firecrawl_api_key';
@@ -57,7 +66,7 @@ export class MetaService {
 
       console.log('Firecrawl extraction successful:', response);
 
-      const data = response.data?.[0];
+      const data = response.data?.[0] as FirecrawlData | undefined;
       if (!data) {
         return {
           success: false,
@@ -70,7 +79,7 @@ export class MetaService {
         title: data.title || '',
         description: data.description || '',
         image: '', // Le immagini possono essere estratte dal contenuto HTML se necessario
-        content: data.content || '',
+        content: data.markdown || data.html || data.text || '',
         credits: `Estratto da: ${url}`
       };
 
