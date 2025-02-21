@@ -8,6 +8,7 @@ import { useToast } from './ui/use-toast';
 import { MetaService } from '@/utils/MetaService';
 import { Loader2, Image as ImageIcon } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
+import { useNavigate } from 'react-router-dom';
 
 interface UrlInputProps {
   onTitleExtracted: (title: string) => void;
@@ -30,6 +31,7 @@ const UrlInput: React.FC<UrlInputProps> = ({
   const [isImageUrl, setIsImageUrl] = useState(false);
   const [progress, setProgress] = useState(0);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const simulateProgress = () => {
     setProgress(0);
@@ -121,6 +123,19 @@ const UrlInput: React.FC<UrlInputProps> = ({
             toast({
               title: "Contenuto estratto",
               description: "Il contenuto è stato estratto con successo",
+            });
+            
+            // Naviga alla pagina del contenuto estratto
+            navigate('/extracted-content', { 
+              state: {
+                url: result.url,
+                title: result.title,
+                description: result.description,
+                image: result.image,
+                credits: result.credits,
+                content: result.content,
+                extractionDate: result.extractionDate
+              }
             });
             
             if (onTabChange) {
