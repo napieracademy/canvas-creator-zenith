@@ -46,20 +46,29 @@ const TextInput: React.FC<TextInputProps> = ({
   const isEmpty = !value || value.trim().length === 0;
   const { toast } = useToast();
   
-  // Manteniamo l'ultimo valore salvato
-  const [lastValue, setLastValue] = useState(value);
+  // Manteniamo una cronologia delle modifiche carattere per carattere
+  const [charHistory, setCharHistory] = useState<string[]>([value]);
 
   const handleChange = (newValue: string) => {
-    setLastValue(value); // Salviamo il valore corrente prima di cambiarlo
+    // Aggiungiamo il nuovo valore alla cronologia solo se è diverso dall'ultimo
+    if (newValue !== charHistory[charHistory.length - 1]) {
+      setCharHistory(prev => [...prev, newValue]);
+    }
     onChange(newValue);
   };
 
   const handleUndo = () => {
-    if (lastValue !== value) {
-      onChange(lastValue);
+    if (charHistory.length > 1) {
+      // Rimuoviamo l'ultimo valore e prendiamo il penultimo
+      const newHistory = charHistory.slice(0, -1);
+      const previousValue = newHistory[newHistory.length - 1];
+      
+      setCharHistory(newHistory);
+      onChange(previousValue);
+      
       toast({
-        title: "Modifiche annullate",
-        description: "Il testo è stato ripristinato al valore precedente"
+        title: "Carattere annullato",
+        description: "L'ultima modifica è stata annullata"
       });
     }
   };
@@ -73,7 +82,7 @@ const TextInput: React.FC<TextInputProps> = ({
             variant="ghost"
             size="sm"
             onClick={handleUndo}
-            disabled={disabled || lastValue === value}
+            disabled={disabled || charHistory.length <= 1}
             className="h-8 w-8 p-0"
           >
             <Undo2 className="h-4 w-4" />
