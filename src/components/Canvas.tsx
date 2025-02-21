@@ -46,16 +46,17 @@ const Canvas: React.FC<CanvasProps> = ({
       return;
     }
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
     if (!ctx) {
       console.warn('Canvas context not found');
       return;
     }
 
-    console.log('Starting canvas render with dimensions:', {
+    console.log('🎨 Rendering canvas with:', {
       width: ORIGINAL_WIDTH,
       height: ORIGINAL_HEIGHT,
-      logo // Log per verificare che il logo sia presente
+      backgroundColor,
+      logo
     });
 
     canvas.width = ORIGINAL_WIDTH;
@@ -94,48 +95,53 @@ const Canvas: React.FC<CanvasProps> = ({
 
     // Wait for fonts to load
     await document.fonts.ready;
-    console.log('Fonts loaded');
 
-    // Disegna il logo/immagine di sfondo se presente
-    if (backgroundColor.startsWith('http') || backgroundColor.startsWith('/')) {
-      console.log('Drawing background as image:', backgroundColor);
-      await drawLogo(context, backgroundColor);
-    } else {
-      console.log('Drawing background color/gradient:', backgroundColor);
-      if (backgroundColor.includes('gradient')) {
-        const gradient = ctx.createLinearGradient(0, 0, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
-        const colors = backgroundColor.match(/#[a-fA-F0-9]{6}/g);
-        if (colors && colors.length >= 2) {
-          gradient.addColorStop(0, colors[0]);
-          gradient.addColorStop(1, colors[1]);
-        }
-        ctx.fillStyle = gradient;
+    try {
+      // Se l'URL è un'immagine, disegnala come sfondo
+      if (backgroundColor.startsWith('http') || backgroundColor.startsWith('/')) {
+        console.log('🖼️ Drawing background image:', backgroundColor);
+        await drawLogo(context, backgroundColor);
+        
+        // Verifica se l'immagine è stata effettivamente disegnata
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const hasContent = imageData.data.some(pixel => pixel !== 0);
+        console.log('✅ Image drawn successfully:', hasContent);
       } else {
-        ctx.fillStyle = backgroundColor;
+        console.log('🎨 Drawing background color:', backgroundColor);
+        if (backgroundColor.includes('gradient')) {
+          const gradient = ctx.createLinearGradient(0, 0, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
+          const colors = backgroundColor.match(/#[a-fA-F0-9]{6}/g);
+          if (colors && colors.length >= 2) {
+            gradient.addColorStop(0, colors[0]);
+            gradient.addColorStop(1, colors[1]);
+          }
+          ctx.fillStyle = gradient;
+        } else {
+          ctx.fillStyle = backgroundColor;
+        }
+        ctx.fillRect(0, 0, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
       }
-      ctx.fillRect(0, 0, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
-    }
 
-    // Draw logo if provided
-    if (logo) {
-      console.log('Drawing logo as overlay:', logo);
-      await drawLogo(context, logo);
-    }
+      // Disegna il logo se presente
+      if (logo && logo !== '/placeholder.svg') {
+        console.log('🎯 Drawing logo overlay:', logo);
+        await drawLogo(context, logo);
+      }
 
-    // Draw safe zone if enabled
-    if (showSafeZone) {
-      console.log('Drawing safe zone');
-      drawSafeZone(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
-    }
+      // Draw safe zone if enabled
+      if (showSafeZone) {
+        drawSafeZone(ctx, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
+      }
 
-    // Draw main text
-    console.log('Drawing main text');
-    drawText(context, text, textAlign, textColor, fontSize, 'title', spacing);
-    
-    // Draw description if provided
-    if (description) {
-      console.log('Drawing description');
-      drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', spacing);
+      // Draw main text
+      drawText(context, text, textAlign, textColor, fontSize, 'title', spacing);
+      
+      // Draw description if provided
+      if (description) {
+        drawText(context, description, descriptionAlign, textColor, descriptionFontSize, 'description', spacing);
+      }
+    } catch (error) {
+      console.error('❌ Error during canvas rendering:', error);
     }
   }, [
     text,
@@ -158,7 +164,7 @@ const Canvas: React.FC<CanvasProps> = ({
   ]);
 
   useEffect(() => {
-    console.log('Canvas effect triggered with dependencies');
+    console.log('🔄 Canvas effect triggered');
     renderCanvas().catch(error => {
       console.error('Error rendering canvas:', error);
     });
@@ -172,8 +178,14 @@ const Canvas: React.FC<CanvasProps> = ({
 
   return (
     <div className="flex flex-col w-full h-full">
-      <div ref={containerRef} className="relative w-full h-full">
-        <CanvasRender canvasRef={canvasRef} />
+      <div 
+        ref={containerRef} 
+        className="relative w-full h-full"
+        style={{ zIndex: 10 }} // Assicuriamoci che il container abbia un z-index appropriato
+      >
+        <CanvasRender 
+          canvasRef={canvasRef}
+        />
       </div>
       <div className="mt-2 flex justify-end gap-2 text-sm text-gray-500">
         <div>{scale}%</div>
