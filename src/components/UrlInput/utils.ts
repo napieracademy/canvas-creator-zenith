@@ -9,13 +9,17 @@ export const isValidImageUrl = (url: string): boolean => {
 
 export const saveToDatabase = async (data: SaveToDbData): Promise<boolean> => {
   try {
+    console.log('💾 [UrlInput] Tentativo di salvataggio con dati:', data);
     const { error } = await supabase
       .from('extracted_content')
-      .insert([data]);
+      .insert([{
+        ...data,
+        image_url: data.image_url || null // Assicuriamoci che l'immagine sia null se non presente
+      }]);
 
     if (error) throw error;
 
-    console.log('✅ [UrlInput] Contenuto salvato nel database');
+    console.log('✅ [UrlInput] Contenuto salvato nel database con successo');
     return true;
   } catch (error) {
     console.error('❌ [UrlInput] Errore nel salvataggio:', error);
@@ -24,12 +28,12 @@ export const saveToDatabase = async (data: SaveToDbData): Promise<boolean> => {
 };
 
 export const createSimulateProgress = (
-  setProgress: (value: number) => void
+  setProgress: React.Dispatch<React.SetStateAction<number>>
 ): () => () => void => {
   return () => {
     setProgress(0);
     const interval = setInterval(() => {
-      setProgress(prev => {
+      setProgress((prev: number) => {
         if (prev >= 90) {
           clearInterval(interval);
           return prev;

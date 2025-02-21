@@ -66,11 +66,21 @@ export class MetaService {
         doc.querySelector('meta[name="description"]')?.getAttribute('content') || '';
       console.log('📝 [MetaService] Descrizione estratta:', description);
 
-      // Estrazione immagine
-      const image = 
+      // Migliorata l'estrazione delle immagini
+      let image = 
         doc.querySelector('meta[property="og:image"]')?.getAttribute('content') ||
         doc.querySelector('meta[property="twitter:image"]')?.getAttribute('content') ||
-        doc.querySelector('link[rel="image_src"]')?.getAttribute('href') || '';
+        doc.querySelector('meta[property="twitter:image:src"]')?.getAttribute('content') ||
+        doc.querySelector('link[rel="image_src"]')?.getAttribute('href') ||
+        doc.querySelector('meta[name="thumbnail"]')?.getAttribute('content') ||
+        '';
+
+      // Se l'immagine è un URL relativo, lo convertiamo in assoluto
+      if (image && !image.startsWith('http')) {
+        const baseUrl = new URL(url);
+        image = new URL(image, baseUrl.origin).toString();
+      }
+
       console.log('🖼️ [MetaService] Immagine estratta:', image);
 
       // Estrazione autore e publisher
@@ -175,7 +185,7 @@ export class MetaService {
         url: url
       };
 
-      console.log('✅ [MetaService] Estrazione completata con successo');
+      console.log('✅ [MetaService] Estrazione completata con successo', result);
       return result;
 
     } catch (error) {
