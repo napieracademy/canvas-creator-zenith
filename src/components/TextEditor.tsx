@@ -53,7 +53,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
     <div className="space-y-4">
       <div className="space-y-6">
         <TextInput 
-          value={text} 
+          value={extractedContent || text}
           onChange={onTextChange} 
           textAlign={textAlign}
           onTextAlignChange={onTextAlignChange}
