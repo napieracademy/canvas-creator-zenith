@@ -41,8 +41,10 @@ interface ContentTableProps {
 }
 
 const calculateTimeRemaining = (createdAt: string): string => {
+  if (!createdAt) return "Data non disponibile";
+  
   const created = new Date(createdAt);
-  const deadline = new Date(created.getTime() + 48 * 60 * 60 * 1000); // 48 ore in millisecondi
+  const deadline = new Date(created.getTime() + 48 * 60 * 60 * 1000); // 48 ore dalla data di salvataggio
   const now = new Date();
   const remaining = deadline.getTime() - now.getTime();
 
