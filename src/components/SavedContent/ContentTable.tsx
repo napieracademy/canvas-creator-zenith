@@ -39,7 +39,7 @@ export const ContentTable = ({
           <TableHead>Titolo</TableHead>
           <TableHead className="hidden md:table-cell w-[50px]">Link</TableHead>
           <TableHead className="hidden lg:table-cell">Contenuto</TableHead>
-          <TableHead className="hidden lg:table-cell">Data</TableHead>
+          <TableHead className="hidden lg:table-cell">Data di estrazione</TableHead>
           <TableHead className="text-right">Azioni</TableHead>
         </TableRow>
       </TableHeader>
