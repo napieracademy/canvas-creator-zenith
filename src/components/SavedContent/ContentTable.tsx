@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Table,
   TableBody,
@@ -10,7 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Image as ImageIcon, ExternalLink, Trash2 } from 'lucide-react';
+import { Image as ImageIcon, ExternalLink, Trash2, Clock } from 'lucide-react';
 import { ContentActions } from './ContentActions';
 import { ExpandedContent } from './ExpandedContent';
 import { ColumnToggle, type ColumnVisibility } from './ColumnToggle';
@@ -41,6 +40,20 @@ interface ContentTableProps {
   onMigrateToHome: (content: ExtractedContent) => void;
 }
 
+const calculateTimeRemaining = (createdAt: string): string => {
+  const created = new Date(createdAt);
+  const deadline = new Date(created.getTime() + 48 * 60 * 60 * 1000); // 48 ore in millisecondi
+  const now = new Date();
+  const remaining = deadline.getTime() - now.getTime();
+
+  if (remaining <= 0) return "In eliminazione...";
+
+  const hours = Math.floor(remaining / (1000 * 60 * 60));
+  const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+
+  return `${hours}h ${minutes}m`;
+};
+
 export const ContentTable = ({
   contents,
   expandedRows,
@@ -60,6 +73,22 @@ export const ContentTable = ({
   });
 
   const [selectedRows, setSelectedRows] = React.useState<Set<string>>(new Set());
+  const [timeRemaining, setTimeRemaining] = React.useState<{[key: string]: string}>({});
+
+  useEffect(() => {
+    const updateCountdowns = () => {
+      const newTimeRemaining: {[key: string]: string} = {};
+      contents.forEach(content => {
+        newTimeRemaining[content.id] = calculateTimeRemaining(content.created_at);
+      });
+      setTimeRemaining(newTimeRemaining);
+    };
+
+    updateCountdowns();
+    const interval = setInterval(updateCountdowns, 60000); // Aggiorna ogni minuto
+
+    return () => clearInterval(interval);
+  }, [contents]);
 
   const handleColumnToggle = (columnKey: keyof ColumnVisibility) => {
     setColumnVisibility(prev => ({
@@ -140,7 +169,7 @@ export const ContentTable = ({
               {columnVisibility.title && <TableHead className="text-left">Titolo</TableHead>}
               {columnVisibility.link && <TableHead className="hidden md:table-cell w-[50px] text-center">Link</TableHead>}
               {columnVisibility.content && <TableHead className="hidden lg:table-cell text-left">Contenuto</TableHead>}
-              {columnVisibility.extractionDate && <TableHead className="hidden lg:table-cell text-left">Data di estrazione</TableHead>}
+              <TableHead className="w-[120px] text-center">Tempo rimasto</TableHead>
               {columnVisibility.actions && <TableHead className="text-right">Azioni</TableHead>}
             </TableRow>
           </TableHeader>
@@ -217,11 +246,14 @@ export const ContentTable = ({
                       {content.content?.length > 100 ? '...' : ''}
                     </TableCell>
                   )}
-                  {columnVisibility.extractionDate && (
-                    <TableCell className="hidden lg:table-cell text-left cursor-pointer" onClick={() => onToggleRow(content.id)}>
-                      {new Date(content.extraction_date).toLocaleString('it-IT')}
-                    </TableCell>
-                  )}
+                  <TableCell className="w-[120px] text-center">
+                    <div className="flex items-center justify-center gap-2 text-sm">
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                      <span className={timeRemaining[content.id]?.startsWith("In") ? "text-red-500" : ""}>
+                        {timeRemaining[content.id]}
+                      </span>
+                    </div>
+                  </TableCell>
                   {columnVisibility.actions && (
                     <TableCell className="text-right">
                       <ContentActions
