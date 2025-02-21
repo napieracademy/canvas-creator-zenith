@@ -13,8 +13,13 @@ export const saveToDatabase = async (data: SaveToDbData): Promise<boolean> => {
     const { error } = await supabase
       .from('extracted_content')
       .insert([{
-        ...data,
-        image_url: data.image_url || null // Assicuriamoci che l'immagine sia null se non presente
+        url: data.url,
+        title: data.title,
+        description: data.description,
+        content: data.content,
+        credits: data.credits,
+        image_url: data.image_url || null,
+        extraction_date: data.extraction_date
       }]);
 
     if (error) throw error;

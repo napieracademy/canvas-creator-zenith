@@ -9,25 +9,8 @@ import { MetaService } from '@/utils/MetaService';
 import { Loader2, Image as ImageIcon } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import { supabase } from '@/integrations/supabase/client';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-
-interface UrlInputProps {
-  onTitleExtracted: (title: string) => void;
-  onDescriptionExtracted: (description: string) => void;
-  onImageExtracted?: (image: string) => void;
-  onContentExtracted?: (content: string) => void;
-  onTabChange?: (value: string) => void;
-  onLoadingChange?: (loading: boolean) => void;
-}
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import type { UrlInputProps } from './UrlInput/types';
 
 const UrlInput: React.FC<UrlInputProps> = ({ 
   onTitleExtracted, 
@@ -105,26 +88,15 @@ const UrlInput: React.FC<UrlInputProps> = ({
     credits?: string;
     image_url?: string;
     extraction_date?: string;
-    publication_date?: string;
-    modification_date?: string;
   }) => {
     try {
       const existingContent = await checkExistingContent(data.url);
 
       if (existingContent) {
-        console.log('🔄 [UrlInput] Contenuto esistente trovato, verifica date di modifica');
-        
-        const result = await MetaService.extractMetadata(data.url);
-        
-        if (result.success) {
-          setTempContent({
-            ...data,
-            publication_date: result.publicationDate,
-            modification_date: result.modificationDate
-          });
-          setShowDuplicateDialog(true);
-          return { saved: false, duplicate: true };
-        }
+        console.log('🔄 [UrlInput] Contenuto esistente trovato');
+        setTempContent(existingContent);
+        setShowDuplicateDialog(true);
+        return { saved: false, duplicate: true };
       }
 
       const { error } = await supabase
@@ -171,22 +143,14 @@ const UrlInput: React.FC<UrlInputProps> = ({
         const result = await MetaService.extractMetadata(url);
         
         if (result.success) {
-          let description = result.description;
-          if (!description && result.content) {
-            const sentences = result.content.split(/[.!?]+/).filter(Boolean);
-            description = sentences.slice(0, 2).join('. ') + '.';
-          }
-          
           const { saved, duplicate } = await saveToDatabase({
             url: url,
             title: result.title,
-            description: description,
+            description: result.description,
             content: result.content,
             credits: result.credits,
             image_url: result.image,
-            extraction_date: result.extractionDate,
-            publication_date: result.publicationDate,
-            modification_date: result.modificationDate
+            extraction_date: result.extractionDate
           });
 
           if (saved) {
