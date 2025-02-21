@@ -9,56 +9,66 @@ export function useCanvasScale(
   const [scale, setScale] = useState(100);
   const rafId = useRef<number>();
   const resizeTimeoutId = useRef<NodeJS.Timeout>();
+  const observer = useRef<ResizeObserver | null>(null);
 
   const updateScale = useCallback(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (rafId.current) {
+      cancelAnimationFrame(rafId.current);
+    }
 
-    const container = canvas.parentElement;
-    if (!container) return;
+    rafId.current = requestAnimationFrame(() => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
 
-    const containerWidth = container.clientWidth;
-    const containerHeight = container.clientHeight;
-    const scaleFactor = Math.min(
-      containerWidth / originalWidth,
-      containerHeight / originalHeight
-    );
-    setScale(Math.round(scaleFactor * 100));
+      const container = canvas.parentElement;
+      if (!container) return;
+
+      const containerWidth = container.clientWidth;
+      const containerHeight = container.clientHeight;
+      const scaleFactor = Math.min(
+        containerWidth / originalWidth,
+        containerHeight / originalHeight
+      );
+      
+      setScale(Math.round(scaleFactor * 100));
+    });
   }, [canvasRef, originalWidth, originalHeight]);
 
   useEffect(() => {
-    // Create a more efficient resize observer with throttling
-    const resizeObserver = new ResizeObserver(() => {
+    // Cleanup previous observer if it exists
+    if (observer.current) {
+      observer.current.disconnect();
+    }
+
+    // Create a new observer with debouncing
+    observer.current = new ResizeObserver((entries) => {
       // Clear any existing timeout
       if (resizeTimeoutId.current) {
         clearTimeout(resizeTimeoutId.current);
       }
 
-      // Clear any existing animation frame
-      if (rafId.current) {
-        cancelAnimationFrame(rafId.current);
-      }
-
-      // Throttle updates to prevent excessive calculations
+      // Debounce the resize updates
       resizeTimeoutId.current = setTimeout(() => {
-        rafId.current = requestAnimationFrame(() => {
-          updateScale();
-        });
-      }, 150); // Increased throttle time to 150ms
+        if (!entries.length) return;
+        
+        updateScale();
+      }, 250); // Increased debounce time to 250ms
     });
 
-    // Observe the canvas container
+    // Start observing
     const canvas = canvasRef.current;
     if (canvas?.parentElement) {
-      resizeObserver.observe(canvas.parentElement);
+      observer.current.observe(canvas.parentElement);
     }
 
-    // Initial scale calculation
+    // Initial scale calculation with RAF
     rafId.current = requestAnimationFrame(updateScale);
 
-    // Cleanup function
+    // Cleanup
     return () => {
-      resizeObserver.disconnect();
+      if (observer.current) {
+        observer.current.disconnect();
+      }
       
       if (resizeTimeoutId.current) {
         clearTimeout(resizeTimeoutId.current);
