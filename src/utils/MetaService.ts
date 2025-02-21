@@ -1,5 +1,5 @@
 
-interface MetaResult {
+interface MetadataResult {
   success: boolean;
   title?: string;
   description?: string;
@@ -10,46 +10,55 @@ interface MetaResult {
 }
 
 export class MetaService {
-  static async extractMetadata(url: string): Promise<MetaResult> {
+  static async extractMetadata(url: string): Promise<MetadataResult> {
     try {
-      console.log('Starting metadata extraction for URL:', url);
+      // Utilizziamo il proxy cors-anywhere per aggirare le limitazioni CORS
+      const proxyUrl = `https://cors-anywhere.herokuapp.com/${url}`;
+      const response = await fetch(proxyUrl);
       
-      const response = await fetch(url);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const html = await response.text();
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, 'text/html');
 
-      const metadata = {
-        title: doc.querySelector('title')?.textContent || 
-               doc.querySelector('meta[property="og:title"]')?.getAttribute('content') || 
-               '',
-        description: doc.querySelector('meta[name="description"]')?.getAttribute('content') || 
-                    doc.querySelector('meta[property="og:description"]')?.getAttribute('content') || 
-                    '',
-        image: doc.querySelector('meta[property="og:image"]')?.getAttribute('content') || '',
-        content: doc.querySelector('article')?.textContent || 
-                doc.querySelector('.article-content')?.textContent ||
-                doc.querySelector('.post-content')?.textContent ||
-                doc.querySelector('main')?.textContent ||
-                doc.body.textContent || '',
-        credits: `Estratto da: ${url}`
-      };
+      // Estrai il titolo
+      const title = doc.querySelector('meta[property="og:title"]')?.getAttribute('content') || 
+                   doc.querySelector('meta[name="twitter:title"]')?.getAttribute('content') ||
+                   doc.title;
 
-      console.log('Extracted metadata:', metadata);
+      // Estrai la descrizione
+      const description = doc.querySelector('meta[property="og:description"]')?.getAttribute('content') ||
+                         doc.querySelector('meta[name="twitter:description"]')?.getAttribute('content') ||
+                         doc.querySelector('meta[name="description"]')?.getAttribute('content');
+
+      // Estrai l'immagine
+      const image = doc.querySelector('meta[property="og:image"]')?.getAttribute('content') ||
+                   doc.querySelector('meta[name="twitter:image"]')?.getAttribute('content');
+
+      // Estrai i credits
+      const credits = doc.querySelector('meta[name="author"]')?.getAttribute('content') ||
+                     doc.querySelector('meta[property="article:author"]')?.getAttribute('content');
+
+      // Estrai il contenuto principale (optional)
+      const content = doc.querySelector('article')?.textContent ||
+                     doc.querySelector('main')?.textContent;
 
       return {
         success: true,
-        ...metadata
+        title,
+        description,
+        image,
+        content,
+        credits
       };
     } catch (error) {
       console.error('Error in metadata extraction:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Errore sconosciuto'
+        error: error instanceof Error ? error.message : 'Errore durante l\'estrazione dei metadati'
       };
     }
   }

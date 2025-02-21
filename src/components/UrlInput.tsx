@@ -27,187 +27,143 @@ const UrlInput: React.FC<UrlInputProps> = ({
   onLoadingChange 
 }) => {
   const [url, setUrl] = useState('');
-  const [isImageUrl, setIsImageUrl] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const simulateProgress = () => {
-    setProgress(0);
-    const interval = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 90) {
-          clearInterval(interval);
-          return prev;
-        }
-        return prev + 10;
-      });
-    }, 500);
-
-    return () => clearInterval(interval);
-  };
-
   const isValidImageUrl = (url: string) => {
-    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
-    return imageExtensions.some(ext => url.toLowerCase().endsWith(ext));
+    try {
+      const urlObj = new URL(url);
+      const path = urlObj.pathname.toLowerCase();
+      return ['.jpg', '.jpeg', '.png', '.gif', '.webp'].some(ext => path.endsWith(ext));
+    } catch {
+      return false;
+    }
   };
 
-  const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newUrl = e.target.value;
-    setUrl(newUrl);
-    setIsImageUrl(isValidImageUrl(newUrl));
+  const handleImageUrl = async (imageUrl: string) => {
+    return new Promise<boolean>((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve(true);
+      img.onerror = () => resolve(false);
+      img.src = imageUrl;
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Starting URL submission with URL:', url);
+    
+    if (!url) {
+      toast({
+        title: "Errore",
+        description: "Inserisci un URL valido",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
     onLoadingChange?.(true);
-    const stopProgress = simulateProgress();
 
     try {
-      if (isImageUrl) {
-        console.log('Processing image URL');
-        const img = new Image();
-        img.onload = () => {
-          if (onImageExtracted) {
-            onImageExtracted(url);
-            setProgress(100);
-            toast({
-              title: "Immagine caricata",
-              description: "L'immagine è stata aggiunta correttamente",
-            });
-          }
-        };
-        img.onerror = () => {
-          console.error('Image loading failed');
+      if (isValidImageUrl(url)) {
+        const isValidImage = await handleImageUrl(url);
+        if (isValidImage && onImageExtracted) {
+          onImageExtracted(url);
           toast({
-            title: "Errore",
-            description: "L'URL dell'immagine non è valido o l'immagine non è accessibile",
-            variant: "destructive",
+            title: "Successo",
+            description: "Immagine caricata correttamente",
           });
-        };
-        img.src = url;
+        } else {
+          throw new Error("Immagine non valida o inaccessibile");
+        }
       } else {
-        console.log('Extracting metadata from URL');
         const result = await MetaService.extractMetadata(url);
-        console.log('Metadata extraction result:', result);
-        
         if (result.success) {
           let extracted = false;
 
           if (result.title) {
-            console.log('Title extracted:', result.title);
             onTitleExtracted(result.title);
             extracted = true;
           }
           if (result.description) {
-            console.log('Description extracted:', result.description);
             onDescriptionExtracted(result.description);
             extracted = true;
           }
           if (result.image && onImageExtracted) {
-            console.log('Image extracted:', result.image);
-            onImageExtracted(result.image);
-            toast({
-              title: "Immagine estratta",
-              description: "L'immagine è stata estratta dall'articolo",
-            });
-            extracted = true;
+            const isValidImage = await handleImageUrl(result.image);
+            if (isValidImage) {
+              onImageExtracted(result.image);
+              extracted = true;
+            }
           }
           if (result.content && onContentExtracted) {
-            console.log('Content extracted:', result.content);
             onContentExtracted(result.content);
           }
-          if (result.credits) {
-            console.log('Credits extracted:', result.credits);
-            const creditsEvent = new CustomEvent('creditsExtracted', {
-              detail: { credits: result.credits }
-            });
-            document.dispatchEvent(creditsEvent);
-          }
-
-          setProgress(100);
 
           if (extracted) {
             toast({
-              title: "Contenuto estratto",
-              description: "Il contenuto è stato estratto con successo",
+              title: "Successo",
+              description: "Contenuti estratti correttamente",
             });
-            
-            if (onTabChange) {
-              onTabChange('manual');
-            }
+            onTabChange?.('manual');
           } else {
             toast({
-              title: "Nessun contenuto",
-              description: "Nessun contenuto è stato trovato nell'URL specificato",
+              title: "Attenzione",
+              description: "Nessun contenuto trovato nell'URL specificato",
               variant: "destructive",
             });
           }
         } else {
-          console.error('Metadata extraction failed:', result.error);
-          toast({
-            title: "Errore",
-            description: result.error || "Impossibile estrarre i contenuti dall'URL",
-            variant: "destructive",
-          });
+          throw new Error(result.error || "Errore durante l'estrazione dei contenuti");
         }
       }
     } catch (error) {
-      console.error('Error in URL submission:', error);
+      console.error('Error:', error);
       toast({
         title: "Errore",
-        description: "Errore durante il recupero dell'URL",
+        description: error instanceof Error ? error.message : "Errore durante l'elaborazione dell'URL",
         variant: "destructive",
       });
     } finally {
+      setIsLoading(false);
       onLoadingChange?.(false);
-      stopProgress();
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <Label className="text-sm font-medium text-gray-700">
-        {isImageUrl ? "URL dell'immagine" : "URL dell'articolo"}
+        URL del contenuto
       </Label>
-      <div className="space-y-2">
-        <div className="flex gap-2">
-          <Input
-            type="url"
-            value={url}
-            onChange={handleUrlChange}
-            placeholder={isImageUrl ? "https://example.com/image.jpg" : "https://example.com/article"}
-            className="flex-1"
-            required
-          />
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button type="submit" disabled={progress > 0 && progress < 100}>
-                  {progress > 0 && progress < 100 ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : isImageUrl ? (
-                    <ImageIcon className="mr-2 h-4 w-4" />
-                  ) : null}
-                  {isImageUrl ? "Carica immagine" : "Estrai contenuti"}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>
-                  {isImageUrl 
-                    ? "Carica un'immagine da URL" 
-                    : "Estrai automaticamente titolo e descrizione dall'URL"}
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-        {progress > 0 && (
-          <div className="space-y-1">
-            <Progress value={progress} className="h-2" />
-            <p className="text-sm text-gray-500 text-right">{progress}%</p>
-          </div>
-        )}
+      <div className="flex gap-2">
+        <Input
+          type="url"
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          placeholder="https://example.com"
+          className="flex-1"
+          disabled={isLoading}
+          required
+        />
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <ImageIcon className="h-4 w-4" />
+                )}
+                <span className="ml-2">
+                  {isLoading ? "Caricamento..." : "Estrai"}
+                </span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Estrai automaticamente contenuti dall'URL</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
     </form>
   );
