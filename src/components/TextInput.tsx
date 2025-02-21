@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
@@ -20,6 +21,7 @@ interface TextInputProps {
   disabled?: boolean;
   onTitleExtracted?: (title: string) => void;
   onDescriptionExtracted?: (description: string) => void;
+  onImageExtracted?: (image: string) => void;
   onTabChange?: (value: string) => void;
   onLoadingChange?: (loading: boolean) => void;
   otherText?: string;
@@ -36,6 +38,11 @@ const TextInput: React.FC<TextInputProps> = ({
   onFontSizeChange,
   label,
   disabled,
+  onTitleExtracted,
+  onDescriptionExtracted,
+  onImageExtracted,
+  onTabChange,
+  onLoadingChange,
   otherText,
   extractedContent,
   onExtractedContentUpdated
