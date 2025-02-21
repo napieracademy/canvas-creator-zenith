@@ -10,21 +10,28 @@ export const useContentRefresh = (onFetchContents: () => Promise<void>) => {
   const handleRefresh = async () => {
     setIsRefreshing(true);
     try {
+      console.log('🔄 [ContentRefresh] Starting refresh');
+      
       const { data, error } = await supabase
         .from('extracted_content')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ [ContentRefresh] Error fetching data:', error);
+        throw error;
+      }
+
+      console.log('✅ [ContentRefresh] Data fetched successfully:', data?.length || 0, 'items');
 
       toast({
         title: "Lista aggiornata",
-        description: "I contenuti sono stati aggiornati con successo",
+        description: `${data?.length || 0} contenuti caricati con successo`,
       });
 
-      onFetchContents();
+      await onFetchContents();
     } catch (error) {
-      console.error('Errore durante l\'aggiornamento della lista:', error);
+      console.error('❌ [ContentRefresh] Error during refresh:', error);
       toast({
         title: "Errore",
         description: "Impossibile aggiornare la lista dei contenuti",

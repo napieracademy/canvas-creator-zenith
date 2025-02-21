@@ -3,28 +3,45 @@ import { supabase } from '@/integrations/supabase/client';
 import type { SaveToDbData } from './types';
 
 export const isValidImageUrl = (url: string): boolean => {
+  if (!url) return false;
   const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
   return imageExtensions.some(ext => url.toLowerCase().endsWith(ext));
 };
 
 export const checkExistingContent = async (url: string) => {
-  const { data: existingContent } = await supabase
-    .from('extracted_content')
-    .select('*')
-    .eq('url', url)
-    .maybeSingle();
+  try {
+    console.log('🔍 [UrlInput] Checking for existing content:', url);
+    const { data: existingContent, error } = await supabase
+      .from('extracted_content')
+      .select('*')
+      .eq('url', url)
+      .maybeSingle();
 
-  return existingContent;
+    if (error) {
+      console.error('❌ [UrlInput] Error checking existing content:', error);
+      throw error;
+    }
+
+    console.log('✅ [UrlInput] Existing content check result:', existingContent);
+    return existingContent;
+  } catch (error) {
+    console.error('❌ [UrlInput] Error in checkExistingContent:', error);
+    throw error;
+  }
 };
 
 export const saveToDatabase = async (data: SaveToDbData) => {
   try {
-    console.log('💾 [UrlInput] Tentativo di salvataggio con dati:', data);
+    console.log('💾 [UrlInput] Attempting to save data:', data);
     
+    if (!data.url) {
+      throw new Error('URL is required');
+    }
+
     const existingContent = await checkExistingContent(data.url);
 
     if (existingContent) {
-      console.log('🔄 [UrlInput] Contenuto esistente trovato');
+      console.log('🔄 [UrlInput] Found existing content');
       return { saved: false, duplicate: true, existingContent };
     }
 
@@ -32,21 +49,25 @@ export const saveToDatabase = async (data: SaveToDbData) => {
       .from('extracted_content')
       .insert([{
         url: data.url,
-        title: data.title,
-        description: data.description,
-        extracted_content: data.extractedContent,
-        credits: data.credits,
+        title: data.title || '',
+        description: data.description || '',
+        extracted_content: data.extractedContent || '',
+        credits: data.credits || '',
         image_url: data.image_url || null,
-        extraction_date: data.extraction_date
+        extraction_date: data.extraction_date || new Date().toISOString(),
+        created_at: new Date().toISOString()
       }]);
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ [UrlInput] Error saving to database:', error);
+      throw error;
+    }
 
-    console.log('✅ [UrlInput] Contenuto salvato nel database');
+    console.log('✅ [UrlInput] Content saved to database successfully');
     return { saved: true, duplicate: false };
   } catch (error) {
-    console.error('❌ [UrlInput] Errore nel salvataggio:', error);
-    return { saved: false, duplicate: false };
+    console.error('❌ [UrlInput] Error in saveToDatabase:', error);
+    return { saved: false, duplicate: false, error };
   }
 };
 
@@ -54,8 +75,10 @@ export const createSimulateProgress = (
   setProgress: React.Dispatch<React.SetStateAction<number>>
 ): () => () => void => {
   return () => {
+    let interval: number;
+    
     setProgress(0);
-    const interval = setInterval(() => {
+    interval = window.setInterval(() => {
       setProgress((prev: number) => {
         if (prev >= 90) {
           clearInterval(interval);
@@ -65,6 +88,11 @@ export const createSimulateProgress = (
       });
     }, 500);
 
-    return () => clearInterval(interval);
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+      setProgress(0);
+    };
   };
 };
