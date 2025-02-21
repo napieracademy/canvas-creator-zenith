@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   Table,
@@ -9,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Image as ImageIcon, ExternalLink, Trash2, Clock } from 'lucide-react';
+import { Image as ImageIcon, ExternalLink, Trash2, Clock, FilterX, Filter } from 'lucide-react';
 import { ContentActions } from './ContentActions';
 import { ExpandedContent } from './ExpandedContent';
 import { ColumnToggle, type ColumnVisibility } from './ColumnToggle';
@@ -76,6 +77,7 @@ export const ContentTable = ({
 
   const [selectedRows, setSelectedRows] = React.useState<Set<string>>(new Set());
   const [timeRemaining, setTimeRemaining] = React.useState<{[key: string]: string}>({});
+  const [showDuplicates, setShowDuplicates] = React.useState(false);
 
   useEffect(() => {
     const updateCountdowns = () => {
@@ -113,7 +115,7 @@ export const ContentTable = ({
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedRows(new Set(contents.map(content => content.id)));
+      setSelectedRows(new Set(displayedContents.map(content => content.id)));
     } else {
       setSelectedRows(new Set());
     }
@@ -126,31 +128,65 @@ export const ContentTable = ({
     setSelectedRows(new Set());
   };
 
+  // Funzione per identificare i contenuti duplicati
+  const getDuplicateGroups = () => {
+    const urlGroups = contents.reduce((acc, content) => {
+      const url = content.url;
+      if (!acc[url]) {
+        acc[url] = [];
+      }
+      acc[url].push(content);
+      return acc;
+    }, {} as { [key: string]: ExtractedContent[] });
+
+    return Object.values(urlGroups).filter(group => group.length > 1);
+  };
+
+  // Filtra i contenuti da mostrare
+  const displayedContents = showDuplicates
+    ? getDuplicateGroups().flat()
+    : contents;
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        {selectedRows.size > 0 && (
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="destructive" size="sm">
-                <Trash2 className="h-4 w-4 mr-2" />
-                Elimina selezionati ({selectedRows.size})
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Sei sicuro?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Stai per eliminare {selectedRows.size} elementi selezionati. Questa azione non può essere annullata.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Annulla</AlertDialogCancel>
-                <AlertDialogAction onClick={handleBulkDelete}>Elimina</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        )}
+        <div className="flex gap-2">
+          {selectedRows.size > 0 && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" size="sm">
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Elimina selezionati ({selectedRows.size})
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Sei sicuro?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Stai per eliminare {selectedRows.size} elementi selezionati. Questa azione non può essere annullata.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Annulla</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleBulkDelete}>Elimina</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowDuplicates(!showDuplicates)}
+            className={showDuplicates ? "bg-muted" : ""}
+          >
+            {showDuplicates ? (
+              <FilterX className="h-4 w-4 mr-2" />
+            ) : (
+              <Filter className="h-4 w-4 mr-2" />
+            )}
+            {showDuplicates ? "Mostra tutti" : "Mostra duplicati"}
+          </Button>
+        </div>
         <div className="flex-grow flex justify-end">
           <ColumnToggle columns={columnVisibility} onColumnToggle={handleColumnToggle} />
         </div>
@@ -161,7 +197,7 @@ export const ContentTable = ({
             <TableRow>
               <TableHead className="w-[30px]">
                 <Checkbox 
-                  checked={selectedRows.size === contents.length && contents.length > 0}
+                  checked={selectedRows.size === displayedContents.length && displayedContents.length > 0}
                   onCheckedChange={handleSelectAll}
                   aria-label="Select all"
                 />
@@ -176,7 +212,7 @@ export const ContentTable = ({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {contents.map((content) => (
+            {displayedContents.map((content) => (
               <React.Fragment key={content.id}>
                 <TableRow>
                   <TableCell className="w-[30px]">
