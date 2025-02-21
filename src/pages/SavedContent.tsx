@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Eye, Trash2 } from 'lucide-react';
+import { ArrowLeft, Eye, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import {
@@ -29,6 +29,7 @@ interface ExtractedContent {
 const SavedContent = () => {
   const [contents, setContents] = useState<ExtractedContent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -95,6 +96,16 @@ const SavedContent = () => {
     });
   };
 
+  const toggleRow = (id: string) => {
+    const newExpandedRows = new Set(expandedRows);
+    if (newExpandedRows.has(id)) {
+      newExpandedRows.delete(id);
+    } else {
+      newExpandedRows.add(id);
+    }
+    setExpandedRows(newExpandedRows);
+  };
+
   if (loading) {
     return (
       <div className="container mx-auto p-6">
@@ -122,51 +133,86 @@ const SavedContent = () => {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-[30px]"></TableHead>
                 <TableHead>Titolo</TableHead>
-                <TableHead>URL</TableHead>
-                <TableHead>Descrizione</TableHead>
-                <TableHead>Data Estrazione</TableHead>
+                <TableHead className="hidden md:table-cell">URL</TableHead>
+                <TableHead className="hidden lg:table-cell">Data</TableHead>
                 <TableHead className="text-right">Azioni</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {contents.map((content) => (
-                <TableRow key={content.id}>
-                  <TableCell className="font-medium">
-                    {content.title || 'Senza titolo'}
-                  </TableCell>
-                  <TableCell className="max-w-xs truncate">
-                    <a 
-                      href={content.url} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
-                    >
-                      {content.url}
-                    </a>
-                  </TableCell>
-                  <TableCell className="max-w-xs truncate">
-                    {content.description}
-                  </TableCell>
-                  <TableCell>
-                    {new Date(content.extraction_date).toLocaleString('it-IT')}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button variant="outline" size="sm" onClick={() => handleView(content)}>
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => handleDelete(content.id)}
-                        className="text-red-500 hover:text-red-700"
+                <React.Fragment key={content.id}>
+                  <TableRow className="cursor-pointer" onClick={() => toggleRow(content.id)}>
+                    <TableCell className="w-[30px]">
+                      {expandedRows.has(content.id) ? (
+                        <ChevronUp className="h-4 w-4" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4" />
+                      )}
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      {content.title || 'Senza titolo'}
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell max-w-xs truncate">
+                      <a 
+                        href={content.url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline"
+                        onClick={(e) => e.stopPropagation()}
                       >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                        {content.url}
+                      </a>
+                    </TableCell>
+                    <TableCell className="hidden lg:table-cell">
+                      {new Date(content.extraction_date).toLocaleString('it-IT')}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2" onClick={(e) => e.stopPropagation()}>
+                        <Button variant="outline" size="sm" onClick={() => handleView(content)}>
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleDelete(content.id)}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                  {expandedRows.has(content.id) && (
+                    <TableRow>
+                      <TableCell colSpan={5} className="bg-muted/50 p-4">
+                        <div className="space-y-4">
+                          <div>
+                            <h3 className="font-semibold mb-2">Descrizione</h3>
+                            <p className="text-sm text-muted-foreground">
+                              {content.description || 'Nessuna descrizione disponibile'}
+                            </p>
+                          </div>
+                          <div>
+                            <h3 className="font-semibold mb-2">Contenuto</h3>
+                            <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                              {content.content || 'Nessun contenuto disponibile'}
+                            </p>
+                          </div>
+                          {content.credits && (
+                            <div>
+                              <h3 className="font-semibold mb-2">Crediti</h3>
+                              <p className="text-sm text-muted-foreground">
+                                {content.credits}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </React.Fragment>
               ))}
             </TableBody>
           </Table>
