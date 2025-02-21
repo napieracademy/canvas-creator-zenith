@@ -1,3 +1,4 @@
+
 interface MetadataResult {
   success: boolean;
   title?: string;
@@ -60,13 +61,31 @@ export class MetaService {
         doc.querySelector('title')?.textContent || '';
       console.log('📌 [MetaService] Titolo estratto:', title);
 
-      // Estrazione descrizione
-      const description = 
-        doc.querySelector('meta[property="og:description"]')?.getAttribute('content') ||
-        doc.querySelector('meta[name="description"]')?.getAttribute('content') || '';
+      // Estrazione descrizione - migliorata
+      const description = doc.querySelector('meta[property="og:description"]')?.getAttribute('content') ||
+        doc.querySelector('meta[name="description"]')?.getAttribute('content') ||
+        doc.querySelector('meta[name="twitter:description"]')?.getAttribute('content') ||
+        doc.querySelector('meta[property="article:description"]')?.getAttribute('content');
+      
       console.log('📝 [MetaService] Descrizione estratta:', description);
 
-      // Migliorata l'estrazione delle immagini
+      // Se non troviamo una descrizione nei meta tag, cerchiamo nel contenuto
+      let extractedDescription = description;
+      if (!extractedDescription) {
+        // Cerchiamo prima nei paragrafi con la classe description o summary
+        const descriptionParagraph = 
+          doc.querySelector('.description p, .summary p, [class*="description"] p, [class*="summary"] p')?.textContent ||
+          doc.querySelector('article p:first-of-type')?.textContent ||
+          doc.querySelector('.article-content p:first-of-type')?.textContent ||
+          doc.querySelector('.post-content p:first-of-type')?.textContent;
+
+        if (descriptionParagraph) {
+          extractedDescription = descriptionParagraph.trim();
+          console.log('📝 [MetaService] Descrizione estratta dal paragrafo:', extractedDescription);
+        }
+      }
+
+      // Estrazione immagine
       let image = 
         doc.querySelector('meta[property="og:image"]')?.getAttribute('content') ||
         doc.querySelector('meta[property="twitter:image"]')?.getAttribute('content') ||
@@ -77,12 +96,10 @@ export class MetaService {
       // Validazione e normalizzazione dell'URL dell'immagine
       if (image) {
         try {
-          // Se l'immagine è un URL relativo, lo convertiamo in assoluto
           if (!image.startsWith('http')) {
             const baseUrl = new URL(url);
             image = new URL(image, baseUrl.origin).toString();
           }
-          // Verifica che l'URL sia valido
           new URL(image);
         } catch (error) {
           console.warn('⚠️ [MetaService] URL immagine non valido:', image);
@@ -106,19 +123,10 @@ export class MetaService {
       const unwantedSelectors = [
         'script', 'style', 'iframe', 'nav', 'header', 'footer', 'aside',
         'form', '.social', '.share', '.comments', '.related', '.sidebar',
-        '.advertisement', '.newsletter', '.subscription',
-        '.tabs-nav', '[data-mrf-recirculation]', '.overtitle-art-logo',
-        '.title-art-hp', '.nav-section', '.menu-section',
-        '[data-type="related"]', '[data-type="highlights"]',
-        '[data-mrf-recirculation="In Evidenza"]',
-        '.related-articles', '.highlighted-content',
-        '.breadcrumbs', '.pagination', '.article-navigation',
-        '.article-footer', '.article-header', '.article-meta',
-        '.has-text-black', '#article-navigation',
-        '.is-pastone', '.is-small-medium'
+        '.advertisement', '.newsletter', '.subscription'
       ];
 
-      // Cerca il contenuto principale
+      // Cerchiamo il contenuto principale
       const mainContentSelectors = [
         'article',
         '[role="main"]',
@@ -129,11 +137,7 @@ export class MetaService {
         '#article-body',
         '.story-body',
         '.article-body',
-        '.content-body',
-        '.main-content',
-        '.article-text',
-        '.post-text',
-        '.story-content'
+        '.content-body'
       ];
 
       let mainElement = null;
@@ -154,7 +158,7 @@ export class MetaService {
         elements.forEach(el => el.remove());
       });
 
-      // Estrai solo i paragrafi con contenuto significativo e prendi le prime 10 righe
+      // Estrai solo i paragrafi con contenuto significativo
       const paragraphs = Array.from(clone.querySelectorAll('p'))
         .map(p => p.textContent?.trim())
         .filter(text => text && text.length > 20)
@@ -168,11 +172,16 @@ export class MetaService {
             /^articoli correlati$/i
           ];
           return !unwantedPatterns.some(pattern => pattern.test(text || ''));
-        })
-        .slice(0, 10);
+        });
 
       const cleanContent = paragraphs.join('\n\n');
-      console.log('📄 [MetaService] Contenuto pulito estratto (prime 10 righe)');
+      console.log('📄 [MetaService] Contenuto estratto');
+
+      // Se ancora non abbiamo una descrizione, prendiamo il primo paragrafo valido
+      if (!extractedDescription && paragraphs.length > 0) {
+        extractedDescription = paragraphs[0];
+        console.log('📝 [MetaService] Descrizione estratta dal primo paragrafo:', extractedDescription);
+      }
 
       // Formatta i credits
       let credits = '';
@@ -186,7 +195,7 @@ export class MetaService {
       const result = {
         success: true,
         title: title.trim(),
-        description: description.trim(),
+        description: extractedDescription?.trim(),
         credits: credits,
         content: cleanContent,
         image: image,
