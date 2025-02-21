@@ -125,7 +125,7 @@ export class MetaService {
         }
       });
 
-      // Estrai solo i paragrafi con contenuto significativo
+      // Estrai solo i paragrafi con contenuto significativo e prendi le prime 10 righe
       const paragraphs = Array.from(clone.querySelectorAll('p'))
         .map(p => p.textContent?.trim())
         .filter(text => text && text.length > 20)  // Filtra paragrafi troppo corti
@@ -140,10 +140,11 @@ export class MetaService {
             /^articoli correlati$/i
           ];
           return !unwantedPatterns.some(pattern => pattern.test(text || ''));
-        });
+        })
+        .slice(0, 10); // Prendi solo le prime 10 righe
 
       const cleanContent = paragraphs.join('\n\n');
-      console.log('📄 [MetaService] Contenuto pulito estratto');
+      console.log('📄 [MetaService] Contenuto pulito estratto (prime 10 righe)');
 
       // Formatta i credits
       let credits = '';
@@ -158,7 +159,7 @@ export class MetaService {
         title: title.trim(),
         description: description.trim(),
         credits: credits,
-        content: cleanContent,
+        content: cleanContent, // Ora contiene solo le prime 10 righe
         extractionDate: new Date().toLocaleString(),
         url: url
       };
