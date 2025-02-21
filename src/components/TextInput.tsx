@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
@@ -46,11 +45,9 @@ const TextInput: React.FC<TextInputProps> = ({
   const isEmpty = !value || value.trim().length === 0;
   const { toast } = useToast();
   
-  // Manteniamo una cronologia delle modifiche carattere per carattere
   const [charHistory, setCharHistory] = useState<string[]>([value]);
 
   const handleChange = (newValue: string) => {
-    // Aggiungiamo il nuovo valore alla cronologia solo se è diverso dall'ultimo
     if (newValue !== charHistory[charHistory.length - 1]) {
       setCharHistory(prev => [...prev, newValue]);
     }
@@ -59,7 +56,6 @@ const TextInput: React.FC<TextInputProps> = ({
 
   const handleUndo = () => {
     if (charHistory.length > 1) {
-      // Rimuoviamo l'ultimo valore e prendiamo il penultimo
       const newHistory = charHistory.slice(0, -1);
       const previousValue = newHistory[newHistory.length - 1];
       
@@ -143,4 +139,3 @@ const TextInput: React.FC<TextInputProps> = ({
 };
 
 export default TextInput;
-
