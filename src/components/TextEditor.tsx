@@ -49,11 +49,14 @@ const TextEditor: React.FC<TextEditorProps> = ({
   extractedContent,
   onContentExtracted
 }) => {
+  // Combina il titolo con il contenuto estratto
+  const titleWithContent = `${text}\n\n${extractedContent || ''}`;
+
   return (
     <div className="space-y-4">
       <div className="space-y-6">
         <TextInput 
-          value={text}
+          value={titleWithContent}
           onChange={onTextChange} 
           textAlign={textAlign}
           onTextAlignChange={onTextAlignChange}
