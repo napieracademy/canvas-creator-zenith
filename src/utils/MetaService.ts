@@ -168,9 +168,23 @@ export class MetaService {
         }
       }
 
-      console.log('Extracted content:', content.slice(0, 200) + '...');
-      console.log('Content word count:', content.split(/\s+/).filter(word => word.length > 0).length);
-      console.log('Content length:', content.length);
+      // Normalize content:
+      // 1. Replace multiple spaces with single space
+      // 2. Replace multiple newlines with double newline (for paragraphs)
+      // 3. Trim whitespace from start and end
+      // 4. Remove any zero-width spaces or other invisible characters
+      const normalizedContent = content
+        .replace(/[\u200B-\u200D\uFEFF]/g, '') // Remove zero-width spaces
+        .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+        .replace(/\n\s*\n\s*\n/g, '\n\n') // Replace multiple newlines with double newline
+        .replace(/^\s+|\s+$/g, '') // Trim start and end
+        .split('\n') // Split into lines
+        .map(line => line.trim()) // Trim each line
+        .filter(line => line.length > 0) // Remove empty lines
+        .join('\n\n'); // Join with double newlines for readability
+
+      console.log('Content word count:', normalizedContent.split(/\s+/).filter(word => word.length > 0).length);
+      console.log('Content length:', normalizedContent.length);
       
       const result = {
         success: true,
@@ -178,7 +192,7 @@ export class MetaService {
         description: description.trim(),
         image: image.trim(),
         credits: credits,
-        content: content
+        content: normalizedContent
       };
 
       // Genera e scarica il file di testo con i metadati
