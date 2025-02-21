@@ -2,10 +2,17 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { ArrowLeft, Eye, Trash2 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 interface ExtractedContent {
   id: string;
@@ -107,38 +114,62 @@ const SavedContent = () => {
       </div>
 
       {contents.length === 0 ? (
-        <Card className="p-6">
-          <p className="text-center text-gray-500">Nessun contenuto salvato</p>
-        </Card>
+        <div className="text-center text-gray-500 p-8">
+          Nessun contenuto salvato
+        </div>
       ) : (
-        <div className="space-y-4">
-          {contents.map((content) => (
-            <Card key={content.id} className="p-6">
-              <div className="flex justify-between items-start">
-                <div className="space-y-2 flex-1">
-                  <h2 className="text-xl font-semibold">{content.title || 'Senza titolo'}</h2>
-                  <p className="text-sm text-gray-500 break-all">{content.url}</p>
-                  <p className="text-sm">{content.description?.substring(0, 200)}...</p>
-                  <p className="text-xs text-gray-400">
-                    Estratto il: {new Date(content.extraction_date).toLocaleString('it-IT')}
-                  </p>
-                </div>
-                <div className="flex gap-2 ml-4">
-                  <Button variant="outline" size="sm" onClick={() => handleView(content)}>
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => handleDelete(content.id)}
-                    className="text-red-500 hover:text-red-700"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </Card>
-          ))}
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Titolo</TableHead>
+                <TableHead>URL</TableHead>
+                <TableHead>Descrizione</TableHead>
+                <TableHead>Data Estrazione</TableHead>
+                <TableHead className="text-right">Azioni</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {contents.map((content) => (
+                <TableRow key={content.id}>
+                  <TableCell className="font-medium">
+                    {content.title || 'Senza titolo'}
+                  </TableCell>
+                  <TableCell className="max-w-xs truncate">
+                    <a 
+                      href={content.url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline"
+                    >
+                      {content.url}
+                    </a>
+                  </TableCell>
+                  <TableCell className="max-w-xs truncate">
+                    {content.description}
+                  </TableCell>
+                  <TableCell>
+                    {new Date(content.extraction_date).toLocaleString('it-IT')}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Button variant="outline" size="sm" onClick={() => handleView(content)}>
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => handleDelete(content.id)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       )}
     </div>
