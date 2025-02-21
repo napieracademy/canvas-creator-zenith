@@ -1,4 +1,3 @@
-
 import React from 'react';
 import CanvasPreview from '@/components/CanvasPreview';
 import MagicButton from '@/components/MagicButton';
@@ -29,7 +28,7 @@ interface MainContentProps {
   isLoading: boolean;
   credits: string;
   viewMode: 'full' | 'fast';
-  logo?: string; // Aggiungiamo la prop logo
+  logo?: string;
   onEffectiveFontSizeChange: (size: number) => void;
   onShowSafeZoneChange: (show: boolean) => void;
   onSpacingChange: (spacing: number) => void;
@@ -43,6 +42,7 @@ interface MainContentProps {
   onLoadingChange: (loading: boolean) => void;
   onFormatChange: (format: 'post' | 'story') => void;
   onViewModeChange: (mode: 'full' | 'fast') => void;
+  onImageExtracted?: (image: string) => void;
 }
 
 const MainContent: React.FC<MainContentProps> = ({
@@ -74,7 +74,8 @@ const MainContent: React.FC<MainContentProps> = ({
   onTabChange,
   onLoadingChange,
   onFormatChange,
-  onViewModeChange
+  onViewModeChange,
+  onImageExtracted
 }) => {
   return (
     <div className="h-screen p-6">

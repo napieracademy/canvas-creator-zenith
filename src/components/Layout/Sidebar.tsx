@@ -48,6 +48,7 @@ interface SidebarProps {
   onColorSelect: (background: string, text: string) => void;
   onContentExtracted?: (content: string) => void;
   onLogoChange?: (logo: string) => void;
+  onImageExtracted?: (image: string) => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -79,6 +80,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   onColorSelect,
   onContentExtracted,
   onLogoChange,
+  onImageExtracted,
 }) => {
   const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
