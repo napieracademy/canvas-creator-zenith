@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect, useCallback } from 'react';
 import { CanvasProps } from '@/types/canvas';
 import { useCanvasScale } from '@/hooks/useCanvasScale';
@@ -96,37 +95,26 @@ const Canvas: React.FC<CanvasProps> = ({
     console.log('Fonts loaded');
 
     // Draw background
-    if (backgroundColor.startsWith('url(')) {
-      console.log('Drawing background image');
+    if (backgroundColor.startsWith('http') || backgroundColor.startsWith('/')) {
+      console.log('Drawing background image:', backgroundColor);
       const img = new Image();
       img.crossOrigin = "anonymous";
       
       await new Promise((resolve, reject) => {
         img.onload = resolve;
         img.onerror = reject;
-        img.src = backgroundColor.slice(4, -1);
+        img.src = backgroundColor;
       });
 
-      // Disegna l'immagine nella metà superiore del canvas
+      // Prima disegna il colore di sfondo
+      ctx.fillStyle = '#f0f0f0'; // Colore di sfondo neutro
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Poi disegna l'immagine con blend mode nella metà superiore
       const scale = Math.max(canvas.width / img.width, (canvas.height * 0.5) / img.height);
       const x = (canvas.width - img.width * scale) / 2;
       const y = 0;
       
-      // Prima disegna il colore di sfondo
-      if (backgroundColor.includes('gradient')) {
-        const gradient = ctx.createLinearGradient(0, 0, ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
-        const colors = backgroundColor.match(/#[a-fA-F0-9]{6}/g);
-        if (colors && colors.length >= 2) {
-          gradient.addColorStop(0, colors[0]);
-          gradient.addColorStop(1, colors[1]);
-        }
-        ctx.fillStyle = gradient;
-      } else {
-        ctx.fillStyle = backgroundColor;
-      }
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // Poi disegna l'immagine con blend mode
       ctx.globalCompositeOperation = 'multiply';
       ctx.drawImage(img, x, y, img.width * scale, canvas.height * 0.5);
       ctx.globalCompositeOperation = 'source-over';
@@ -220,4 +208,3 @@ const Canvas: React.FC<CanvasProps> = ({
 };
 
 export default withFeatureVariants(Canvas, 'Canvas');
-
