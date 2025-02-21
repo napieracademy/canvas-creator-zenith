@@ -8,11 +8,24 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ChevronDown, ChevronUp, Image as ImageIcon, ExternalLink } from 'lucide-react';
+import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { ChevronDown, ChevronUp, Image as ImageIcon, ExternalLink, Trash2 } from 'lucide-react';
 import { ContentActions } from './ContentActions';
 import { ExpandedContent } from './ExpandedContent';
 import { ColumnToggle, type ColumnVisibility } from './ColumnToggle';
 import type { ExtractedContent } from './types';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface ContentTableProps {
   contents: ExtractedContent[];
@@ -41,6 +54,8 @@ export const ContentTable = ({
     actions: true
   });
 
+  const [selectedRows, setSelectedRows] = React.useState<Set<string>>(new Set());
+
   const handleColumnToggle = (columnKey: keyof ColumnVisibility) => {
     setColumnVisibility(prev => ({
       ...prev,
@@ -48,15 +63,72 @@ export const ContentTable = ({
     }));
   };
 
+  const handleSelectRow = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const newSelectedRows = new Set(selectedRows);
+    if (newSelectedRows.has(id)) {
+      newSelectedRows.delete(id);
+    } else {
+      newSelectedRows.add(id);
+    }
+    setSelectedRows(newSelectedRows);
+  };
+
+  const handleSelectAll = () => {
+    if (selectedRows.size === contents.length) {
+      setSelectedRows(new Set());
+    } else {
+      setSelectedRows(new Set(contents.map(content => content.id)));
+    }
+  };
+
+  const handleBulkDelete = () => {
+    selectedRows.forEach(id => {
+      onDelete(id);
+    });
+    setSelectedRows(new Set());
+  };
+
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
-        <ColumnToggle columns={columnVisibility} onColumnToggle={handleColumnToggle} />
+      <div className="flex justify-between items-center">
+        {selectedRows.size > 0 && (
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" size="sm">
+                <Trash2 className="h-4 w-4 mr-2" />
+                Elimina selezionati ({selectedRows.size})
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Sei sicuro?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Stai per eliminare {selectedRows.size} elementi selezionati. Questa azione non può essere annullata.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Annulla</AlertDialogCancel>
+                <AlertDialogAction onClick={handleBulkDelete}>Elimina</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
+        <div className="flex-grow flex justify-end">
+          <ColumnToggle columns={columnVisibility} onColumnToggle={handleColumnToggle} />
+        </div>
       </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-[30px]">
+                <Checkbox 
+                  checked={selectedRows.size === contents.length && contents.length > 0}
+                  onCheckedChange={handleSelectAll}
+                  aria-label="Select all"
+                />
+              </TableHead>
               <TableHead className="w-[30px]"></TableHead>
               {columnVisibility.image && <TableHead className="w-[50px] text-left">Img</TableHead>}
               {columnVisibility.id && <TableHead className="w-[100px] text-left">ID</TableHead>}
@@ -71,6 +143,14 @@ export const ContentTable = ({
             {contents.map((content) => (
               <React.Fragment key={content.id}>
                 <TableRow className="cursor-pointer" onClick={() => onToggleRow(content.id)}>
+                  <TableCell className="w-[30px]">
+                    <Checkbox 
+                      checked={selectedRows.has(content.id)}
+                      onCheckedChange={(e) => handleSelectRow(content.id, e as unknown as React.MouseEvent)}
+                      aria-label={`Select ${content.title}`}
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  </TableCell>
                   <TableCell className="w-[30px]">
                     {expandedRows.has(content.id) ? (
                       <ChevronUp className="h-4 w-4" />
