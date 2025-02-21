@@ -9,6 +9,7 @@ const DEFAULT_DESCRIPTION = 'Crea bellissime immagini per i social media in poch
 
 export const useIndexState = () => {
   const location = useLocation();
+  
   const getRandomTheme = () => {
     const randomIndex = Math.floor(Math.random() * colorPairs.length);
     return colorPairs[randomIndex];
@@ -17,41 +18,65 @@ export const useIndexState = () => {
   const randomTheme = getRandomTheme();
 
   const loadFromCache = () => {
-    if (location.state?.text || location.state?.description) {
+    try {
+      if (location.state?.text || location.state?.description) {
+        const cached = localStorage.getItem('socialImageCache');
+        const cachedData = cached ? JSON.parse(cached) : {};
+        
+        return {
+          text: location.state.text || DEFAULT_TEXT,
+          description: location.state.description || DEFAULT_DESCRIPTION,
+          backgroundColor: cachedData.backgroundColor || randomTheme.background,
+          textColor: cachedData.textColor || randomTheme.text,
+          fontSize: cachedData.fontSize || 111,
+          descriptionFontSize: cachedData.descriptionFontSize || 56,
+          spacing: cachedData.spacing || 100,
+          textAlign: cachedData.textAlign || 'left',
+          descriptionAlign: cachedData.descriptionAlign || 'left',
+          format: cachedData.format || 'post'
+        };
+      }
+
       const cached = localStorage.getItem('socialImageCache');
-      const cachedData = cached ? JSON.parse(cached) : {};
-      
+      if (cached) {
+        const parsedCache = JSON.parse(cached);
+        console.log('Loaded from cache:', parsedCache);
+        return parsedCache;
+      }
+
+      console.log('Using default values');
       return {
-        text: location.state.text || DEFAULT_TEXT,
-        description: location.state.description || DEFAULT_DESCRIPTION,
-        backgroundColor: cachedData.backgroundColor || randomTheme.background,
-        textColor: cachedData.textColor || randomTheme.text,
-        fontSize: cachedData.fontSize || 111,
-        descriptionFontSize: cachedData.descriptionFontSize || 56,
-        spacing: cachedData.spacing || 100,
-        textAlign: cachedData.textAlign || 'left',
-        descriptionAlign: cachedData.descriptionAlign || 'left',
-        format: cachedData.format || 'post'
+        text: DEFAULT_TEXT,
+        description: DEFAULT_DESCRIPTION,
+        backgroundColor: randomTheme.background,
+        textColor: randomTheme.text,
+        fontSize: 111,
+        descriptionFontSize: 56,
+        spacing: 100,
+        textAlign: 'left',
+        descriptionAlign: 'left',
+        format: 'post'
+      };
+    } catch (error) {
+      console.error('Error loading from cache:', error);
+      toast({
+        title: "Errore",
+        description: "Errore nel caricamento delle impostazioni salvate",
+        variant: "destructive"
+      });
+      return {
+        text: DEFAULT_TEXT,
+        description: DEFAULT_DESCRIPTION,
+        backgroundColor: randomTheme.background,
+        textColor: randomTheme.text,
+        fontSize: 111,
+        descriptionFontSize: 56,
+        spacing: 100,
+        textAlign: 'left',
+        descriptionAlign: 'left',
+        format: 'post'
       };
     }
-
-    const cached = localStorage.getItem('socialImageCache');
-    if (cached) {
-      return JSON.parse(cached);
-    }
-
-    return {
-      text: DEFAULT_TEXT,
-      description: DEFAULT_DESCRIPTION,
-      backgroundColor: randomTheme.background,
-      textColor: randomTheme.text,
-      fontSize: 111,
-      descriptionFontSize: 56,
-      spacing: 100,
-      textAlign: 'left',
-      descriptionAlign: 'left',
-      format: 'post'
-    };
   };
 
   const initialState = loadFromCache();
@@ -83,6 +108,33 @@ export const useIndexState = () => {
   const [extractedArticleText, setExtractedArticleText] = useState('');
   const [articleTextAlign, setArticleTextAlign] = useState<'left' | 'center' | 'right'>('left');
   const [articleFontSize, setArticleFontSize] = useState(32);
+
+  // Ripristiniamo il salvataggio nella cache
+  useEffect(() => {
+    try {
+      const dataToCache = {
+        text,
+        description,
+        backgroundColor,
+        textColor,
+        fontSize,
+        descriptionFontSize,
+        spacing,
+        textAlign,
+        descriptionAlign,
+        format
+      };
+      localStorage.setItem('socialImageCache', JSON.stringify(dataToCache));
+      console.log('Saved to cache:', dataToCache);
+    } catch (error) {
+      console.error('Error saving to cache:', error);
+      toast({
+        title: "Errore",
+        description: "Impossibile salvare le impostazioni",
+        variant: "destructive"
+      });
+    }
+  }, [text, description, backgroundColor, textColor, fontSize, descriptionFontSize, spacing, textAlign, descriptionAlign, format]);
 
   useEffect(() => {
     if (location.state?.text || location.state?.description) {
