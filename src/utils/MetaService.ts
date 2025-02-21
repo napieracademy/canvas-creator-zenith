@@ -58,6 +58,39 @@ export class MetaService {
         doc.querySelector('meta[name="publisher"]')?.getAttribute('content') || '';
       console.log('🏢 [MetaService] Editore estratto:', publisher);
 
+      // Selettori da rimuovere estesi per catturare più elementi non necessari
+      const unwantedSelectors = [
+        'script', 'style', 'iframe', 'nav', 'header', 'footer', 'aside',
+        '.ad', '.ads', '.advertisement', '.social-share', '.comments',
+        '.related-posts', '.sidebar', '.widget', '[role="complementary"]',
+        '[role="navigation"]', '.nav', '.menu', '.search', '.share', '.social',
+        '.author-bio', '.breadcrumb', '.pagination', '.evidenza',
+        '.highlight', '.featured', '.breaking', '.tag-list', '.tags',
+        '.category', '.categories', '.toolbar', '.tools', '.utility-bar',
+        '.newsletter', '.subscription', '.subscribe', '.recommended',
+        '.popular', '.trending', '.most-read', '.most-shared',
+        '.read-more', '.more-articles', '.more-stories', '.read-next',
+        'aside', '[role="complementary"]', '.complementary', '.supplementary',
+        '.additional', '.extra', '.bonus', '.sponsored', '.advertisement',
+        '.promo', '.promotion', '.announcement', '.alert', '.notice',
+        '.notification', '.cookie', '.gdpr', '.privacy', '.legal',
+        '.terms', '.disclaimer', '.warning', '.note', '.meta',
+        '.metadata', '.byline', '.dateline', '.timestamp', '.time',
+        '.date', '.author', '.contributor', '.attribution', '.source',
+        '.origin', '.credit', '.credits', '.rights', '.copyright',
+        '.sharing', '.share-buttons', '.social-buttons', '.follow',
+        '.follow-us', '.connect', '.stay-connected', '.stay-in-touch',
+        '.contact', '.contact-us', '.reach-out', '.email-us',
+        '.print', '.print-article', '.print-page', '.save',
+        '.save-article', '.save-page', '.bookmark', '.favorite',
+        '.like', '.rating', '.score', '.votes', '.poll',
+        '.survey', '.quiz', '.test', '.assessment', '.evaluation',
+        '[data-type="advertisement"]', '[data-type="sponsored"]',
+        '[data-type="promo"]', '[data-type="promotion"]',
+        '[data-role="advertisement"]', '[data-role="sponsored"]',
+        '[data-role="promo"]', '[data-role="promotion"]'
+      ];
+
       // Cerchiamo prima il contenuto principale in selettori comuni
       const mainContentSelectors = [
         'article',
@@ -67,7 +100,13 @@ export class MetaService {
         '.article-content',
         '.entry-content',
         '#article-body',
-        '.story-body'
+        '.story-body',
+        '.article-body',
+        '.content-body',
+        '.main-content',
+        '.article-text',
+        '.post-text',
+        '.story-content'
       ];
 
       let mainElement = null;
@@ -85,26 +124,56 @@ export class MetaService {
       const clone = mainElement.cloneNode(true) as HTMLElement;
 
       // Rimuoviamo elementi non necessari
-      const elementsToRemove = clone.querySelectorAll(
-        'script, style, iframe, nav, header, footer, aside, .ad, .ads, .advertisement, ' +
-        '.social-share, .comments, .related-posts, .sidebar, .widget, ' +
-        '[role="complementary"], [role="navigation"], .nav, .menu, .search, ' +
-        '.share, .social, .author-bio, .breadcrumb, .pagination'
-      );
-      elementsToRemove.forEach(el => el.remove());
+      unwantedSelectors.forEach(selector => {
+        const elements = clone.querySelectorAll(selector);
+        elements.forEach(el => el.remove());
+      });
+
+      // Funzione per verificare se un testo è significativo
+      const isSignificantText = (text: string): boolean => {
+        const minLength = 20;
+        const unwantedPatterns = [
+          /cookie/i,
+          /privacy/i,
+          /copyright/i,
+          /all rights reserved/i,
+          /^\d{1,2}\/\d{1,2}\/\d{2,4}$/,
+          /^published/i,
+          /^updated/i,
+          /^posted/i,
+          /^written by/i,
+          /^author/i,
+          /^share/i,
+          /^follow/i,
+          /^sign up/i,
+          /^subscribe/i,
+          /^advertisement/i,
+          /^sponsored/i,
+          /^recommended/i,
+          /^related/i,
+          /^popular/i,
+          /^trending/i,
+          /^breaking/i,
+          /^featured/i,
+          /^highlight/i,
+          /^in evidenza/i,
+          /^evidenza/i,
+          /^tag/i,
+          /^categoria/i,
+          /^category/i
+        ];
+
+        if (text.length < minLength) return false;
+        if (unwantedPatterns.some(pattern => pattern.test(text))) return false;
+        return true;
+      };
 
       // Estraiamo i paragrafi con contenuto significativo
       const paragraphs = Array.from(clone.querySelectorAll('p, h1, h2, h3, h4, h5, h6'))
         .map(p => p.textContent?.trim())
-        .filter(text => {
-          if (!text) return false;
-          if (text.length < 20) return false;
-          if (text.includes('Cookie') || text.includes('Privacy')) return false;
-          if (text.includes('Copyright') || text.includes('All rights reserved')) return false;
-          if (/^\d{1,2}\/\d{1,2}\/\d{2,4}$/.test(text)) return false;
-          return true;
-        });
+        .filter(text => text && isSignificantText(text));
 
+      // Uniamo i paragrafi con doppia spaziatura
       const cleanContent = paragraphs.join('\n\n');
       console.log('📄 [MetaService] Contenuto pulito, lunghezza:', cleanContent.length);
 
