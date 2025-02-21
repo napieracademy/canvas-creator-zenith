@@ -136,6 +136,7 @@ const SavedContent = () => {
                 <TableHead className="w-[30px]"></TableHead>
                 <TableHead>Titolo</TableHead>
                 <TableHead className="hidden md:table-cell">URL</TableHead>
+                <TableHead className="hidden lg:table-cell">Contenuto</TableHead>
                 <TableHead className="hidden lg:table-cell">Data</TableHead>
                 <TableHead className="text-right">Azioni</TableHead>
               </TableRow>
@@ -165,6 +166,10 @@ const SavedContent = () => {
                         {content.url}
                       </a>
                     </TableCell>
+                    <TableCell className="hidden lg:table-cell max-w-xs truncate">
+                      {content.content?.substring(0, 100)}
+                      {content.content?.length > 100 ? '...' : ''}
+                    </TableCell>
                     <TableCell className="hidden lg:table-cell">
                       {new Date(content.extraction_date).toLocaleString('it-IT')}
                     </TableCell>
@@ -186,7 +191,7 @@ const SavedContent = () => {
                   </TableRow>
                   {expandedRows.has(content.id) && (
                     <TableRow>
-                      <TableCell colSpan={5} className="bg-muted/50 p-4">
+                      <TableCell colSpan={6} className="bg-muted/50 p-4">
                         <div className="space-y-4">
                           <div>
                             <h3 className="font-semibold mb-2">Descrizione</h3>
@@ -195,7 +200,7 @@ const SavedContent = () => {
                             </p>
                           </div>
                           <div>
-                            <h3 className="font-semibold mb-2">Contenuto</h3>
+                            <h3 className="font-semibold mb-2">Contenuto Completo</h3>
                             <p className="text-sm text-muted-foreground whitespace-pre-wrap">
                               {content.content || 'Nessun contenuto disponibile'}
                             </p>
