@@ -94,6 +94,7 @@ const TextEditor: React.FC<TextEditorProps> = ({
           label="Contenuto"
           disabled={false}
           otherText=""
+          extractedContent={extractedContent}
         />
       </div>
     </div>
