@@ -31,12 +31,12 @@ export class MetaService {
       const doc = parser.parseFromString(text, 'text/html');
       console.log('🔍 [MetaService] HTML parsato correttamente');
 
-      let title = 
+      const title = 
         doc.querySelector('meta[property="og:title"]')?.getAttribute('content') ||
         doc.querySelector('title')?.textContent || '';
       console.log('📌 [MetaService] Titolo estratto:', title);
 
-      let description = 
+      const description = 
         doc.querySelector('meta[property="og:description"]')?.getAttribute('content') ||
         doc.querySelector('meta[name="description"]')?.getAttribute('content') || '';
       console.log('📝 [MetaService] Descrizione estratta:', description);
@@ -71,57 +71,6 @@ export class MetaService {
           .join(' · ');
       }
       console.log('🏷️ [MetaService] Credits generati:', credits);
-
-      if (content) {
-        console.log('🔄 [MetaService] Inizio miglioramento contenuto');
-        try {
-          console.log('🎯 [MetaService] Tentativo miglioramento titolo');
-          const titleResponse = await fetch('http://localhost:54321/functions/v1/improve-content', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              content: content.slice(0, 2000),
-              type: 'title'
-            }),
-          });
-
-          if (titleResponse.ok) {
-            const { improvedText: improvedTitle } = await titleResponse.json();
-            if (improvedTitle) {
-              title = improvedTitle;
-              console.log('✅ [MetaService] Titolo migliorato:', improvedTitle);
-            }
-          } else {
-            console.log('⚠️ [MetaService] Errore nel miglioramento del titolo, status:', titleResponse.status);
-          }
-
-          console.log('🎯 [MetaService] Tentativo miglioramento descrizione');
-          const descriptionResponse = await fetch('http://localhost:54321/functions/v1/improve-content', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              content: content.slice(0, 2000),
-              type: 'description'
-            }),
-          });
-
-          if (descriptionResponse.ok) {
-            const { improvedText: improvedDescription } = await descriptionResponse.json();
-            if (improvedDescription) {
-              description = improvedDescription;
-              console.log('✅ [MetaService] Descrizione migliorata:', improvedDescription);
-            }
-          } else {
-            console.log('⚠️ [MetaService] Errore nel miglioramento della descrizione, status:', descriptionResponse.status);
-          }
-        } catch (error) {
-          console.error('❌ [MetaService] Errore durante il miglioramento del contenuto:', error);
-        }
-      }
 
       const result = {
         success: true,
