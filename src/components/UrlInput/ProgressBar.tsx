@@ -6,7 +6,7 @@ interface ProgressBarProps {
   progress: number;
 }
 
-export const ProgressBar = ({ progress }: ProgressBarProps) => (
+export const ProgressBar: React.FC<ProgressBarProps> = ({ progress }) => (
   <div className="space-y-1">
     <Progress value={progress} className="h-2" />
     <p className="text-sm text-gray-500 text-right">{progress}%</p>

@@ -16,4 +16,6 @@ export interface SaveToDbData {
   credits?: string;
   image_url?: string;
   extraction_date?: string;
+  publication_date?: string;
+  modification_date?: string;
 }

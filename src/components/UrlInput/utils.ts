@@ -7,24 +7,39 @@ export const isValidImageUrl = (url: string): boolean => {
   return imageExtensions.some(ext => url.toLowerCase().endsWith(ext));
 };
 
-export const saveToDatabase = async (data: SaveToDbData): Promise<boolean> => {
+export const saveToDatabase = async (data: SaveToDbData) => {
   try {
     console.log('💾 [UrlInput] Tentativo di salvataggio con dati:', data);
+    
+    const existingContent = await checkExistingContent(data.url);
+
+    if (existingContent) {
+      console.log('🔄 [UrlInput] Contenuto esistente trovato');
+      return { saved: false, duplicate: true, existingContent };
+    }
+
     const { error } = await supabase
       .from('extracted_content')
-      .insert([{
-        ...data,
-        image_url: data.image_url || null // Assicuriamoci che l'immagine sia null se non presente
-      }]);
+      .insert([data]);
 
     if (error) throw error;
 
-    console.log('✅ [UrlInput] Contenuto salvato nel database con successo');
-    return true;
+    console.log('✅ [UrlInput] Contenuto salvato nel database');
+    return { saved: true, duplicate: false };
   } catch (error) {
     console.error('❌ [UrlInput] Errore nel salvataggio:', error);
-    return false;
+    return { saved: false, duplicate: false };
   }
+};
+
+export const checkExistingContent = async (url: string) => {
+  const { data: existingContent } = await supabase
+    .from('extracted_content')
+    .select('*')
+    .eq('url', url)
+    .maybeSingle();
+
+  return existingContent;
 };
 
 export const createSimulateProgress = (
