@@ -12,20 +12,21 @@ interface MetadataResult {
 export class MetaService {
   static async extractMetadata(url: string): Promise<MetadataResult> {
     try {
-      // Utilizziamo CORS Anywhere come proxy
-      const proxyUrl = `https://cors-anywhere.herokuapp.com/${url}`;
-      
-      const response = await fetch(proxyUrl, {
-        headers: {
-          'Origin': window.location.origin
-        }
-      });
+      // Utilizziamo un server CORS proxy affidabile
+      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+      const response = await fetch(proxyUrl);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const html = await response.text();
+      const data = await response.json();
+      const html = data.contents;
+      
+      if (!html) {
+        throw new Error('Nessun contenuto ricevuto dal server');
+      }
+
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, 'text/html');
 
