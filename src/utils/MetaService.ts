@@ -67,10 +67,15 @@ export class MetaService {
       const cached = MetaService.getFromCache(url);
       if (cached) return cached;
 
+      // Lista aggiornata di proxy con fallback
       const proxyUrls = [
         `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
         `https://cors-anywhere.herokuapp.com/${url}`,
-        `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+        `https://thingproxy.freeboard.io/fetch/${url}`,
+        `https://api.scraperapi.com?url=${encodeURIComponent(url)}`,
+        // Tentativo diretto come ultima risorsa
+        url
       ];
 
       let response = null;
@@ -81,25 +86,39 @@ export class MetaService {
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
         'Accept-Language': 'en-US,en;q=0.5',
         'Cache-Control': 'no-cache',
-        'Pragma': 'no-cache'
+        'Pragma': 'no-cache',
+        'Upgrade-Insecure-Requests': '1',
+        'Sec-Fetch-Dest': 'document',
+        'Sec-Fetch-Mode': 'navigate',
+        'Sec-Fetch-Site': 'cross-site'
       };
 
       for (const proxyUrl of proxyUrls) {
         try {
-          console.log('📡 [MetaService] Tentativo di fetch via proxy:', proxyUrl);
+          console.log('📡 [MetaService] Tentativo di fetch via:', proxyUrl);
           
-          response = await MetaService.fetchWithTimeout(proxyUrl, {
-            headers,
-            method: 'GET'
-          });
+          const isDirectUrl = proxyUrl === url;
+          const fetchOptions = {
+            headers: isDirectUrl ? {
+              ...headers,
+              'Origin': window.location.origin,
+              'Referer': window.location.origin
+            } : headers,
+            method: 'GET',
+            mode: isDirectUrl ? 'cors' as const : 'no-cors' as const
+          };
+
+          response = await MetaService.fetchWithTimeout(proxyUrl, fetchOptions);
           
-          if (response.ok) {
-            console.log('✨ [MetaService] Proxy funzionante trovato:', proxyUrl);
+          if (response.ok || response.status === 0) { // status 0 può essere valido in modalità no-cors
+            console.log('✨ [MetaService] Connessione riuscita via:', proxyUrl);
             break;
           }
+
+          console.log('↪️ [MetaService] Risposta non valida:', response.status, response.statusText);
         } catch (e) {
           error = e;
-          console.log('⚠️ [MetaService] Proxy fallito:', proxyUrl, e);
+          console.log('⚠️ [MetaService] Errore durante il fetch:', proxyUrl, e);
           if (e.name === 'AbortError') {
             console.log('⏱️ [MetaService] Timeout raggiunto per:', proxyUrl);
           }
@@ -107,8 +126,8 @@ export class MetaService {
         }
       }
 
-      if (!response || !response.ok) {
-        throw error || new Error('Tutti i proxy hanno fallito');
+      if (!response || (!response.ok && response.status !== 0)) {
+        throw error || new Error('Tutti i tentativi di fetch hanno fallito');
       }
 
       const text = await response.text();
@@ -133,7 +152,6 @@ export class MetaService {
         ...dates
       };
 
-      // Salva in cache
       MetaService.setCache(url, result);
 
       console.log('✅ [MetaService] Estrazione completata con successo', result);
