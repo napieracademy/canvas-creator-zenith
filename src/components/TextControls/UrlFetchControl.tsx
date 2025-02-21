@@ -8,7 +8,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "../ui/popover";
-import UrlInput from '../../components/UrlInput';
+import UrlInput from '../UrlInput';
 
 interface UrlFetchControlProps {
   onTitleExtracted: (title: string) => void;
