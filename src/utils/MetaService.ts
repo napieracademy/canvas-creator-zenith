@@ -1,3 +1,4 @@
+
 import { MetadataResult } from './metadata/types';
 import { extractDates } from './metadata/dateUtils';
 import { parseMetadata } from './metadata/parserUtils';
@@ -188,7 +189,7 @@ export class MetaService {
   // Aggiungiamo una funzione di test
   static async test() {
     console.log('🧪 [MetaService] Avvio test di fetch...');
-    const result = await MetaService.extractMetadata('https://firecrawl.betteruptime.com/');
+    const result = await MetaService.extractMetadata('https://follemente.alcinema.it/');
     console.log('📊 [MetaService] Risultato del test:', result);
     return result;
   }
