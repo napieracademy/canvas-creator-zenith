@@ -1,6 +1,4 @@
 
-import FirecrawlApp from '@mendable/firecrawl-js';
-
 interface MetaResult {
   success: boolean;
   title?: string;
@@ -11,22 +9,11 @@ interface MetaResult {
   error?: string;
 }
 
-interface FirecrawlData {
-  title?: string;
-  description?: string;
-  content?: string;
-  html?: string;
-  markdown?: string;
-  text?: string;
-}
-
 export class MetaService {
-  private static firecrawlApp: FirecrawlApp | null = null;
-  private static API_KEY_STORAGE_KEY = 'firecrawl_api_key';
+  private static API_KEY_STORAGE_KEY = 'scraper_api_key';
 
   static saveApiKey(apiKey: string): void {
     localStorage.setItem(this.API_KEY_STORAGE_KEY, apiKey);
-    this.firecrawlApp = new FirecrawlApp({ apiKey });
     console.log('API key saved successfully');
   }
 
@@ -40,45 +27,35 @@ export class MetaService {
       if (!apiKey) {
         return { 
           success: false, 
-          error: 'API key non trovata. Inserisci la tua API key di Firecrawl.' 
+          error: 'API key non trovata. Inserisci la tua API key di ScraperAPI.' 
         };
       }
 
-      if (!this.firecrawlApp) {
-        this.firecrawlApp = new FirecrawlApp({ apiKey });
+      console.log('Starting ScraperAPI extraction for URL:', url);
+      const scraperUrl = `http://api.scraperapi.com?api_key=${apiKey}&url=${encodeURIComponent(url)}`;
+      
+      const response = await fetch(scraperUrl);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+      
+      const html = await response.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
 
-      console.log('Starting Firecrawl extraction for URL:', url);
-      const response = await this.firecrawlApp.crawlUrl(url, {
-        limit: 1
-      });
-
-      if (!response.success) {
-        console.error('Firecrawl extraction failed:', response);
-        return { 
-          success: false, 
-          error: 'Errore durante l\'estrazione dei contenuti' 
-        };
-      }
-
-      console.log('Firecrawl extraction successful:', response);
-
-      const data = response.data?.[0] as FirecrawlData | undefined;
-      if (!data) {
-        return {
-          success: false,
-          error: 'Nessun contenuto trovato'
-        };
-      }
-
-      // Estraiamo le informazioni dal documento Firecrawl
       const metadata = {
-        title: data.title || '',
-        description: data.description || '',
-        image: '', // Le immagini possono essere estratte dal contenuto HTML se necessario
-        content: data.markdown || data.html || data.text || '',
+        title: doc.querySelector('title')?.textContent || 
+               doc.querySelector('meta[property="og:title"]')?.getAttribute('content') || 
+               '',
+        description: doc.querySelector('meta[name="description"]')?.getAttribute('content') || 
+                    doc.querySelector('meta[property="og:description"]')?.getAttribute('content') || 
+                    '',
+        image: doc.querySelector('meta[property="og:image"]')?.getAttribute('content') || '',
+        content: doc.body.textContent || '',
         credits: `Estratto da: ${url}`
       };
+
+      console.log('ScraperAPI extraction successful:', metadata);
 
       return {
         success: true,

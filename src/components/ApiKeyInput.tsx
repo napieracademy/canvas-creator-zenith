@@ -29,7 +29,7 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onKeySet }) => {
     MetaService.saveApiKey(apiKey);
     toast({
       title: "API key salvata",
-      description: "La tua API key di Firecrawl è stata salvata correttamente"
+      description: "La tua API key di ScraperAPI è stata salvata correttamente"
     });
     onKeySet();
   };
@@ -37,12 +37,12 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onKeySet }) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Label>API Key Firecrawl</Label>
+        <Label>API Key ScraperAPI</Label>
         <Input
           type="password"
           value={apiKey}
           onChange={(e) => setApiKey(e.target.value)}
-          placeholder="Inserisci la tua API key di Firecrawl"
+          placeholder="Inserisci la tua API key di ScraperAPI"
         />
       </div>
       <Button type="submit">Salva API Key</Button>
