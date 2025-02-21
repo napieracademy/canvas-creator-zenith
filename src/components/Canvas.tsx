@@ -1,7 +1,7 @@
-
 import React, { useRef, useEffect, useCallback } from 'react';
 import { CanvasProps } from '@/types/canvas';
 import { useCanvasScale } from '@/hooks/useCanvasScale';
+import { withFeatureVariants } from './withFeatureVariants';
 import { 
   SAFE_ZONE_MARGIN,
   drawSafeZone,
@@ -200,4 +200,4 @@ const Canvas: React.FC<CanvasProps> = ({
   );
 };
 
-export default Canvas;
+export default withFeatureVariants(Canvas, 'Canvas');
