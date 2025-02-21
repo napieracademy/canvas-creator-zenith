@@ -1,22 +1,10 @@
+
 import React from 'react';
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import TextInput from "@/components/TextInput";
-import UrlInput from "@/components/UrlInput";
-import TextAlignControl from "@/components/TextControls/TextAlignControl";
-import TextTranslateControl from "@/components/TextControls/TextTranslateControl";
-import ColorPresets from "@/components/ColorPresets";
-import FontSizeControl from "@/components/TextControls/FontSizeControl";
-import TextImproveControl from "@/components/TextControls/TextImproveControl";
-import DescriptionGenerateControl from "@/components/TextControls/DescriptionGenerateControl";
-import FormatSelector from "@/components/FormatSelector";
-import { Separator } from "@/components/ui/separator";
-import { Image } from 'lucide-react';
-import { toast } from '@/components/ui/use-toast';
 import TextEditor from '@/components/TextEditor';
 import Header from '@/components/Layout/Header';
+import ColorPresets from '@/components/ColorPresets';
+import { Separator } from "@/components/ui/separator";
 import { withFeatureVariants } from '@/components/withFeatureVariants';
 
 interface SidebarProps {
@@ -80,42 +68,6 @@ const Sidebar: React.FC<SidebarProps> = ({
   onContentExtracted,
   onLogoChange,
 }) => {
-  const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      if (file.size > 1024 * 1024) {
-        toast({
-          title: "File troppo grande",
-          description: "Il file non deve superare 1MB",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      if (!file.type.startsWith('image/')) {
-        toast({
-          title: "Formato non supportato",
-          description: "Carica un'immagine in formato PNG, JPG o SVG",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        if (onLogoChange) {
-          onLogoChange(result);
-          toast({
-            title: "Logo aggiornato",
-            description: "Il logo è stato caricato correttamente"
-          });
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   return (
     <div className={cn(
       "flex h-screen flex-col gap-4 border-r bg-background p-6",
