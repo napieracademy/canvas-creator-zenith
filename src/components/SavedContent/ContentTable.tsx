@@ -139,13 +139,38 @@ export const ContentTable = ({
       return acc;
     }, {} as { [key: string]: ExtractedContent[] });
 
-    return Object.values(urlGroups).filter(group => group.length > 1);
+    return Object.entries(urlGroups)
+      .filter(([_, group]) => group.length > 1)
+      .map(([url, group]) => ({
+        url,
+        items: group,
+        firstItem: group[0],
+        count: group.length
+      }));
+  };
+
+  // Stato per tenere traccia dei gruppi espansi
+  const [expandedGroups, setExpandedGroups] = React.useState<Set<string>>(new Set());
+
+  const toggleGroup = (url: string) => {
+    const newExpandedGroups = new Set(expandedGroups);
+    if (newExpandedGroups.has(url)) {
+      newExpandedGroups.delete(url);
+    } else {
+      newExpandedGroups.add(url);
+    }
+    setExpandedGroups(newExpandedGroups);
   };
 
   // Filtra i contenuti da mostrare
   const displayedContents = showDuplicates
-    ? getDuplicateGroups().flat()
-    : contents;
+    ? getDuplicateGroups()
+    : contents.map(content => ({
+        url: content.url,
+        items: [content],
+        firstItem: content,
+        count: 1
+      }));
 
   return (
     <div className="space-y-4">
@@ -197,7 +222,7 @@ export const ContentTable = ({
             <TableRow>
               <TableHead className="w-[30px]">
                 <Checkbox 
-                  checked={selectedRows.size === displayedContents.length && displayedContents.length > 0}
+                  checked={selectedRows.size === contents.length && contents.length > 0}
                   onCheckedChange={handleSelectAll}
                   aria-label="Select all"
                 />
@@ -212,25 +237,29 @@ export const ContentTable = ({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {displayedContents.map((content) => (
-              <React.Fragment key={content.id}>
-                <TableRow>
+            {displayedContents.map((group) => (
+              <React.Fragment key={group.url}>
+                <TableRow 
+                  className={showDuplicates && group.count > 1 ? "bg-muted/30" : ""}
+                  onClick={() => showDuplicates && group.count > 1 && toggleGroup(group.url)}
+                >
                   <TableCell className="w-[30px]">
                     <Checkbox 
-                      checked={selectedRows.has(content.id)}
-                      onCheckedChange={(checked) => handleSelectRow(content.id, checked as boolean)}
-                      aria-label={`Select ${content.title}`}
+                      checked={selectedRows.has(group.firstItem.id)}
+                      onCheckedChange={(checked) => handleSelectRow(group.firstItem.id, checked as boolean)}
+                      aria-label={`Select ${group.firstItem.title}`}
+                      onClick={(e) => e.stopPropagation()}
                     />
                   </TableCell>
                   {columnVisibility.image && (
-                    <TableCell className="w-[50px] text-left cursor-pointer" onClick={() => onToggleRow(content.id)}>
-                      {content.image_url ? (
+                    <TableCell className="w-[50px] text-left">
+                      {group.firstItem.image_url ? (
                         <HoverCard>
                           <HoverCardTrigger asChild>
                             <img
-                              src={content.image_url}
-                              alt={content.title}
-                              className="w-8 h-8 object-cover rounded cursor-pointer"
+                              src={group.firstItem.image_url}
+                              alt={group.firstItem.title}
+                              className="w-8 h-8 object-cover rounded"
                               onError={(e) => {
                                 const target = e.target as HTMLImageElement;
                                 target.src = '/placeholder.svg';
@@ -239,8 +268,8 @@ export const ContentTable = ({
                           </HoverCardTrigger>
                           <HoverCardContent className="w-64 p-0">
                             <img
-                              src={content.image_url}
-                              alt={content.title}
+                              src={group.firstItem.image_url}
+                              alt={group.firstItem.title}
                               className="w-full h-64 object-cover rounded"
                               onError={(e) => {
                                 const target = e.target as HTMLImageElement;
@@ -255,47 +284,52 @@ export const ContentTable = ({
                     </TableCell>
                   )}
                   {columnVisibility.id && (
-                    <TableCell className="font-mono text-sm text-left cursor-pointer" onClick={() => onToggleRow(content.id)}>
-                      {content.id.substring(0, 8)}...
+                    <TableCell className="font-mono text-sm text-left">
+                      {group.firstItem.id.substring(0, 8)}...
+                      {showDuplicates && group.count > 1 && (
+                        <span className="ml-2 text-xs text-muted-foreground">
+                          (+{group.count - 1})
+                        </span>
+                      )}
                     </TableCell>
                   )}
                   {columnVisibility.title && (
-                    <TableCell className="font-medium text-left cursor-pointer" onClick={() => onToggleRow(content.id)}>
-                      {content.title || 'Senza titolo'}
+                    <TableCell className="font-medium text-left">
+                      {group.firstItem.title || 'Senza titolo'}
                     </TableCell>
                   )}
                   {columnVisibility.link && (
                     <TableCell className="hidden md:table-cell w-[50px] text-center">
                       <a 
-                        href={content.url} 
+                        href={group.url} 
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="text-blue-600 hover:text-blue-800 transition-colors inline-flex items-center justify-center"
                         onClick={(e) => e.stopPropagation()}
-                        title={content.url}
+                        title={group.url}
                       >
                         <ExternalLink className="h-4 w-4" />
                       </a>
                     </TableCell>
                   )}
                   {columnVisibility.content && (
-                    <TableCell className="hidden lg:table-cell max-w-xs truncate text-left cursor-pointer" onClick={() => onToggleRow(content.id)}>
-                      {content.content?.substring(0, 100)}
-                      {content.content?.length > 100 ? '...' : ''}
+                    <TableCell className="hidden lg:table-cell max-w-xs truncate text-left">
+                      {group.firstItem.content?.substring(0, 100)}
+                      {group.firstItem.content?.length > 100 ? '...' : ''}
                     </TableCell>
                   )}
                   <TableCell className="w-[120px] text-center">
                     <div className="flex items-center justify-center gap-2 text-sm">
                       <Clock className="h-4 w-4 text-muted-foreground" />
-                      <span className={timeRemaining[content.id]?.startsWith("In") ? "text-red-500" : ""}>
-                        {timeRemaining[content.id]}
+                      <span className={timeRemaining[group.firstItem.id]?.startsWith("In") ? "text-red-500" : ""}>
+                        {timeRemaining[group.firstItem.id]}
                       </span>
                     </div>
                   </TableCell>
                   {columnVisibility.actions && (
                     <TableCell className="text-right">
                       <ContentActions
-                        content={content}
+                        content={group.firstItem}
                         onDelete={onDelete}
                         onView={onView}
                         onMigrateToHome={onMigrateToHome}
@@ -303,7 +337,100 @@ export const ContentTable = ({
                     </TableCell>
                   )}
                 </TableRow>
-                {expandedRows.has(content.id) && <ExpandedContent content={content} />}
+                {showDuplicates && 
+                 group.count > 1 && 
+                 expandedGroups.has(group.url) && 
+                 group.items.slice(1).map(content => (
+                  <TableRow key={content.id} className="bg-muted/10">
+                    <TableCell className="w-[30px]">
+                      <Checkbox 
+                        checked={selectedRows.has(content.id)}
+                        onCheckedChange={(checked) => handleSelectRow(content.id, checked as boolean)}
+                        aria-label={`Select ${content.title}`}
+                      />
+                    </TableCell>
+                    {columnVisibility.image && (
+                      <TableCell className="w-[50px] text-left">
+                        {content.image_url ? (
+                          <HoverCard>
+                            <HoverCardTrigger asChild>
+                              <img
+                                src={content.image_url}
+                                alt={content.title}
+                                className="w-8 h-8 object-cover rounded"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.src = '/placeholder.svg';
+                                }}
+                              />
+                            </HoverCardTrigger>
+                            <HoverCardContent className="w-64 p-0">
+                              <img
+                                src={content.image_url}
+                                alt={content.title}
+                                className="w-full h-64 object-cover rounded"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.src = '/placeholder.svg';
+                                }}
+                              />
+                            </HoverCardContent>
+                          </HoverCard>
+                        ) : (
+                          <ImageIcon className="w-8 h-8 text-gray-300" />
+                        )}
+                      </TableCell>
+                    )}
+                    {columnVisibility.id && (
+                      <TableCell className="font-mono text-sm text-left">
+                        {content.id.substring(0, 8)}...
+                      </TableCell>
+                    )}
+                    {columnVisibility.title && (
+                      <TableCell className="font-medium text-left">
+                        {content.title || 'Senza titolo'}
+                      </TableCell>
+                    )}
+                    {columnVisibility.link && (
+                      <TableCell className="hidden md:table-cell w-[50px] text-center">
+                        <a 
+                          href={content.url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-800 transition-colors inline-flex items-center justify-center"
+                          onClick={(e) => e.stopPropagation()}
+                          title={content.url}
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                        </a>
+                      </TableCell>
+                    )}
+                    {columnVisibility.content && (
+                      <TableCell className="hidden lg:table-cell max-w-xs truncate text-left">
+                        {content.content?.substring(0, 100)}
+                        {content.content?.length > 100 ? '...' : ''}
+                      </TableCell>
+                    )}
+                    <TableCell className="w-[120px] text-center">
+                      <div className="flex items-center justify-center gap-2 text-sm">
+                        <Clock className="h-4 w-4 text-muted-foreground" />
+                        <span className={timeRemaining[content.id]?.startsWith("In") ? "text-red-500" : ""}>
+                          {timeRemaining[content.id]}
+                        </span>
+                      </div>
+                    </TableCell>
+                    {columnVisibility.actions && (
+                      <TableCell className="text-right">
+                        <ContentActions
+                          content={content}
+                          onDelete={onDelete}
+                          onView={onView}
+                          onMigrateToHome={onMigrateToHome}
+                        />
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))}
               </React.Fragment>
             ))}
           </TableBody>
