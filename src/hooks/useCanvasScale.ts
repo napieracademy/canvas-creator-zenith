@@ -8,7 +8,8 @@ export function useCanvasScale(
 ) {
   const [scale, setScale] = useState(100);
   const rafId = useRef<number>();
-  const resizeTimeoutId = useRef<NodeJS.Timeout>();
+  const resizeObserver = useRef<ResizeObserver>();
+  const isUpdating = useRef(false);
 
   const updateScale = useCallback(() => {
     const canvas = canvasRef.current;
@@ -17,56 +18,71 @@ export function useCanvasScale(
     const container = canvas.parentElement;
     if (!container) return;
 
-    const containerWidth = container.clientWidth;
-    const containerHeight = container.clientHeight;
-    const scaleFactor = Math.min(
-      containerWidth / originalWidth,
-      containerHeight / originalHeight
-    );
-    setScale(Math.round(scaleFactor * 100));
-  }, [canvasRef, originalWidth, originalHeight]);
-
-  useEffect(() => {
-    // Create a more efficient resize observer with throttling
-    const resizeObserver = new ResizeObserver(() => {
-      // Clear any existing timeout
-      if (resizeTimeoutId.current) {
-        clearTimeout(resizeTimeoutId.current);
-      }
-
-      // Clear any existing animation frame
+    // If we're already processing an update, schedule for next frame
+    if (isUpdating.current) {
       if (rafId.current) {
         cancelAnimationFrame(rafId.current);
       }
+      rafId.current = requestAnimationFrame(updateScale);
+      return;
+    }
 
-      // Throttle updates to prevent excessive calculations
-      resizeTimeoutId.current = setTimeout(() => {
-        rafId.current = requestAnimationFrame(() => {
-          updateScale();
-        });
-      }, 150); // Increased throttle time to 150ms
+    isUpdating.current = true;
+
+    // Use RAF to ensure we're not fighting with the browser's layout calculations
+    rafId.current = requestAnimationFrame(() => {
+      try {
+        const containerWidth = container.clientWidth;
+        const containerHeight = container.clientHeight;
+        
+        const scaleFactor = Math.min(
+          containerWidth / originalWidth,
+          containerHeight / originalHeight
+        );
+        
+        setScale(Math.round(scaleFactor * 100));
+      } finally {
+        isUpdating.current = false;
+      }
+    });
+  }, [canvasRef, originalWidth, originalHeight]);
+
+  useEffect(() => {
+    // Create ResizeObserver only once
+    resizeObserver.current = new ResizeObserver((entries) => {
+      // Ignore empty entry lists
+      if (!entries.length) return;
+
+      // If we already have a pending update, don't schedule another one
+      if (isUpdating.current) return;
+
+      // Schedule update for next frame
+      if (rafId.current) {
+        cancelAnimationFrame(rafId.current);
+      }
+      rafId.current = requestAnimationFrame(updateScale);
     });
 
     // Observe the canvas container
     const canvas = canvasRef.current;
     if (canvas?.parentElement) {
-      resizeObserver.observe(canvas.parentElement);
+      resizeObserver.current.observe(canvas.parentElement);
     }
 
     // Initial scale calculation
-    rafId.current = requestAnimationFrame(updateScale);
+    updateScale();
 
     // Cleanup function
     return () => {
-      resizeObserver.disconnect();
-      
-      if (resizeTimeoutId.current) {
-        clearTimeout(resizeTimeoutId.current);
+      if (resizeObserver.current) {
+        resizeObserver.current.disconnect();
       }
       
       if (rafId.current) {
         cancelAnimationFrame(rafId.current);
       }
+
+      isUpdating.current = false;
     };
   }, [updateScale]);
 
