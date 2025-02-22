@@ -1,20 +1,135 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { toast } from '@/components/ui/use-toast';
+import { colorPairs } from '@/data/colorPairs';
+import { calculateOptimalSizes } from '@/utils/fontSizeCalculator';
 import MobileWarning from '@/components/Layout/MobileWarning';
 import LoadingOverlay from '@/components/Layout/LoadingOverlay';
+import Sidebar from '@/components/Layout/Sidebar';
 import MainContent from '@/components/Layout/MainContent';
-import NavigationMenu from '@/components/Layout/NavigationMenu';
-import { RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useIndexState } from '@/hooks/useIndexState';
-import { useIndexHandlers } from '@/hooks/useIndexHandlers';
-import IndexSidebar from '@/components/Layout/IndexSidebar';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 
 const IndexPage = () => {
+  const location = useLocation();
+  const getRandomTheme = () => {
+    const randomIndex = Math.floor(Math.random() * colorPairs.length);
+    return colorPairs[randomIndex];
+  };
+
+  const randomTheme = getRandomTheme();
   const isMobile = useIsMobile();
-  const state = useIndexState();
-  const handlers = useIndexHandlers(state);
+
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [text, setText] = useState(location.state?.text || 'Social Image Creator');
+  const [description, setDescription] = useState(location.state?.description || 'Crea bellissime immagini per i social media in pochi secondi. Personalizza colori, font e layout per ottenere il massimo impatto visivo.');
+  const [backgroundColor, setBackgroundColor] = useState(randomTheme.background);
+  const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right'>('left');
+  const [descriptionAlign, setDescriptionAlign] = useState<'left' | 'center' | 'right'>('left');
+  const [fontSize, setFontSize] = useState(111);
+  const [descriptionFontSize, setDescriptionFontSize] = useState(56);
+  const [spacing, setSpacing] = useState(100);
+  const [effectiveFontSize, setEffectiveFontSize] = useState(111);
+  const [textColor, setTextColor] = useState(randomTheme.text);
+  const [showSafeZone, setShowSafeZone] = useState(false);
+  const [format, setFormat] = useState<'post' | 'story'>('post');
+  const [activeTab, setActiveTab] = useState('manual');
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentFont, setCurrentFont] = useState('');
+  const [credits, setCredits] = useState('');
+  const [viewMode, setViewMode] = useState<'full' | 'fast'>('full');
+  const [extractedContent, setExtractedContent] = useState('');
+  const [logo, setLogo] = useState('/placeholder.svg');
+
+  useEffect(() => {
+    if (location.state?.text || location.state?.description) {
+      toast({
+        title: "Contenuto importato",
+        description: "Il contenuto è stato importato con successo",
+      });
+    } else {
+      toast({
+        title: "Tema selezionato",
+        description: `Tema: ${randomTheme.name}`,
+      });
+    }
+  }, []);
+
+  const handleColorSelect = (background: string, text: string) => {
+    setBackgroundColor(background);
+    setTextColor(text);
+  };
+
+  const handleMagicOptimization = () => {
+    if (!text && !description) {
+      toast({
+        title: "Contenuto mancante",
+        description: "Inserisci del testo prima di utilizzare l'ottimizzazione automatica",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const { titleFontSize, descriptionFontSize: newDescFontSize, spacing: newSpacing } = calculateOptimalSizes(text, description);
+    
+    setFontSize(titleFontSize);
+    setDescriptionFontSize(newDescFontSize);
+    setSpacing(newSpacing);
+
+    toast({
+      title: "Layout ottimizzato",
+      description: "Le dimensioni sono state ottimizzate in base al contenuto"
+    });
+  };
+
+  const handleDownload = () => {
+    const canvas = document.querySelector('canvas');
+    if (!canvas) return;
+
+    const tempCanvas = document.createElement('canvas');
+    const ctx = tempCanvas.getContext('2d');
+    if (!ctx) return;
+
+    tempCanvas.width = 1080;
+    tempCanvas.height = format === 'post' ? 1350 : 1920;
+
+    ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, tempCanvas.width, tempCanvas.height);
+
+    const link = document.createElement('a');
+    link.download = `social-image-${format}.png`;
+    link.href = tempCanvas.toDataURL('image/png');
+    link.click();
+
+    toast({
+      title: "Immagine scaricata",
+      description: `L'immagine è stata salvata nel formato ${format === 'post' ? 'post (1080x1350)' : 'story (1080x1920)'}`,
+    });
+  };
+
+  const handleViewModeChange = (mode: 'full' | 'fast') => {
+    setViewMode(mode);
+    toast({
+      title: mode === 'full' ? 'Modalità completa' : 'Modalità semplificata',
+      description: mode === 'full' 
+        ? 'Tutte le funzionalità sono ora disponibili' 
+        : 'Visualizzazione semplificata attivata'
+    });
+  };
+
+  const handleLogoChange = (newLogo: string) => {
+    setLogo(newLogo);
+  };
+
+  // Funzione per gestire l'estrazione della descrizione
+  const handleDescriptionExtracted = (newDescription: string) => {
+    console.log('📝 [Index] Nuova descrizione ricevuta:', newDescription);
+    setDescription(newDescription);
+    toast({
+      title: "Descrizione aggiornata",
+      description: "La descrizione è stata estratta con successo"
+    });
+  };
 
   if (isMobile) {
     return <MobileWarning />;
@@ -22,61 +137,82 @@ const IndexPage = () => {
 
   return (
     <div className="relative">
-      <NavigationMenu />
-      <div className="flex items-center gap-2 absolute top-4 right-4 z-50">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handlers.handleClean}
-          className="flex items-center gap-2"
-        >
-          <RefreshCw className="h-4 w-4" />
-          Ripristina
-        </Button>
-      </div>
       <div className="flex">
-        {state.viewMode === 'full' && (
-          <IndexSidebar
-            sidebarOpen={state.sidebarOpen}
-            setSidebarOpen={state.setSidebarOpen}
-            state={state}
-            handlers={handlers}
-          />
+        {viewMode === 'full' && (
+          <div className={`relative transition-all duration-300 ${sidebarOpen ? 'w-[400px]' : 'w-0'}`}>
+            {sidebarOpen && (
+              <Sidebar
+                text={text}
+                description={description}
+                textAlign={textAlign}
+                descriptionAlign={descriptionAlign}
+                backgroundColor={backgroundColor}
+                textColor={textColor}
+                fontSize={fontSize}
+                descriptionFontSize={descriptionFontSize}
+                spacing={spacing}
+                format={format}
+                currentFont={currentFont}
+                onFormatChange={setFormat}
+                onTextChange={setText}
+                onDescriptionChange={setDescription}
+                onTextAlignChange={setTextAlign}
+                onDescriptionAlignChange={setDescriptionAlign}
+                onFontSizeChange={setFontSize}
+                onDescriptionFontSizeChange={setDescriptionFontSize}
+                onSpacingChange={setSpacing}
+                disabled={isLoading}
+                onTitleExtracted={setText}
+                onDescriptionExtracted={handleDescriptionExtracted}
+                onTabChange={setActiveTab}
+                onLoadingChange={setIsLoading}
+                onColorSelect={handleColorSelect}
+                extractedContent={extractedContent}
+                onContentExtracted={setExtractedContent}
+                onLogoChange={handleLogoChange}
+              />
+            )}
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="absolute -right-8 top-1/2 -translate-y-1/2 bg-white border rounded-r-lg p-1 hover:bg-gray-50"
+            >
+              {sidebarOpen ? <ChevronLeft className="w-6 h-6" /> : <ChevronRight className="w-6 h-6" />}
+            </button>
+          </div>
         )}
         <MainContent
-          text={state.text}
-          description={state.description}
-          backgroundColor={state.backgroundColor}
-          textAlign={state.textAlign}
-          descriptionAlign={state.descriptionAlign}
-          textColor={state.textColor}
-          fontSize={state.fontSize}
-          descriptionFontSize={state.descriptionFontSize}
-          spacing={state.spacing}
-          showSafeZone={state.showSafeZone}
-          format={state.format}
-          currentFont={state.currentFont}
-          isLoading={state.isLoading}
-          credits={state.credits}
-          viewMode={state.viewMode}
-          logo={state.logo}
-          onEffectiveFontSizeChange={state.setEffectiveFontSize}
-          onShowSafeZoneChange={state.setShowSafeZone}
-          onSpacingChange={state.setSpacing}
-          onMagicOptimization={handlers.handleMagicOptimization}
-          onDownload={handlers.handleDownload}
-          onTextChange={state.setText}
-          onDescriptionChange={state.setDescription}
-          onTitleExtracted={state.setText}
-          onDescriptionExtracted={handlers.handleDescriptionExtracted}
-          onImageExtracted={handlers.handleImageExtracted}
-          onTabChange={state.setActiveTab}
-          onLoadingChange={state.setIsLoading}
-          onFormatChange={state.setFormat}
-          onViewModeChange={handlers.handleViewModeChange}
+          text={text}
+          description={description}
+          backgroundColor={backgroundColor}
+          textAlign={textAlign}
+          descriptionAlign={descriptionAlign}
+          textColor={textColor}
+          fontSize={fontSize}
+          descriptionFontSize={descriptionFontSize}
+          spacing={spacing}
+          showSafeZone={showSafeZone}
+          format={format}
+          currentFont={currentFont}
+          isLoading={isLoading}
+          credits={credits}
+          viewMode={viewMode}
+          logo={logo}
+          onEffectiveFontSizeChange={setEffectiveFontSize}
+          onShowSafeZoneChange={setShowSafeZone}
+          onSpacingChange={setSpacing}
+          onMagicOptimization={handleMagicOptimization}
+          onDownload={handleDownload}
+          onTextChange={setText}
+          onDescriptionChange={setDescription}
+          onTitleExtracted={setText}
+          onDescriptionExtracted={handleDescriptionExtracted}
+          onTabChange={setActiveTab}
+          onLoadingChange={setIsLoading}
+          onFormatChange={setFormat}
+          onViewModeChange={handleViewModeChange}
         />
       </div>
-      {state.isLoading && <LoadingOverlay isLoading={state.isLoading} />}
+      {isLoading && <LoadingOverlay isLoading={isLoading} />}
     </div>
   );
 };

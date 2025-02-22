@@ -14,12 +14,9 @@ const CanvasRender: React.FC<CanvasRenderProps> = ({ canvasRef }) => {
         maxWidth: '100%',
         maxHeight: '100%',
         objectFit: 'contain',
-        imageRendering: 'crisp-edges', // Migliora la qualità del rendering
-        backfaceVisibility: 'hidden', // Ottimizzazione performance
-        transform: 'translateZ(0)', // Attiva hardware acceleration
       }}
     />
   );
 };
 
-export default React.memo(CanvasRender); // Previene re-render non necessari
+export default CanvasRender;

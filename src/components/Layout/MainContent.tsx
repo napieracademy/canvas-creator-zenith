@@ -1,11 +1,17 @@
 
 import React from 'react';
 import CanvasPreview from '@/components/CanvasPreview';
+import MagicButton from '@/components/MagicButton';
+import SafeZoneToggle from '@/components/SafeZoneToggle';
+import DownloadButton from '@/components/DownloadButton';
+import TextTranslateControl from '@/components/TextControls/TextTranslateControl';
+import SpacingControl from '@/components/SpacingControl';
+import UrlFetchControl from '@/components/TextControls/UrlFetchControl';
+import SuperButton from '@/components/SuperButton';
 import { Separator } from "@/components/ui/separator";
-import FormatControls from './MainContent/FormatControls';
-import ViewControls from './MainContent/ViewControls';
-import ImportControls from './MainContent/ImportControls';
-import TextToolbar from './MainContent/TextToolbar';
+import { Button } from "@/components/ui/button";
+import { Square, RectangleVertical, Zap } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface MainContentProps {
   text: string;
@@ -23,7 +29,7 @@ interface MainContentProps {
   isLoading: boolean;
   credits: string;
   viewMode: 'full' | 'fast';
-  logo?: string;
+  logo?: string; // Aggiungiamo la prop logo
   onEffectiveFontSizeChange: (size: number) => void;
   onShowSafeZoneChange: (show: boolean) => void;
   onSpacingChange: (spacing: number) => void;
@@ -37,7 +43,6 @@ interface MainContentProps {
   onLoadingChange: (loading: boolean) => void;
   onFormatChange: (format: 'post' | 'story') => void;
   onViewModeChange: (mode: 'full' | 'fast') => void;
-  onImageExtracted?: (image: string) => void;
 }
 
 const MainContent: React.FC<MainContentProps> = ({
@@ -94,51 +99,128 @@ const MainContent: React.FC<MainContentProps> = ({
         />
         <div className="absolute top-3 right-3 flex items-center gap-2 p-2 rounded-lg bg-white/20 backdrop-blur-sm">
           <div className="flex items-center gap-2 ml-auto">
-            <FormatControls 
-              format={format}
-              onFormatChange={onFormatChange}
-              isLoading={isLoading}
-            />
+            {/* Gruppo Formato - sempre visibile */}
+            <div className="flex items-center gap-2">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant={format === 'post' ? 'default' : 'ghost'}
+                      size="sm"
+                      onClick={() => onFormatChange('post')}
+                      disabled={isLoading}
+                    >
+                      <Square className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Formato Post Instagram quadrato</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant={format === 'story' ? 'default' : 'ghost'}
+                      size="sm"
+                      onClick={() => onFormatChange('story')}
+                      disabled={isLoading}
+                    >
+                      <RectangleVertical className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Formato Story Instagram verticale</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
 
             <Separator orientation="vertical" className="h-8 bg-white/20" />
 
-            <ViewControls 
-              viewMode={viewMode}
-              onViewModeChange={onViewModeChange}
-              isLoading={isLoading}
-            />
+            {/* Gruppo Vista - sempre visibile */}
+            <div className="flex items-center gap-2">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant={viewMode === 'fast' ? 'default' : 'ghost'}
+                      size="sm"
+                      onClick={() => onViewModeChange(viewMode === 'full' ? 'fast' : 'full')}
+                      disabled={isLoading}
+                    >
+                      <Zap className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{viewMode === 'full' ? 'Passa alla modalità semplificata' : 'Torna alla modalità completa'}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
 
             <Separator orientation="vertical" className="h-8 bg-white/20" />
 
-            <ImportControls 
-              text={text}
-              description={description}
-              isLoading={isLoading}
-              onTitleExtracted={onTitleExtracted}
-              onDescriptionExtracted={onDescriptionExtracted}
-              onTabChange={onTabChange}
-              onLoadingChange={onLoadingChange}
-              onTextChange={onTextChange}
-              onDescriptionChange={onDescriptionChange}
-              onMagicOptimization={onMagicOptimization}
-              onDownload={onDownload}
-            />
+            {/* Gruppo Importazione/Input - sempre visibile */}
+            <div className="flex items-center gap-2">
+              <UrlFetchControl
+                onTitleExtracted={onTitleExtracted}
+                onDescriptionExtracted={onDescriptionExtracted}
+                onTabChange={onTabChange}
+                onLoadingChange={onLoadingChange}
+                disabled={isLoading}
+              />
+              <SuperButton 
+                text={text}
+                description={description}
+                onTextChange={onTextChange}
+                onDescriptionChange={onDescriptionChange}
+                onMagicOptimization={onMagicOptimization}
+                disabled={isLoading}
+              />
+              <DownloadButton onDownload={onDownload} />
+            </div>
 
             {viewMode === 'full' && (
               <>
                 <Separator orientation="vertical" className="h-8 bg-white/20" />
-                <TextToolbar 
-                  text={text}
-                  description={description}
-                  spacing={spacing}
-                  showSafeZone={showSafeZone}
-                  isLoading={isLoading}
-                  onTextChange={onTextChange}
-                  onDescriptionChange={onDescriptionChange}
-                  onSpacingChange={onSpacingChange}
-                  onShowSafeZoneChange={onShowSafeZoneChange}
-                  onMagicOptimization={onMagicOptimization}
-                />
+
+                <div className="flex items-center gap-2 animate-fade-in">
+                  <TextTranslateControl 
+                    texts={{ title: text, description }}
+                    onTranslate={({ title, description }) => {
+                      onTextChange(title);
+                      onDescriptionChange(description);
+                    }}
+                    disabled={isLoading}
+                  />
+                </div>
+
+                <Separator orientation="vertical" className="h-8 bg-white/20" />
+
+                <div className="flex items-center gap-2 animate-fade-in">
+                  <SpacingControl 
+                    value={spacing} 
+                    onChange={onSpacingChange} 
+                    disabled={isLoading}
+                  />
+                  <SafeZoneToggle 
+                    showSafeZone={showSafeZone}
+                    onShowSafeZoneChange={onShowSafeZoneChange}
+                    disabled={isLoading}
+                  />
+                </div>
+
+                <Separator orientation="vertical" className="h-8 bg-white/20" />
+
+                <div className="flex items-center gap-2 animate-fade-in">
+                  <MagicButton 
+                    onMagicOptimization={onMagicOptimization} 
+                    disabled={isLoading} 
+                  />
+                </div>
               </>
             )}
           </div>

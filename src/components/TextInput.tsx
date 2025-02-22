@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState } from 'react';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
 import TextAlignControl from './TextControls/TextAlignControl';
@@ -9,12 +9,25 @@ import DescriptionGenerateControl from './TextControls/DescriptionGenerateContro
 import { ChevronRight, Undo2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { useToast } from './ui/use-toast';
-import type { TextInputProps } from '@/types/text';
 
-/**
- * TextInput component for handling text input with various controls
- * @param props Component properties
- */
+interface TextInputProps {
+  value: string;
+  onChange: (value: string) => void;
+  textAlign: 'left' | 'center' | 'right';
+  onTextAlignChange: (value: 'left' | 'center' | 'right') => void;
+  fontSize: number;
+  onFontSizeChange: (value: number) => void;
+  label: string;
+  disabled?: boolean;
+  onTitleExtracted?: (title: string) => void;
+  onDescriptionExtracted?: (description: string) => void;
+  onTabChange?: (value: string) => void;
+  onLoadingChange?: (loading: boolean) => void;
+  otherText?: string;
+  extractedContent?: string;
+  onContentExtracted?: (content: string) => void;
+}
+
 const TextInput: React.FC<TextInputProps> = ({ 
   value, 
   onChange, 
@@ -24,89 +37,40 @@ const TextInput: React.FC<TextInputProps> = ({
   onFontSizeChange,
   label,
   disabled,
-  onTitleExtracted,
-  onDescriptionExtracted,
-  onImageExtracted,
-  onTabChange,
-  onLoadingChange,
   otherText,
   extractedContent,
-  onExtractedContentUpdated
+  onContentExtracted
 }) => {
-  const [charHistory, setCharHistory] = useState<string[]>([value]);
+  const isDescription = label.toLowerCase() === 'descrizione';
+  const isContent = label.toLowerCase() === 'contenuto';
+  const isTitle = label.toLowerCase() === 'titolo';
+  const hasTitle = isDescription && otherText && otherText.trim().length > 0;
+  const isEmpty = !value || value.trim().length === 0;
   const { toast } = useToast();
+  
+  const [charHistory, setCharHistory] = useState<string[]>([value]);
 
-  // Memoize input type checks
-  const inputType = useMemo(() => {
-    const labelLower = label.toLowerCase();
-    return {
-      isDescription: labelLower === 'descrizione',
-      isArticle: labelLower === 'contenuto articolo',
-      isTitle: labelLower === 'titolo'
-    };
-  }, [label]);
-
-  // Memoize state checks
-  const { hasTitle, isEmpty } = useMemo(() => ({
-    hasTitle: inputType.isDescription && otherText && otherText.trim().length > 0,
-    isEmpty: !value || value.trim().length === 0
-  }), [inputType.isDescription, otherText, value]);
-
-  const handleError = useCallback((error: Error, context: string) => {
-    console.error(`Error in TextInput (${context}):`, error);
-    toast({
-      title: "Errore",
-      description: `Si è verificato un errore durante ${context}`,
-      variant: "destructive"
-    });
-  }, [toast]);
-
-  /**
-   * Handles text changes while maintaining history
-   */
-  const handleChange = useCallback((newValue: string) => {
-    try {
-      if (newValue !== charHistory[charHistory.length - 1]) {
-        setCharHistory(prev => [...prev, newValue]);
-        onChange(newValue);
-      }
-    } catch (error) {
-      handleError(error as Error, "la modifica del testo");
+  const handleChange = (newValue: string) => {
+    if (newValue !== charHistory[charHistory.length - 1]) {
+      setCharHistory(prev => [...prev, newValue]);
     }
-  }, [charHistory, onChange, handleError]);
+    onChange(newValue);
+  };
 
-  /**
-   * Handles undo operation
-   */
-  const handleUndo = useCallback(() => {
+  const handleUndo = () => {
     if (charHistory.length > 1) {
-      try {
-        const newHistory = charHistory.slice(0, -1);
-        const previousValue = newHistory[newHistory.length - 1];
-        
-        setCharHistory(newHistory);
-        onChange(previousValue);
-        
-        toast({
-          title: "Carattere annullato",
-          description: "L'ultima modifica è stata annullata"
-        });
-      } catch (error) {
-        handleError(error as Error, "l'annullamento dell'ultima modifica");
-      }
+      const newHistory = charHistory.slice(0, -1);
+      const previousValue = newHistory[newHistory.length - 1];
+      
+      setCharHistory(newHistory);
+      onChange(previousValue);
+      
+      toast({
+        title: "Carattere annullato",
+        description: "L'ultima modifica è stata annullata"
+      });
     }
-  }, [charHistory, onChange, toast, handleError]);
-
-  // Memoize placeholder text
-  const placeholder = useMemo(() => {
-    if (inputType.isDescription && hasTitle && isEmpty) {
-      return "Clicca sulla bacchetta magica per generare automaticamente una descrizione dal titolo...";
-    }
-    if (inputType.isArticle) {
-      return "Il contenuto dell'articolo estratto apparirà qui...";
-    }
-    return `Scrivi il tuo ${label.toLowerCase()} qui...`;
-  }, [inputType.isDescription, inputType.isArticle, hasTitle, isEmpty, label]);
+  };
 
   return (
     <div className="space-y-4">
@@ -139,7 +103,7 @@ const TextInput: React.FC<TextInputProps> = ({
             disabled={disabled}
             otherText={otherText}
           />
-          {inputType.isDescription && hasTitle && isEmpty && (
+          {isDescription && hasTitle && isEmpty && (
             <>
               <ChevronRight className="h-4 w-4 text-gray-400 animate-bounce-x" />
               <DescriptionGenerateControl
@@ -153,10 +117,14 @@ const TextInput: React.FC<TextInputProps> = ({
       </div>
       
       <Textarea
-        placeholder={placeholder}
-        value={inputType.isArticle ? (extractedContent || '') : value}
+        placeholder={isDescription && hasTitle && isEmpty 
+          ? "Clicca sulla bacchetta magica per generare automaticamente una descrizione dal titolo..." 
+          : isContent 
+            ? "Il contenuto estratto apparirà qui..."
+            : `Scrivi il tuo ${label.toLowerCase()} qui...`}
+        value={isContent ? (extractedContent || '') : value}
         onChange={(e) => handleChange(e.target.value)}
-        className={`resize-none ${inputType.isArticle ? 'h-64' : 'h-32'} bg-white/50 backdrop-blur-sm focus:bg-white transition-colors duration-200`}
+        className={`resize-none ${isContent ? 'h-64' : 'h-32'} bg-white/50 backdrop-blur-sm focus:bg-white transition-colors duration-200`}
         style={{ textAlign }}
         disabled={disabled}
       />
